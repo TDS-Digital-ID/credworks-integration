@@ -1,0 +1,10 @@
+CredWorks integration kit
+
+Project-owned source in this distribution is licensed under the Apache License, Version 2.0.
+Third-party code, dependencies and fonts retain their respective licences and notices.
+This licence does not grant rights to university, product or third-party trademarks.
+
+The Education application font notices are in:
+apps/education-sign-in/src/public/mono-OFL.txt
+apps/education-sign-in/src/public/spectral-OFL.txt
+See apps/education-sign-in/src/public/fonts.md for attribution and provenance.

@@ -1,0 +1,29 @@
+{
+  "name": "@unsw-vc/education-sign-in",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "test": "node --import tsx --test ../../tests/application-http.test.mjs",
+    "start": "node --import tsx src/cli.ts",
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.2",
+    "pg": "^8.22.0",
+    "tsx": "^4.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.0",
+    "@types/pg": "^8.20.0",
+    "drizzle-kit": "^0.31.10",
+    "typescript": "5.9.3"
+  },
+  "files": [
+    "src",
+    "drizzle"
+  ],
+  "license": "Apache-2.0"
+}

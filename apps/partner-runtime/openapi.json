@@ -1,0 +1,1034 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "CredWorks Education partner runtime",
+    "version": "0.1.0",
+    "description": "Supported profile: W3C SD-JWT+KB, ES256, DCQL literal scalar Education paths, decentralized_identifier request client ID, direct_post vp_token. Ephemeral sessions/cache, persistent encrypted Rust identity. Container/public distribution and physical observations are separately recorded. Stable codes and limitations are documented in README."
+  },
+  "paths": {
+    "/.well-known/did.json": {
+      "get": {
+        "operationId": "publicDid",
+        "servers": [
+          {
+            "url": "https://partner.example",
+            "description": "Wallet HTTPS proxy; management routes must never be forwarded"
+          }
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Persistent partner DID verification methods",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oid4vp/request/{capability}": {
+      "get": {
+        "operationId": "signedWalletRequest",
+        "servers": [
+          {
+            "url": "https://partner.example",
+            "description": "Wallet HTTPS proxy; management routes must never be forwarded"
+          }
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "capability",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{43}$"
+            }
+          }
+        ],
+        "description": "Stored ES256 oauth-authz-req+jwt. Exact Education DCQL, decentralized_identifier client ID, vp_token, direct_post, nonce/state, fixed creation plus120-second expiry. Retrieval never extends expiry. Capability is public ceremony data, never application correlation. Retrieval additionally enforces current exact permission and cache freshness before returning the unchanged signed request.",
+        "responses": {
+          "200": {
+            "description": "Signed authorization request",
+            "content": {
+              "application/oauth-authz-req+jwt": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oid4vp/response/{capability}": {
+      "post": {
+        "operationId": "walletDirectPost",
+        "servers": [
+          {
+            "url": "https://partner.example",
+            "description": "Wallet HTTPS proxy; management routes must never be forwarded"
+          }
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "capability",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{43}$"
+            }
+          }
+        ],
+        "description": "Bounded128KiB direct_post. Exactly state and vp_token; vp_token is JSON query-ID\u2192one-element SD-JWT+KB array. Completion is claimed once before verification. Public acknowledgement carries no claims or decision.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "state": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_-]{43}$"
+                  },
+                  "vp_token": {
+                    "type": "string",
+                    "description": "JSON {\"education_sign_in\":[\"<SD-JWT+KB>\"]} or education_eligibility"
+                  }
+                },
+                "required": [
+                  "state",
+                  "vp_token"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Completion admitted; retrieve protected result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {
+                      "const": "accepted"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/sign": {
+      "post": {
+        "operationId": "ownershipProof",
+        "servers": [
+          {
+            "url": "http://127.0.0.1:3081",
+            "description": "Protected application listener in runtime network namespace"
+          }
+        ],
+        "security": [
+          {
+            "RuntimeBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OwnershipChallenge"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Proof"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Legacy invalid_request"
+          },
+          "401": {
+            "description": "Runtime bearer refusal or protected correlation refusal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Legacy not_found"
+          }
+        }
+      }
+    },
+    "/management/sessions": {
+      "post": {
+        "operationId": "createSession",
+        "servers": [
+          {
+            "url": "http://127.0.0.1:3081",
+            "description": "Protected application listener in runtime network namespace"
+          }
+        ],
+        "security": [
+          {
+            "RuntimeBearer": []
+          }
+        ],
+        "description": "Requires fresh exact issuer/type/definition/profile/origin/key scope. Protect returned correlation_capability in the initiating application interaction. No account, eligibility or cookie decision. Maximum100 retained sessions; management bodies4KiB.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSession"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Runtime bearer refusal or protected correlation refusal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/sessions/{session_id}": {
+      "get": {
+        "operationId": "sessionStatus",
+        "servers": [
+          {
+            "url": "http://127.0.0.1:3081",
+            "description": "Protected application listener in runtime network namespace"
+          }
+        ],
+        "security": [
+          {
+            "RuntimeBearer": [],
+            "SessionCapability": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{43}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Runtime bearer refusal or protected correlation refusal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/sessions/{session_id}/result": {
+      "post": {
+        "operationId": "consumeResult",
+        "servers": [
+          {
+            "url": "http://127.0.0.1:3081",
+            "description": "Protected application listener in runtime network namespace"
+          }
+        ],
+        "security": [
+          {
+            "RuntimeBearer": [],
+            "SessionCapability": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{43}$"
+            }
+          }
+        ],
+        "description": "One-time atomic consumption. Public state cannot authorize retrieval. Results are retained until creation plus 240 seconds; completed ceremonies are not subject to the 120-second request-completion deadline. Verified claims are delivered only before the immutable original evidence/credential deadline and while current exact permission and credential status remain valid. Refusal consumes the result without claims. Refresh cannot extend its original deadline. Verified enrolled=false remains a value for caller policy.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Empty"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Result"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Runtime bearer refusal or protected correlation refusal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/evidence/refresh": {
+      "post": {
+        "operationId": "refreshEvidence",
+        "servers": [
+          {
+            "url": "http://127.0.0.1:3081",
+            "description": "Protected application listener in runtime network namespace"
+          }
+        ],
+        "security": [
+          {
+            "RuntimeBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Empty"
+              }
+            }
+          }
+        },
+        "description": "Atomic signed trust, per-verifier permission and configured status refresh. TLS certificates/hostnames checked, redirects refused,5second deadline and256KiB cap. Permission cap16KiB/two grants/300second signed lifetime. Cache expires at min signed document expiry and configured maxage1\u2013300seconds. No credential URL fetch; fresh offline permitted, stale refuses. Failed refresh retains only still-fresh prior snapshot.",
+        "responses": {
+          "200": {
+            "description": "Evidence replaced",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {
+                      "const": "refreshed"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Stable refusal; no diagnostics or claims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Runtime bearer refusal or protected correlation refusal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "RuntimeBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Runtime management token; registry project credential does not authorize runtime"
+      },
+      "SessionCapability": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Session-Capability",
+        "description": "Protected application interaction capability returned on creation; distinct from public state/request capability"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Runtime codes: SESSION_BAD_REQUEST, RESPONSE_BAD_REQUEST, RESPONSE_STATE_MISMATCH, SESSION_ACCESS_DENIED, SCOPE_NOT_PERMITTED, SESSION_NOT_FOUND, REQUEST_DEADLINE, REQUEST_TOO_LARGE, SESSION_CAPACITY, RESULT_PENDING, RESULT_CONSUMED, SESSION_ALREADY_COMPLETED, SESSION_EXPIRED, EVIDENCE_UNAVAILABLE, EVIDENCE_STALE, EVIDENCE_REFRESH_FAILED, PERMISSION_VERSION_UNSUPPORTED. Protected refused results additionally preserve validated identity-core enum codes, or PRESENTATION_VERIFICATION_FAILED for unknown exceptions; no diagnostic text."
+              }
+            },
+            "required": [
+              "code"
+            ]
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "CreateSession": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "profile": {
+            "type": "string",
+            "enum": [
+              "education_eligibility",
+              "education_sign_in"
+            ]
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "profile",
+          "interaction_id",
+          "purpose"
+        ]
+      },
+      "Session": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "correlation_capability": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "request_uri": {
+            "type": "string",
+            "format": "uri"
+          },
+          "activation_uri": {
+            "type": "string",
+            "format": "uri"
+          },
+          "expires_at": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "session_id",
+          "interaction_id",
+          "correlation_capability",
+          "request_uri",
+          "activation_uri",
+          "expires_at"
+        ]
+      },
+      "SessionStatus": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "verifying",
+              "complete",
+              "consumed",
+              "expired"
+            ]
+          },
+          "expires_at": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "session_id",
+          "interaction_id",
+          "status",
+          "expires_at"
+        ]
+      },
+      "Claims": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "enrolled": {
+            "type": "boolean"
+          },
+          "institution_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "student_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "enrolled",
+          "institution_id"
+        ]
+      },
+      "Evidence": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "issuer_did": {
+            "type": "string"
+          },
+          "credential_type": {
+            "const": "UniversityEducationCredential"
+          },
+          "definition_id": {
+            "const": "urn:credworks:education"
+          },
+          "definition_version": {
+            "const": "1"
+          },
+          "profile": {
+            "enum": [
+              "education_eligibility",
+              "education_sign_in"
+            ]
+          },
+          "claim_paths": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "minItems": 2,
+            "maxItems": 3
+          },
+          "verifier_did": {
+            "type": "string"
+          },
+          "verifier_public_jwk_sha256_thumbprint": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "issuer_public_jwk_sha256_thumbprint": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "holder_public_jwk_sha256_thumbprint": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "verified_at": {
+            "type": "integer"
+          },
+          "expires_at": {
+            "type": "number",
+            "description": "Immutable authenticated delivery deadline: minimum original cache freshness and signed credential exp when present. Fractional NumericDate values are preserved."
+          }
+        },
+        "required": [
+          "issuer_did",
+          "credential_type",
+          "definition_id",
+          "definition_version",
+          "profile",
+          "claim_paths",
+          "verifier_did",
+          "verifier_public_jwk_sha256_thumbprint",
+          "issuer_public_jwk_sha256_thumbprint",
+          "holder_public_jwk_sha256_thumbprint",
+          "verified_at",
+          "expires_at"
+        ]
+      },
+      "VerifiedResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "const": "verified"
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "claims": {
+            "$ref": "#/components/schemas/Claims"
+          },
+          "evidence": {
+            "$ref": "#/components/schemas/Evidence"
+          }
+        },
+        "required": [
+          "status",
+          "interaction_id",
+          "claims",
+          "evidence"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "evidence": {
+                  "properties": {
+                    "profile": {
+                      "const": "education_sign_in"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "claims": {
+                  "required": [
+                    "student_id"
+                  ]
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "claims": {
+                  "properties": {
+                    "student_id": false
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "RefusedResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "const": "refused"
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "error": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "code": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code"
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "interaction_id",
+          "error"
+        ]
+      },
+      "Result": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/VerifiedResult"
+          },
+          {
+            "$ref": "#/components/schemas/RefusedResult"
+          }
+        ]
+      },
+      "Empty": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "OwnershipChallenge": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "nonce": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 256
+          },
+          "audience": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048
+          }
+        },
+        "required": [
+          "nonce",
+          "audience"
+        ]
+      },
+      "Proof": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "jwt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "jwt"
+        ]
+      },
+      "UnauthorizedError": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/Error"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "error"
+            ],
+            "properties": {
+              "error": {
+                "const": "unauthorized"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

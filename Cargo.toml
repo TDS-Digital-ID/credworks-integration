@@ -1,0 +1,12 @@
+[workspace]
+members = ["core/identity-core", "core/bindings-node"]
+resolver = "3"
+
+[workspace.package]
+edition = "2024"
+license = "Apache-2.0"
+repository = "https://github.com/TDS-Digital-ID/university-vc-monorepo"
+rust-version = "1.85"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"

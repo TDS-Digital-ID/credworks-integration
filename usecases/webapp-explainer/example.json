@@ -1,0 +1,215 @@
+{
+  "description": "Committed UNSW webapp-explainer vector for identity-core SD-JWT tests.",
+  "disclosures": [
+    {
+      "digest": "ThrqttZBfHLKeXrx2SRVMtrFPWy9LYZaKMA1U9FJnSk",
+      "encoded": "WyJFQkFRRUJBUUVCQVFFQkFRRUJBUUVBIiwiZW5yb2xsZWQiLHRydWVd",
+      "path": [
+        "credentialSubject",
+        "enrolled"
+      ],
+      "salt": "EBAQEBAQEBAQEBAQEBAQEA",
+      "salt_bytes": "EBAQEBAQEBAQEBAQEBAQEA"
+    },
+    {
+      "digest": "NoTtRJCi18jVJ_RJbWi9Wr8DKEI03tsUrD7KzSk0PDI",
+      "encoded": "WyJFUkVSRVJFUkVSRVJFUkVSRVJFUkVRIiwiYWZmaWxpYXRpb24iLCJzdHVkZW50Il0",
+      "path": [
+        "credentialSubject",
+        "affiliation"
+      ],
+      "salt": "EREREREREREREREREREREQ",
+      "salt_bytes": "EREREREREREREREREREREQ"
+    },
+    {
+      "digest": "4im4mDZVN7Z2pYhJaH1cltyU_rQSrc2x3r0ALAjBwDE",
+      "encoded": "WyJFaElTRWhJU0VoSVNFaElTRWhJU0VnIiwiZmFtaWx5X25hbWUiLCJDaXRpemVuIl0",
+      "path": [
+        "credentialSubject",
+        "family_name"
+      ],
+      "salt": "EhISEhISEhISEhISEhISEg",
+      "salt_bytes": "EhISEhISEhISEhISEhISEg"
+    },
+    {
+      "digest": "e50HRrZoNYac4iVPY2hC52jFm4vgyGEtIKllnzFgszc",
+      "encoded": "WyJFeE1URXhNVEV4TVRFeE1URXhNVEV3IiwiZ2l2ZW5fbmFtZSIsIkF2ZXJ5Il0",
+      "path": [
+        "credentialSubject",
+        "given_name"
+      ],
+      "salt": "ExMTExMTExMTExMTExMTEw",
+      "salt_bytes": "ExMTExMTExMTExMTExMTEw"
+    },
+    {
+      "digest": "HZw_jn0gTZbbQJwzuQbiKyFt7WWWRE4vlWdtBN2Ap-M",
+      "encoded": "WyJGQlFVRkJRVUZCUVVGQlFVRkJRVUZBIiwic3R1ZGVudF9pZCIsIno1NTU1NTU1Il0",
+      "path": [
+        "credentialSubject",
+        "student_id"
+      ],
+      "salt": "FBQUFBQUFBQUFBQUFBQUFA",
+      "salt_bytes": "FBQUFBQUFBQUFBQUFBQUFA"
+    },
+    {
+      "digest": "C8P36UtuhQAb-Hgl3aHRwHyNT_xzrjgiat7QGcNK1SE",
+      "encoded": "WyJGUlVWRlJVVkZSVVZGUlVWRlJVVkZRIiwicHJvZ3JhbSIsIkJTYyBDb21wdXRlciBTY2llbmNlIl0",
+      "path": [
+        "credentialSubject",
+        "program"
+      ],
+      "salt": "FRUVFRUVFRUVFRUVFRUVFQ",
+      "salt_bytes": "FRUVFRUVFRUVFRUVFRUVFQ"
+    },
+    {
+      "digest": "Y1EWcLYpCBi5bcoVQ4ONuQlkW5x-09X6lQGu4AYzPcA",
+      "encoded": "WyJGaFlXRmhZV0ZoWVdGaFlXRmhZV0ZnIiwiZGF0ZV9vZl9iaXJ0aCIsIjIwMDEtMDItMDMiXQ",
+      "path": [
+        "credentialSubject",
+        "date_of_birth"
+      ],
+      "salt": "FhYWFhYWFhYWFhYWFhYWFg",
+      "salt_bytes": "FhYWFhYWFhYWFhYWFhYWFg"
+    },
+    {
+      "digest": "dtH3tpxr4QqLkyoZ4Jc1Dn51W93Bx4tAEBfUBtjNUSE",
+      "encoded": "WyJGeGNYRnhjWEZ4Y1hGeGNYRnhjWEZ3IiwicGhvdG9faGFzaCIsIjZFb1Q1UzdGOUIweDN1WWNTTzd0bVFlSTZkQVVjRnh4UzRNMWJsajZWYjAiXQ",
+      "path": [
+        "credentialSubject",
+        "photo_hash"
+      ],
+      "salt": "FxcXFxcXFxcXFxcXFxcXFw",
+      "salt_bytes": "FxcXFxcXFxcXFxcXFxcXFw"
+    }
+  ],
+  "holder_public_jwk": {
+    "crv": "P-256",
+    "kid": "holder-1",
+    "kty": "EC",
+    "x": "l87Mf18aZNXEcwOmsiUE2eKGKM9hsi0Kf-YPTVo5QXM",
+    "y": "84Ujs5OCSDJMvN_Om8YPeVEH2sKBQqialSaYM7Z9VG8"
+  },
+  "issuer_jwt": "eyJhbGciOiJFUzI1NiIsInR5cCI6InZjK3NkLWp3dCIsImtpZCI6Imlzc3Vlci0xIn0.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiXSwiX3NkX2FsZyI6InNoYS0yNTYiLCJjbmYiOnsiandrIjp7ImNydiI6IlAtMjU2Iiwia2lkIjoiaG9sZGVyLTEiLCJrdHkiOiJFQyIsIngiOiJsODdNZjE4YVpOWEVjd09tc2lVRTJlS0dLTTloc2kwS2YtWVBUVm81UVhNIiwieSI6Ijg0VWpzNU9DU0RKTXZOX09tOFlQZVZFSDJzS0JRcWlhbFNhWU03WjlWRzgifX0sImNyZWRlbnRpYWxTdGF0dXMiOnsiaWQiOiJodHRwczovL3N0YXR1cy51bnN3LmV4YW1wbGUvc3RhdHVzLzEjNDIiLCJzdGF0dXNMaXN0Q3JlZGVudGlhbCI6Imh0dHBzOi8vc3RhdHVzLnVuc3cuZXhhbXBsZS9zdGF0dXMvMSIsInN0YXR1c0xpc3RJbmRleCI6IjQyIiwic3RhdHVzUHVycG9zZSI6InJldm9jYXRpb24iLCJ0eXBlIjoiQml0c3RyaW5nU3RhdHVzTGlzdEVudHJ5In0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7Il9zZCI6WyI0aW00bURaVk43WjJwWWhKYUgxY2x0eVVfclFTcmMyeDNyMEFMQWpCd0RFIiwiQzhQMzZVdHVoUUFiLUhnbDNhSFJ3SHlOVF94enJqZ2lhdDdRR2NOSzFTRSIsIkhad19qbjBnVFpiYlFKd3p1UWJpS3lGdDdXV1dSRTR2bFdkdEJOMkFwLU0iLCJOb1R0UkpDaTE4alZKX1JKYldpOVdyOERLRUkwM3RzVXJEN0t6U2swUERJIiwiVGhycXR0WkJmSExLZVhyeDJTUlZNdHJGUFd5OUxZWmFLTUExVTlGSm5TayIsIlkxRVdjTFlwQ0JpNWJjb1ZRNE9OdVFsa1c1eC0wOVg2bFFHdTRBWXpQY0EiLCJkdEgzdHB4cjRRcUxreW9aNEpjMURuNTFXOTNCeDR0QUVCZlVCdGpOVVNFIiwiZTUwSFJyWm9OWWFjNGlWUFkyaEM1MmpGbTR2Z3lHRXRJS2xsbnpGZ3N6YyJdLCJpbnN0aXR1dGlvbl9pZCI6InVuc3cuZWR1LmF1In0sImV4cCI6MTg4MzAwMDAwMCwiaWF0IjoxNzgzMDAwMDAwLCJpc3MiOiJodHRwczovL2lzc3Vlci51bnN3LmVkdS5hdSIsImlzc3VlciI6Imh0dHBzOi8vaXNzdWVyLnVuc3cuZWR1LmF1IiwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsIlVuaXZlcnNpdHlFZHVjYXRpb25DcmVkZW50aWFsIl0sInZhbGlkRnJvbSI6IjIwMjYtMDctMDFUMDA6MDA6MDBaIiwidmFsaWRVbnRpbCI6IjIwMjctMDctMDFUMDA6MDA6MDBaIn0.PQWLQEYH6PwPys5H0eQAPowkf-NzolIYmtwob0wERcHQjcmgwCreTskvP0EhLbNqCF2P3e9X5Blqt3_vevgWxQ",
+  "issuer_public_jwk": {
+    "crv": "P-256",
+    "kid": "issuer-1",
+    "kty": "EC",
+    "x": "elkxgIYMQDfIPBJ0mEXI7hQk3Sl_rcuJXjWCVdLH0rI",
+    "y": "qMolWA8mJv5XkGL_G5n_kcJKDaBvsytb4gFIySSfVlA"
+  },
+  "presentations": {
+    "uc3_study_space": {
+      "audience": "https://study-space.example/oid4vp",
+      "iat": 1783000100,
+      "nonce": "uc3-nonce-001",
+      "sd_hash": "UFDvZDrNFeF9qBj5wyhBLgPAON9-Z2O8O8yYzAVoY58",
+      "sd_jwt_kb": "eyJhbGciOiJFUzI1NiIsInR5cCI6InZjK3NkLWp3dCIsImtpZCI6Imlzc3Vlci0xIn0.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiXSwiX3NkX2FsZyI6InNoYS0yNTYiLCJjbmYiOnsiandrIjp7ImNydiI6IlAtMjU2Iiwia2lkIjoiaG9sZGVyLTEiLCJrdHkiOiJFQyIsIngiOiJsODdNZjE4YVpOWEVjd09tc2lVRTJlS0dLTTloc2kwS2YtWVBUVm81UVhNIiwieSI6Ijg0VWpzNU9DU0RKTXZOX09tOFlQZVZFSDJzS0JRcWlhbFNhWU03WjlWRzgifX0sImNyZWRlbnRpYWxTdGF0dXMiOnsiaWQiOiJodHRwczovL3N0YXR1cy51bnN3LmV4YW1wbGUvc3RhdHVzLzEjNDIiLCJzdGF0dXNMaXN0Q3JlZGVudGlhbCI6Imh0dHBzOi8vc3RhdHVzLnVuc3cuZXhhbXBsZS9zdGF0dXMvMSIsInN0YXR1c0xpc3RJbmRleCI6IjQyIiwic3RhdHVzUHVycG9zZSI6InJldm9jYXRpb24iLCJ0eXBlIjoiQml0c3RyaW5nU3RhdHVzTGlzdEVudHJ5In0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7Il9zZCI6WyI0aW00bURaVk43WjJwWWhKYUgxY2x0eVVfclFTcmMyeDNyMEFMQWpCd0RFIiwiQzhQMzZVdHVoUUFiLUhnbDNhSFJ3SHlOVF94enJqZ2lhdDdRR2NOSzFTRSIsIkhad19qbjBnVFpiYlFKd3p1UWJpS3lGdDdXV1dSRTR2bFdkdEJOMkFwLU0iLCJOb1R0UkpDaTE4alZKX1JKYldpOVdyOERLRUkwM3RzVXJEN0t6U2swUERJIiwiVGhycXR0WkJmSExLZVhyeDJTUlZNdHJGUFd5OUxZWmFLTUExVTlGSm5TayIsIlkxRVdjTFlwQ0JpNWJjb1ZRNE9OdVFsa1c1eC0wOVg2bFFHdTRBWXpQY0EiLCJkdEgzdHB4cjRRcUxreW9aNEpjMURuNTFXOTNCeDR0QUVCZlVCdGpOVVNFIiwiZTUwSFJyWm9OWWFjNGlWUFkyaEM1MmpGbTR2Z3lHRXRJS2xsbnpGZ3N6YyJdLCJpbnN0aXR1dGlvbl9pZCI6InVuc3cuZWR1LmF1In0sImV4cCI6MTg4MzAwMDAwMCwiaWF0IjoxNzgzMDAwMDAwLCJpc3MiOiJodHRwczovL2lzc3Vlci51bnN3LmVkdS5hdSIsImlzc3VlciI6Imh0dHBzOi8vaXNzdWVyLnVuc3cuZWR1LmF1IiwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsIlVuaXZlcnNpdHlFZHVjYXRpb25DcmVkZW50aWFsIl0sInZhbGlkRnJvbSI6IjIwMjYtMDctMDFUMDA6MDA6MDBaIiwidmFsaWRVbnRpbCI6IjIwMjctMDctMDFUMDA6MDA6MDBaIn0.PQWLQEYH6PwPys5H0eQAPowkf-NzolIYmtwob0wERcHQjcmgwCreTskvP0EhLbNqCF2P3e9X5Blqt3_vevgWxQ~WyJFQkFRRUJBUUVCQVFFQkFRRUJBUUVBIiwiZW5yb2xsZWQiLHRydWVd~eyJhbGciOiJFUzI1NiIsInR5cCI6ImtiK2p3dCIsImtpZCI6ImhvbGRlci0xIn0.eyJhdWQiOiJodHRwczovL3N0dWR5LXNwYWNlLmV4YW1wbGUvb2lkNHZwIiwibm9uY2UiOiJ1YzMtbm9uY2UtMDAxIiwic2RfaGFzaCI6IlVGRHZaRHJORmVGOXFCajV3eWhCTGdQQU9OOS1aMk84Tzh5WXpBVm9ZNTgiLCJpYXQiOjE3ODMwMDAxMDB9.jpf7FSdC_AN4qDQSyhMkfa7jgDHKo6K3bRgYsxXWdSEyWKI4B5U-vtDyaGbXWBalWydCyX8tbpFW7a1bMraosA",
+      "selected_disclosures": [
+        "WyJFQkFRRUJBUUVCQVFFQkFRRUJBUUVBIiwiZW5yb2xsZWQiLHRydWVd"
+      ]
+    },
+    "uc4_exam_hall": {
+      "audience": "https://exam-hall.example/oid4vp",
+      "iat": 1783000200,
+      "nonce": "uc4-nonce-001",
+      "sd_hash": "pIwRQk2xEvTMyp8vL6tpRv-DrU3eSnqPc2Cq1ow4wPQ",
+      "sd_jwt_kb": "eyJhbGciOiJFUzI1NiIsInR5cCI6InZjK3NkLWp3dCIsImtpZCI6Imlzc3Vlci0xIn0.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiXSwiX3NkX2FsZyI6InNoYS0yNTYiLCJjbmYiOnsiandrIjp7ImNydiI6IlAtMjU2Iiwia2lkIjoiaG9sZGVyLTEiLCJrdHkiOiJFQyIsIngiOiJsODdNZjE4YVpOWEVjd09tc2lVRTJlS0dLTTloc2kwS2YtWVBUVm81UVhNIiwieSI6Ijg0VWpzNU9DU0RKTXZOX09tOFlQZVZFSDJzS0JRcWlhbFNhWU03WjlWRzgifX0sImNyZWRlbnRpYWxTdGF0dXMiOnsiaWQiOiJodHRwczovL3N0YXR1cy51bnN3LmV4YW1wbGUvc3RhdHVzLzEjNDIiLCJzdGF0dXNMaXN0Q3JlZGVudGlhbCI6Imh0dHBzOi8vc3RhdHVzLnVuc3cuZXhhbXBsZS9zdGF0dXMvMSIsInN0YXR1c0xpc3RJbmRleCI6IjQyIiwic3RhdHVzUHVycG9zZSI6InJldm9jYXRpb24iLCJ0eXBlIjoiQml0c3RyaW5nU3RhdHVzTGlzdEVudHJ5In0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7Il9zZCI6WyI0aW00bURaVk43WjJwWWhKYUgxY2x0eVVfclFTcmMyeDNyMEFMQWpCd0RFIiwiQzhQMzZVdHVoUUFiLUhnbDNhSFJ3SHlOVF94enJqZ2lhdDdRR2NOSzFTRSIsIkhad19qbjBnVFpiYlFKd3p1UWJpS3lGdDdXV1dSRTR2bFdkdEJOMkFwLU0iLCJOb1R0UkpDaTE4alZKX1JKYldpOVdyOERLRUkwM3RzVXJEN0t6U2swUERJIiwiVGhycXR0WkJmSExLZVhyeDJTUlZNdHJGUFd5OUxZWmFLTUExVTlGSm5TayIsIlkxRVdjTFlwQ0JpNWJjb1ZRNE9OdVFsa1c1eC0wOVg2bFFHdTRBWXpQY0EiLCJkdEgzdHB4cjRRcUxreW9aNEpjMURuNTFXOTNCeDR0QUVCZlVCdGpOVVNFIiwiZTUwSFJyWm9OWWFjNGlWUFkyaEM1MmpGbTR2Z3lHRXRJS2xsbnpGZ3N6YyJdLCJpbnN0aXR1dGlvbl9pZCI6InVuc3cuZWR1LmF1In0sImV4cCI6MTg4MzAwMDAwMCwiaWF0IjoxNzgzMDAwMDAwLCJpc3MiOiJodHRwczovL2lzc3Vlci51bnN3LmVkdS5hdSIsImlzc3VlciI6Imh0dHBzOi8vaXNzdWVyLnVuc3cuZWR1LmF1IiwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsIlVuaXZlcnNpdHlFZHVjYXRpb25DcmVkZW50aWFsIl0sInZhbGlkRnJvbSI6IjIwMjYtMDctMDFUMDA6MDA6MDBaIiwidmFsaWRVbnRpbCI6IjIwMjctMDctMDFUMDA6MDA6MDBaIn0.PQWLQEYH6PwPys5H0eQAPowkf-NzolIYmtwob0wERcHQjcmgwCreTskvP0EhLbNqCF2P3e9X5Blqt3_vevgWxQ~WyJFQkFRRUJBUUVCQVFFQkFRRUJBUUVBIiwiZW5yb2xsZWQiLHRydWVd~WyJFaElTRWhJU0VoSVNFaElTRWhJU0VnIiwiZmFtaWx5X25hbWUiLCJDaXRpemVuIl0~WyJFeE1URXhNVEV4TVRFeE1URXhNVEV3IiwiZ2l2ZW5fbmFtZSIsIkF2ZXJ5Il0~WyJGQlFVRkJRVUZCUVVGQlFVRkJRVUZBIiwic3R1ZGVudF9pZCIsIno1NTU1NTU1Il0~WyJGeGNYRnhjWEZ4Y1hGeGNYRnhjWEZ3IiwicGhvdG9faGFzaCIsIjZFb1Q1UzdGOUIweDN1WWNTTzd0bVFlSTZkQVVjRnh4UzRNMWJsajZWYjAiXQ~eyJhbGciOiJFUzI1NiIsInR5cCI6ImtiK2p3dCIsImtpZCI6ImhvbGRlci0xIn0.eyJhdWQiOiJodHRwczovL2V4YW0taGFsbC5leGFtcGxlL29pZDR2cCIsIm5vbmNlIjoidWM0LW5vbmNlLTAwMSIsInNkX2hhc2giOiJwSXdSUWsyeEV2VE15cDh2TDZ0cFJ2LURyVTNlU25xUGMyQ3Exb3c0d1BRIiwiaWF0IjoxNzgzMDAwMjAwfQ.gZNMIsmmQdjoMRLbl0hOekyhmIKknxjUIDDZTwsYGHU3330VFSygy1Oz5ukDxnjhod3ODQMA4Z1FAjP1pJMp2A",
+      "selected_disclosures": [
+        "WyJFQkFRRUJBUUVCQVFFQkFRRUJBUUVBIiwiZW5yb2xsZWQiLHRydWVd",
+        "WyJFaElTRWhJU0VoSVNFaElTRWhJU0VnIiwiZmFtaWx5X25hbWUiLCJDaXRpemVuIl0",
+        "WyJFeE1URXhNVEV4TVRFeE1URXhNVEV3IiwiZ2l2ZW5fbmFtZSIsIkF2ZXJ5Il0",
+        "WyJGQlFVRkJRVUZCUVVGQlFVRkJRVUZBIiwic3R1ZGVudF9pZCIsIno1NTU1NTU1Il0",
+        "WyJGeGNYRnhjWEZ4Y1hGeGNYRnhjWEZ3IiwicGhvdG9faGFzaCIsIjZFb1Q1UzdGOUIweDN1WWNTTzd0bVFlSTZkQVVjRnh4UzRNMWJsajZWYjAiXQ"
+      ]
+    }
+  },
+  "sd_jwt": "eyJhbGciOiJFUzI1NiIsInR5cCI6InZjK3NkLWp3dCIsImtpZCI6Imlzc3Vlci0xIn0.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiXSwiX3NkX2FsZyI6InNoYS0yNTYiLCJjbmYiOnsiandrIjp7ImNydiI6IlAtMjU2Iiwia2lkIjoiaG9sZGVyLTEiLCJrdHkiOiJFQyIsIngiOiJsODdNZjE4YVpOWEVjd09tc2lVRTJlS0dLTTloc2kwS2YtWVBUVm81UVhNIiwieSI6Ijg0VWpzNU9DU0RKTXZOX09tOFlQZVZFSDJzS0JRcWlhbFNhWU03WjlWRzgifX0sImNyZWRlbnRpYWxTdGF0dXMiOnsiaWQiOiJodHRwczovL3N0YXR1cy51bnN3LmV4YW1wbGUvc3RhdHVzLzEjNDIiLCJzdGF0dXNMaXN0Q3JlZGVudGlhbCI6Imh0dHBzOi8vc3RhdHVzLnVuc3cuZXhhbXBsZS9zdGF0dXMvMSIsInN0YXR1c0xpc3RJbmRleCI6IjQyIiwic3RhdHVzUHVycG9zZSI6InJldm9jYXRpb24iLCJ0eXBlIjoiQml0c3RyaW5nU3RhdHVzTGlzdEVudHJ5In0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7Il9zZCI6WyI0aW00bURaVk43WjJwWWhKYUgxY2x0eVVfclFTcmMyeDNyMEFMQWpCd0RFIiwiQzhQMzZVdHVoUUFiLUhnbDNhSFJ3SHlOVF94enJqZ2lhdDdRR2NOSzFTRSIsIkhad19qbjBnVFpiYlFKd3p1UWJpS3lGdDdXV1dSRTR2bFdkdEJOMkFwLU0iLCJOb1R0UkpDaTE4alZKX1JKYldpOVdyOERLRUkwM3RzVXJEN0t6U2swUERJIiwiVGhycXR0WkJmSExLZVhyeDJTUlZNdHJGUFd5OUxZWmFLTUExVTlGSm5TayIsIlkxRVdjTFlwQ0JpNWJjb1ZRNE9OdVFsa1c1eC0wOVg2bFFHdTRBWXpQY0EiLCJkdEgzdHB4cjRRcUxreW9aNEpjMURuNTFXOTNCeDR0QUVCZlVCdGpOVVNFIiwiZTUwSFJyWm9OWWFjNGlWUFkyaEM1MmpGbTR2Z3lHRXRJS2xsbnpGZ3N6YyJdLCJpbnN0aXR1dGlvbl9pZCI6InVuc3cuZWR1LmF1In0sImV4cCI6MTg4MzAwMDAwMCwiaWF0IjoxNzgzMDAwMDAwLCJpc3MiOiJodHRwczovL2lzc3Vlci51bnN3LmVkdS5hdSIsImlzc3VlciI6Imh0dHBzOi8vaXNzdWVyLnVuc3cuZWR1LmF1IiwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsIlVuaXZlcnNpdHlFZHVjYXRpb25DcmVkZW50aWFsIl0sInZhbGlkRnJvbSI6IjIwMjYtMDctMDFUMDA6MDA6MDBaIiwidmFsaWRVbnRpbCI6IjIwMjctMDctMDFUMDA6MDA6MDBaIn0.PQWLQEYH6PwPys5H0eQAPowkf-NzolIYmtwob0wERcHQjcmgwCreTskvP0EhLbNqCF2P3e9X5Blqt3_vevgWxQ~WyJFQkFRRUJBUUVCQVFFQkFRRUJBUUVBIiwiZW5yb2xsZWQiLHRydWVd~WyJFUkVSRVJFUkVSRVJFUkVSRVJFUkVRIiwiYWZmaWxpYXRpb24iLCJzdHVkZW50Il0~WyJFaElTRWhJU0VoSVNFaElTRWhJU0VnIiwiZmFtaWx5X25hbWUiLCJDaXRpemVuIl0~WyJFeE1URXhNVEV4TVRFeE1URXhNVEV3IiwiZ2l2ZW5fbmFtZSIsIkF2ZXJ5Il0~WyJGQlFVRkJRVUZCUVVGQlFVRkJRVUZBIiwic3R1ZGVudF9pZCIsIno1NTU1NTU1Il0~WyJGUlVWRlJVVkZSVVZGUlVWRlJVVkZRIiwicHJvZ3JhbSIsIkJTYyBDb21wdXRlciBTY2llbmNlIl0~WyJGaFlXRmhZV0ZoWVdGaFlXRmhZV0ZnIiwiZGF0ZV9vZl9iaXJ0aCIsIjIwMDEtMDItMDMiXQ~WyJGeGNYRnhjWEZ4Y1hGeGNYRnhjWEZ3IiwicGhvdG9faGFzaCIsIjZFb1Q1UzdGOUIweDN1WWNTTzd0bVFlSTZkQVVjRnh4UzRNMWJsajZWYjAiXQ~",
+  "sd_payload": {
+    "@context": [
+      "https://www.w3.org/ns/credentials/v2"
+    ],
+    "_sd_alg": "sha-256",
+    "cnf": {
+      "jwk": {
+        "crv": "P-256",
+        "kid": "holder-1",
+        "kty": "EC",
+        "x": "l87Mf18aZNXEcwOmsiUE2eKGKM9hsi0Kf-YPTVo5QXM",
+        "y": "84Ujs5OCSDJMvN_Om8YPeVEH2sKBQqialSaYM7Z9VG8"
+      }
+    },
+    "credentialStatus": {
+      "id": "https://status.unsw.example/status/1#42",
+      "statusListCredential": "https://status.unsw.example/status/1",
+      "statusListIndex": "42",
+      "statusPurpose": "revocation",
+      "type": "BitstringStatusListEntry"
+    },
+    "credentialSubject": {
+      "_sd": [
+        "4im4mDZVN7Z2pYhJaH1cltyU_rQSrc2x3r0ALAjBwDE",
+        "C8P36UtuhQAb-Hgl3aHRwHyNT_xzrjgiat7QGcNK1SE",
+        "HZw_jn0gTZbbQJwzuQbiKyFt7WWWRE4vlWdtBN2Ap-M",
+        "NoTtRJCi18jVJ_RJbWi9Wr8DKEI03tsUrD7KzSk0PDI",
+        "ThrqttZBfHLKeXrx2SRVMtrFPWy9LYZaKMA1U9FJnSk",
+        "Y1EWcLYpCBi5bcoVQ4ONuQlkW5x-09X6lQGu4AYzPcA",
+        "dtH3tpxr4QqLkyoZ4Jc1Dn51W93Bx4tAEBfUBtjNUSE",
+        "e50HRrZoNYac4iVPY2hC52jFm4vgyGEtIKllnzFgszc"
+      ],
+      "institution_id": "unsw.edu.au"
+    },
+    "exp": 1883000000,
+    "iat": 1783000000,
+    "iss": "https://issuer.unsw.edu.au",
+    "issuer": "https://issuer.unsw.edu.au",
+    "type": [
+      "VerifiableCredential",
+      "UniversityEducationCredential"
+    ],
+    "validFrom": "2026-07-01T00:00:00Z",
+    "validUntil": "2027-07-01T00:00:00Z"
+  },
+  "source_payload": {
+    "@context": [
+      "https://www.w3.org/ns/credentials/v2"
+    ],
+    "cnf": {
+      "jwk": {
+        "crv": "P-256",
+        "kid": "holder-1",
+        "kty": "EC",
+        "x": "l87Mf18aZNXEcwOmsiUE2eKGKM9hsi0Kf-YPTVo5QXM",
+        "y": "84Ujs5OCSDJMvN_Om8YPeVEH2sKBQqialSaYM7Z9VG8"
+      }
+    },
+    "credentialStatus": {
+      "id": "https://status.unsw.example/status/1#42",
+      "statusListCredential": "https://status.unsw.example/status/1",
+      "statusListIndex": "42",
+      "statusPurpose": "revocation",
+      "type": "BitstringStatusListEntry"
+    },
+    "credentialSubject": {
+      "affiliation": "student",
+      "date_of_birth": "2001-02-03",
+      "enrolled": true,
+      "family_name": "Citizen",
+      "given_name": "Avery",
+      "institution_id": "unsw.edu.au",
+      "photo_hash": "6EoT5S7F9B0x3uYcSO7tmQeI6dAUcFxxS4M1blj6Vb0",
+      "program": "BSc Computer Science",
+      "student_id": "z5555555"
+    },
+    "exp": 1883000000,
+    "iat": 1783000000,
+    "iss": "https://issuer.unsw.edu.au",
+    "issuer": "https://issuer.unsw.edu.au",
+    "type": [
+      "VerifiableCredential",
+      "UniversityEducationCredential"
+    ],
+    "validFrom": "2026-07-01T00:00:00Z",
+    "validUntil": "2027-07-01T00:00:00Z"
+  }
+}
+

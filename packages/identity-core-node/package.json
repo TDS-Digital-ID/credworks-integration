@@ -1,0 +1,29 @@
+{
+  "name": "@unsw-vc/identity-core-node",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "pnpm run build:native && tsc --noEmit",
+    "build:native": "napi build --features partner-runtime --manifest-path ../../core/bindings-node/Cargo.toml --platform --output-dir native --js index.js --dts index.d.ts --package-json-path package.json --js-package-name @unsw-vc/identity-core-node -- --locked && cp native/index.js native/index.cjs",
+    "lint": "tsc --noEmit",
+    "test": "node ../../tool/test-fixture-addon.mjs",
+    "build:test-native": "napi build --manifest-path ../../core/bindings-node/Cargo.toml --platform --output-dir native-test --js index.js --dts index.d.ts --package-json-path package.json --js-package-name @unsw-vc/identity-core-node -- --locked && cp native-test/index.js native-test/index.cjs"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "3.6.2",
+    "@sd-jwt/sd-jwt-vc": "0.20.0",
+    "@types/node": "24.10.0",
+    "tsx": "^4.23.0",
+    "typescript": "5.9.3"
+  },
+  "files": [
+    "src",
+    "native/*.node",
+    "native/index.cjs"
+  ],
+  "license": "Apache-2.0"
+}

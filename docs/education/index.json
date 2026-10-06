@@ -1,0 +1,27 @@
+[
+  {
+    "slug": "overview",
+    "title": "Education integration",
+    "order": 1
+  },
+  {
+    "slug": "quickstart",
+    "title": "Setup and registration",
+    "order": 2
+  },
+  {
+    "slug": "profiles",
+    "title": "Profiles and application policy",
+    "order": 3
+  },
+  {
+    "slug": "api",
+    "title": "HTTP API",
+    "order": 4
+  },
+  {
+    "slug": "operations",
+    "title": "Operations and limits",
+    "order": 5
+  }
+]

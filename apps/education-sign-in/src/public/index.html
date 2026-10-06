@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>CredWorks Education sign-in example</title>
+    <link rel="stylesheet" href="/app.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <strong>CredWorks</strong><span class="badge">Synthetic demo</span>
+      </header>
+      <h1>Use your Education credential</h1>
+      <p>Choose what this application needs to know.</p>
+      <section aria-label="Education actions">
+        <button id="sign-in">Sign in with Education</button>
+        <p>
+          Shares enrolment, institution and a stable student ID to recognise
+          your account.
+        </p>
+        <button id="eligibility" class="secondary">
+          Check eligibility only
+        </button>
+        <p>Shares enrolment and institution. No student ID or account.</p>
+      </section>
+      <aside>
+        <h2>About your student ID</h2>
+        <p>
+          Services that receive the same student ID could link your visits. Use
+          eligibility only when an account is unnecessary.
+        </p>
+      </aside>
+      <section id="ceremony" hidden>
+        <h2>Continue in your wallet</h2>
+        <p>
+          Your wallet asks for consent before sharing. Check the recipient,
+          purpose and details.
+        </p>
+        <a id="activation">Open CredWorks wallet on Android</a>
+        <p>
+          On another device, transfer this activation link to the browser on your Android phone and open it there.
+        </p>
+        <code id="activation-text"></code
+        ><button id="complete" class="secondary">Check completion</button>
+      </section>
+      <section aria-live="polite" aria-atomic="true">
+        <h2 id="outcome">Not signed in</h2>
+        <p id="detail">No account session has been created.</p>
+        <code id="account"></code>
+      </section>
+      <footer>
+        Application policy is separate from credential verification. Synthetic
+        data only.
+      </footer>
+    </main>
+  </body>
+</html>

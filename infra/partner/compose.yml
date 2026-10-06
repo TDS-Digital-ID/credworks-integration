@@ -1,0 +1,30 @@
+services:
+  partner:
+    image: ${PARTNER_IMAGE:?set the locally built revision-tagged image}
+    user: "10001:10001"
+    read_only: true
+    restart: unless-stopped
+    init: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 2
+    mem_limit: 512m
+    pids_limit: 128
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=32m"]
+    environment:
+      PARTNER_ORIGIN: ${PARTNER_ORIGIN:?set externally reachable HTTPS origin}
+      PARTNER_STATE_DIR: /state/identity
+      PARTNER_UNLOCK_KEY: ${PARTNER_UNLOCK_KEY:?inject preserved random unlock secret}
+      PARTNER_MANAGEMENT_TOKEN: ${PARTNER_MANAGEMENT_TOKEN:?inject runtime management credential}
+      PARTNER_PUBLIC_PORT: 3080
+      PARTNER_MANAGEMENT_PORT: 3081
+      PARTNER_VERIFIER_CONFIG: ${PARTNER_VERIFIER_CONFIG:-}
+    ports: ["127.0.0.1:${PARTNER_HOST_PORT:-3080}:3080"]
+    volumes:
+      - partner_identity:/state
+      - ${PARTNER_CONFIG_DIR:?set absolute public configuration directory}:/config:ro
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+volumes:
+  partner_identity:

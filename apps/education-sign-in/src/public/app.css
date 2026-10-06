@@ -1,0 +1,110 @@
+@font-face {
+  font-family: Spectral;
+  src: url("/spectral.ttf");
+}
+@font-face {
+  font-family: Mono;
+  src: url("/mono.ttf");
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #f7f6f1;
+  color: #182b25;
+  font:
+    1rem/1.6 system-ui,
+    sans-serif;
+}
+main {
+  max-width: 48rem;
+  margin: auto;
+  padding: 2rem 1.25rem;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  border-bottom: 1px solid #7c8c82;
+  padding-bottom: 1.2rem;
+}
+header strong,
+h1,
+h2 {
+  font-family: Spectral, serif;
+}
+header strong {
+  font-size: 1.7rem;
+}
+h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.15;
+}
+.badge {
+  background: #f6e2b9;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+section {
+  margin: 2rem 0;
+}
+button,
+a {
+  font: inherit;
+  font-weight: 650;
+  color: #fff;
+  background: #204b38;
+  border: 2px solid #204b38;
+  border-radius: 0.25rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  text-align: left;
+  text-decoration: none;
+}
+button.secondary {
+  color: #204b38;
+  background: transparent;
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #a5681e;
+  outline-offset: 4px;
+}
+aside {
+  border: 1px solid #aab4aa;
+  padding: 1rem;
+}
+h2 {
+  font-size: 1.6rem;
+  margin: 0.25rem 0;
+}
+code {
+  font-family: Mono, monospace;
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 0.9rem;
+  margin: 1rem 0;
+}
+footer {
+  border-top: 1px solid #7c8c82;
+  padding-top: 1rem;
+  font-size: 0.9rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto;
+  }
+}
+[hidden] {
+  display: none;
+}

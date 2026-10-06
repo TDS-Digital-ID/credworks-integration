@@ -1,0 +1,69 @@
+{
+  "did": "did:web:issuer.unsw.example.edu.au",
+  "issuer_key_id": "did:web:issuer.unsw.example.edu.au#issuer-1",
+  "holder_key_id": "holder-1",
+  "audience": "https://study-space.example/oid4vp",
+  "nonce": "conformance-nonce",
+  "issued_at": 1783000100,
+  "verify_at": 1783000110,
+  "max_kb_age_seconds": 300,
+  "max_kb_future_skew_seconds": 5,
+  "payload": {
+    "@context": ["https://www.w3.org/ns/credentials/v2"],
+    "type": ["VerifiableCredential", "UniversityEducationCredential"],
+    "iss": "did:web:issuer.unsw.example.edu.au",
+    "issuer": "did:web:issuer.unsw.example.edu.au",
+    "iat": 1783000000,
+    "exp": 1883000000,
+    "validFrom": "2026-07-01T00:00:00Z",
+    "validUntil": "2027-07-01T00:00:00Z",
+    "credentialSubject": {
+      "institution_id": "unsw.edu.au",
+      "enrolled": true,
+      "affiliation": "student",
+      "family_name": "Citizen",
+      "given_name": "Avery",
+      "student_id": "z5555555",
+      "program": "BSc Computer Science",
+      "date_of_birth": "2001-02-03",
+      "photo_hash": "6EoT5S7F9B0x3uYcSO7tmQeI6dAUcFxxS4M1blj6Vb0"
+    },
+    "credentialStatus": {
+      "id": "https://status.unsw.example/status/1#42",
+      "type": "BitstringStatusListEntry",
+      "statusPurpose": "revocation",
+      "statusListIndex": "42",
+      "statusListCredential": "https://status.unsw.example/status/1"
+    },
+    "cnf": {
+      "jwk": null
+    }
+  },
+  "disclosure_specs": [
+    { "object_path": ["credentialSubject"], "claim_name": "enrolled" },
+    { "object_path": ["credentialSubject"], "claim_name": "affiliation" },
+    { "object_path": ["credentialSubject"], "claim_name": "family_name" },
+    { "object_path": ["credentialSubject"], "claim_name": "given_name" },
+    { "object_path": ["credentialSubject"], "claim_name": "student_id" },
+    { "object_path": ["credentialSubject"], "claim_name": "program" },
+    { "object_path": ["credentialSubject"], "claim_name": "date_of_birth" },
+    { "object_path": ["credentialSubject"], "claim_name": "photo_hash" }
+  ],
+  "salts": [
+    "AAAAAAAAAAAAAAAAAAAAAA",
+    "AQEBAQEBAQEBAQEBAQEBAQ",
+    "AgICAgICAgICAgICAgICAg",
+    "AwMDAwMDAwMDAwMDAwMDAw",
+    "BAQEBAQEBAQEBAQEBAQEBA",
+    "BQUFBQUFBQUFBQUFBQUFBQ",
+    "BgYGBgYGBgYGBgYGBgYGBg",
+    "BwcHBwcHBwcHBwcHBwcHBw"
+  ],
+  "profile": {
+    "name": "uc3_study_space",
+    "claim_paths": [
+      ["credentialSubject", "enrolled"],
+      ["credentialSubject", "institution_id"]
+    ]
+  }
+}

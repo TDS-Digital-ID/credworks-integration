@@ -1,0 +1,8 @@
+node_modules/
+target/
+native/
+native-test/
+.logs/
+.artifacts/
+.env
+*.tsbuildinfo

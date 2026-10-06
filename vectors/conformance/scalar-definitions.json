@@ -1,0 +1,179 @@
+{
+  "header": {
+    "alg": "ES256",
+    "typ": "issuer-authorizations+jwt",
+    "kid": "did:web:trust.example#fixture-360"
+  },
+  "anchor": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "OHHy_xO-Zx43QNUZHf-ZrxlrETgrXhp_ydgDZo4zA7s",
+    "y": "WOcityPNKG4C5jWruWGifWMmHlmOSgQY4nYGls5a7WI",
+    "kid": "did:web:trust.example#fixture-360"
+  },
+  "document": {
+    "version": 1,
+    "id": "https://trust.example/issuer-authorizations.jwt",
+    "issuer": "did:web:trust.example",
+    "iat": 100,
+    "exp": 200,
+    "authorizations": [
+      {
+        "credential_issuer_did": "did:web:issuer.example",
+        "credential_issuer_key_id": "did:web:issuer.example#fixture-360",
+        "credential_issuer_public_jwk_sha256_thumbprint": "2CULlToi1T-kKztK9qetdtP_0egXhLcQntnspSJ_AYk",
+        "definition": {
+          "id": "urn:example:membership",
+          "version": "1",
+          "credential_type": "ExampleMembershipCredential",
+          "label": "Membership",
+          "max_validity_seconds": 3600,
+          "claims": [
+            {
+              "name": "member",
+              "label": "Member",
+              "value_type": "boolean",
+              "required": true
+            },
+            {
+              "name": "member_id",
+              "label": "Member ID",
+              "value_type": "string",
+              "required": true
+            },
+            {
+              "name": "score",
+              "label": "Score",
+              "value_type": "number",
+              "required": false
+            },
+            {
+              "name": "visits",
+              "label": "Visits",
+              "value_type": "integer",
+              "required": false
+            }
+          ],
+          "profiles": [
+            {
+              "name": "access",
+              "claim_paths": [
+                [
+                  "credentialSubject",
+                  "member"
+                ]
+              ]
+            },
+            {
+              "name": "sign_in",
+              "claim_paths": [
+                [
+                  "credentialSubject",
+                  "member"
+                ],
+                [
+                  "credentialSubject",
+                  "member_id"
+                ]
+              ]
+            }
+          ]
+        },
+        "status": "active"
+      }
+    ]
+  },
+  "request": {
+    "registry_did": "did:web:trust.example",
+    "credential_issuer_did": "did:web:issuer.example",
+    "credential_issuer_key_id": "did:web:issuer.example#fixture-360",
+    "credential_issuer_public_jwk": {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "qL9wyyjP0tfvvGaJMJT05G8A2TwCqTS6K17Obrtsfq4",
+      "y": "Y-h84GPs-PFxQ71bbtxVfd3UZyIQ29GQS0eke7lj4fc",
+      "kid": "did:web:issuer.example#fixture-360"
+    },
+    "definition_id": "urn:example:membership",
+    "definition_version": "1",
+    "credential_type": "ExampleMembershipCredential"
+  },
+  "definition": {
+    "id": "urn:example:membership",
+    "version": "1",
+    "credential_type": "ExampleMembershipCredential",
+    "label": "Membership",
+    "max_validity_seconds": 3600,
+    "claims": [
+      {
+        "name": "member",
+        "label": "Member",
+        "value_type": "boolean",
+        "required": true
+      },
+      {
+        "name": "member_id",
+        "label": "Member ID",
+        "value_type": "string",
+        "required": true
+      },
+      {
+        "name": "score",
+        "label": "Score",
+        "value_type": "number",
+        "required": false
+      },
+      {
+        "name": "visits",
+        "label": "Visits",
+        "value_type": "integer",
+        "required": false
+      }
+    ],
+    "profiles": [
+      {
+        "name": "access",
+        "claim_paths": [
+          [
+            "credentialSubject",
+            "member"
+          ]
+        ]
+      },
+      {
+        "name": "sign_in",
+        "claim_paths": [
+          [
+            "credentialSubject",
+            "member"
+          ],
+          [
+            "credentialSubject",
+            "member_id"
+          ]
+        ]
+      }
+    ]
+  },
+  "subject": {
+    "member": true,
+    "member_id": "example-member-42",
+    "score": 3.5,
+    "visits": 2
+  },
+  "issuer_header": {
+    "alg": "ES256",
+    "typ": "vc+sd-jwt",
+    "kid": "did:web:issuer.example#fixture-360"
+  },
+  "issuer_jwk": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "qL9wyyjP0tfvvGaJMJT05G8A2TwCqTS6K17Obrtsfq4",
+    "y": "Y-h84GPs-PFxQ71bbtxVfd3UZyIQ29GQS0eke7lj4fc",
+    "kid": "did:web:issuer.example#fixture-360"
+  },
+  "compact_authorization": "eyJhbGciOiJFUzI1NiIsInR5cCI6Imlzc3Vlci1hdXRob3JpemF0aW9ucytqd3QiLCJraWQiOiJkaWQ6d2ViOnRydXN0LmV4YW1wbGUjZml4dHVyZS0zNjAifQ.eyJ2ZXJzaW9uIjoxLCJpZCI6Imh0dHBzOi8vdHJ1c3QuZXhhbXBsZS9pc3N1ZXItYXV0aG9yaXphdGlvbnMuand0IiwiaXNzdWVyIjoiZGlkOndlYjp0cnVzdC5leGFtcGxlIiwiaWF0IjoxMDAsImV4cCI6MjAwLCJhdXRob3JpemF0aW9ucyI6W3siY3JlZGVudGlhbF9pc3N1ZXJfZGlkIjoiZGlkOndlYjppc3N1ZXIuZXhhbXBsZSIsImNyZWRlbnRpYWxfaXNzdWVyX2tleV9pZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjZml4dHVyZS0zNjAiLCJjcmVkZW50aWFsX2lzc3Vlcl9wdWJsaWNfandrX3NoYTI1Nl90aHVtYnByaW50IjoiMkNVTGxUb2kxVC1rS3p0SzlxZXRkdFBfMGVnWGhMY1FudG5zcFNKX0FZayIsImRlZmluaXRpb24iOnsiaWQiOiJ1cm46ZXhhbXBsZTptZW1iZXJzaGlwIiwidmVyc2lvbiI6IjEiLCJjcmVkZW50aWFsX3R5cGUiOiJFeGFtcGxlTWVtYmVyc2hpcENyZWRlbnRpYWwiLCJsYWJlbCI6Ik1lbWJlcnNoaXAiLCJtYXhfdmFsaWRpdHlfc2Vjb25kcyI6MzYwMCwiY2xhaW1zIjpbeyJuYW1lIjoibWVtYmVyIiwibGFiZWwiOiJNZW1iZXIiLCJ2YWx1ZV90eXBlIjoiYm9vbGVhbiIsInJlcXVpcmVkIjp0cnVlfSx7Im5hbWUiOiJtZW1iZXJfaWQiLCJsYWJlbCI6Ik1lbWJlciBJRCIsInZhbHVlX3R5cGUiOiJzdHJpbmciLCJyZXF1aXJlZCI6dHJ1ZX0seyJuYW1lIjoic2NvcmUiLCJsYWJlbCI6IlNjb3JlIiwidmFsdWVfdHlwZSI6Im51bWJlciIsInJlcXVpcmVkIjpmYWxzZX0seyJuYW1lIjoidmlzaXRzIiwibGFiZWwiOiJWaXNpdHMiLCJ2YWx1ZV90eXBlIjoiaW50ZWdlciIsInJlcXVpcmVkIjpmYWxzZX1dLCJwcm9maWxlcyI6W3sibmFtZSI6ImFjY2VzcyIsImNsYWltX3BhdGhzIjpbWyJjcmVkZW50aWFsU3ViamVjdCIsIm1lbWJlciJdXX0seyJuYW1lIjoic2lnbl9pbiIsImNsYWltX3BhdGhzIjpbWyJjcmVkZW50aWFsU3ViamVjdCIsIm1lbWJlciJdLFsiY3JlZGVudGlhbFN1YmplY3QiLCJtZW1iZXJfaWQiXV19XX0sInN0YXR1cyI6ImFjdGl2ZSJ9XX0.M2uFQZ49tI604B3EGmrKd0ay2zOWn269ebV5EMBTsMYMYxvLlJILIUhytQOzqBglwbFmZ4VgLL5qzVv6hdlAPg",
+  "compact_credential": "eyJhbGciOiJFUzI1NiIsInR5cCI6InZjK3NkLWp3dCIsImtpZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjZml4dHVyZS0zNjAifQ.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiLHsiQHZvY2FiIjoiaHR0cHM6Ly9leGFtcGxlLnRlc3Qvdm9jYWIjIn1dLCJfc2RfYWxnIjoic2hhLTI1NiIsImNuZiI6eyJqd2siOnsiY3J2IjoiUC0yNTYiLCJraWQiOiJob2xkZXI6Zml4dHVyZS0zNjAiLCJrdHkiOiJFQyIsIngiOiJsODdNZjE4YVpOWEVjd09tc2lVRTJlS0dLTTloc2kwS2YtWVBUVm81UVhNIiwieSI6Ijg0VWpzNU9DU0RKTXZOX09tOFlQZVZFSDJzS0JRcWlhbFNhWU03WjlWRzgifX0sImNyZWRlbnRpYWxEZWZpbml0aW9uIjp7ImlkIjoidXJuOmV4YW1wbGU6bWVtYmVyc2hpcCIsInZlcnNpb24iOiIxIn0sImNyZWRlbnRpYWxTdGF0dXMiOnsiaWQiOiJodHRwczovL3N0YXR1cy5leGFtcGxlLzEjMCIsInN0YXR1c0xpc3RDcmVkZW50aWFsIjoiaHR0cHM6Ly9zdGF0dXMuZXhhbXBsZS8xIiwic3RhdHVzTGlzdEluZGV4IjoiMCIsInN0YXR1c1B1cnBvc2UiOiJyZXZvY2F0aW9uIiwidHlwZSI6IkJpdHN0cmluZ1N0YXR1c0xpc3RFbnRyeSJ9LCJjcmVkZW50aWFsU3ViamVjdCI6eyJfc2QiOlsiQVRwSnVyZjRVN2NlNlFVbXFxQS0zMk9NZ3JBQXlOQWFfaGEtbnEzMHByZyIsIlBUQ2pzNDZfcDh5YlZ1M3YzenNLb3NZcHQyY0ZJblFkbnJjYXQzSXZ0enciXSwic2NvcmUiOjMuNSwidmlzaXRzIjoyfSwiZXhwIjoyMDAsImlhdCI6MTAwLCJpc3MiOiJkaWQ6d2ViOmlzc3Vlci5leGFtcGxlIiwiaXNzdWVyIjoiZGlkOndlYjppc3N1ZXIuZXhhbXBsZSIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJFeGFtcGxlTWVtYmVyc2hpcENyZWRlbnRpYWwiXSwidmFsaWRGcm9tIjoiMTk3MC0wMS0wMVQwMDowMTo0MFoiLCJ2YWxpZFVudGlsIjoiMTk3MC0wMS0wMVQwMDowMzoyMFoifQ.naU61oUMIW6RXmZGjUKok3y0Xv-F0FdzEihZiKng-cqQ1mlVRNfEHjtQQgoUPKYpKiLYfqYizp0oC6aUpFvS6g~WyJBQUFBQUFBQUFBQUFBQUFBQUFBQUFBIiwibWVtYmVyIix0cnVlXQ~WyJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRIiwibWVtYmVyX2lkIiwiZXhhbXBsZS1tZW1iZXItNDIiXQ~",
+  "disclosed_credential": "eyJhbGciOiJFUzI1NiIsInR5cCI6InZjK3NkLWp3dCIsImtpZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjZml4dHVyZS0zNjAifQ.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiLHsiQHZvY2FiIjoiaHR0cHM6Ly9leGFtcGxlLnRlc3Qvdm9jYWIjIn1dLCJfc2RfYWxnIjoic2hhLTI1NiIsImNuZiI6eyJqd2siOnsiY3J2IjoiUC0yNTYiLCJraWQiOiJob2xkZXI6Zml4dHVyZS0zNjAiLCJrdHkiOiJFQyIsIngiOiJsODdNZjE4YVpOWEVjd09tc2lVRTJlS0dLTTloc2kwS2YtWVBUVm81UVhNIiwieSI6Ijg0VWpzNU9DU0RKTXZOX09tOFlQZVZFSDJzS0JRcWlhbFNhWU03WjlWRzgifX0sImNyZWRlbnRpYWxEZWZpbml0aW9uIjp7ImlkIjoidXJuOmV4YW1wbGU6bWVtYmVyc2hpcCIsInZlcnNpb24iOiIxIn0sImNyZWRlbnRpYWxTdGF0dXMiOnsiaWQiOiJodHRwczovL3N0YXR1cy5leGFtcGxlLzEjMCIsInN0YXR1c0xpc3RDcmVkZW50aWFsIjoiaHR0cHM6Ly9zdGF0dXMuZXhhbXBsZS8xIiwic3RhdHVzTGlzdEluZGV4IjoiMCIsInN0YXR1c1B1cnBvc2UiOiJyZXZvY2F0aW9uIiwidHlwZSI6IkJpdHN0cmluZ1N0YXR1c0xpc3RFbnRyeSJ9LCJjcmVkZW50aWFsU3ViamVjdCI6eyJfc2QiOlsiQVRwSnVyZjRVN2NlNlFVbXFxQS0zMk9NZ3JBQXlOQWFfaGEtbnEzMHByZyIsIlBUQ2pzNDZfcDh5YlZ1M3YzenNLb3NZcHQyY0ZJblFkbnJjYXQzSXZ0enciXSwic2NvcmUiOjMuNSwidmlzaXRzIjoyfSwiZXhwIjoyMDAsImlhdCI6MTAwLCJpc3MiOiJkaWQ6d2ViOmlzc3Vlci5leGFtcGxlIiwiaXNzdWVyIjoiZGlkOndlYjppc3N1ZXIuZXhhbXBsZSIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJFeGFtcGxlTWVtYmVyc2hpcENyZWRlbnRpYWwiXSwidmFsaWRGcm9tIjoiMTk3MC0wMS0wMVQwMDowMTo0MFoiLCJ2YWxpZFVudGlsIjoiMTk3MC0wMS0wMVQwMDowMzoyMFoifQ.naU61oUMIW6RXmZGjUKok3y0Xv-F0FdzEihZiKng-cqQ1mlVRNfEHjtQQgoUPKYpKiLYfqYizp0oC6aUpFvS6g~WyJBQUFBQUFBQUFBQUFBQUFBQUFBQUFBIiwibWVtYmVyIix0cnVlXQ~"
+}

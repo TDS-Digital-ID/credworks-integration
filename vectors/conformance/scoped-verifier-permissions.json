@@ -1,0 +1,71 @@
+{
+  "header": {
+    "alg": "ES256",
+    "typ": "scoped-verifier-permissions+jwt",
+    "kid": "did:web:trust.credworks.xyz#fixture-354"
+  },
+  "anchor": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "9Es5dZoubbcjpvkCSZct_QjpU4Dx_KRw6s0dA-Xt8hQ",
+    "y": "vvr8zyI8oGXwoNtO6pP_BqIRb8qB96SpQ2qNkXoC3t4",
+    "kid": "did:web:trust.credworks.xyz#fixture-354"
+  },
+  "document": {
+    "version": 1,
+    "id": "https://trust.credworks.xyz/verifier-permissions.jwt",
+    "issuer": "did:web:trust.credworks.xyz",
+    "iat": 100,
+    "exp": 200,
+    "permissions": [
+      {
+        "credential_issuer_did": "did:web:issuer-unsw.credworks.xyz",
+        "definition_id": "urn:credworks:education",
+        "definition_version": "1",
+        "credential_type": "UniversityEducationCredential",
+        "verifier_did": "did:web:partner.example",
+        "verifier_origin": "https://partner.example",
+        "profile_name": "education_eligibility",
+        "claim_paths": [
+          [
+            "credentialSubject",
+            "enrolled"
+          ],
+          [
+            "credentialSubject",
+            "institution_id"
+          ]
+        ],
+        "verifier_public_jwk_sha256_thumbprint": "lq_PtW2FX0J6r1miIqjkx1TtZ6GBdGbWoEfdg5cPdyE",
+        "status": "active"
+      }
+    ]
+  },
+  "request": {
+    "credential_issuer_did": "did:web:issuer-unsw.credworks.xyz",
+    "definition_id": "urn:credworks:education",
+    "definition_version": "1",
+    "credential_type": "UniversityEducationCredential",
+    "verifier_did": "did:web:partner.example",
+    "verifier_origin": "https://partner.example",
+    "verifier_public_jwk": {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "EFfgq1eA9HDe_JN40cfIdDe7TG-epVxj2TYmbb14H9o",
+      "y": "9vFkWhXL5dyfqbff2W7lp9zBG1xe9PH3jYOzOTxqRaI",
+      "kid": "did:web:partner.example#key-1"
+    },
+    "profile_name": "education_eligibility",
+    "claim_paths": [
+      [
+        "credentialSubject",
+        "enrolled"
+      ],
+      [
+        "credentialSubject",
+        "institution_id"
+      ]
+    ]
+  },
+  "compact_jws": "eyJhbGciOiJFUzI1NiIsInR5cCI6InNjb3BlZC12ZXJpZmllci1wZXJtaXNzaW9ucytqd3QiLCJraWQiOiJkaWQ6d2ViOnRydXN0LmNyZWR3b3Jrcy54eXojZml4dHVyZS0zNTQifQ.eyJ2ZXJzaW9uIjoxLCJpZCI6Imh0dHBzOi8vdHJ1c3QuY3JlZHdvcmtzLnh5ei92ZXJpZmllci1wZXJtaXNzaW9ucy5qd3QiLCJpc3N1ZXIiOiJkaWQ6d2ViOnRydXN0LmNyZWR3b3Jrcy54eXoiLCJpYXQiOjEwMCwiZXhwIjoyMDAsInBlcm1pc3Npb25zIjpbeyJjcmVkZW50aWFsX2lzc3Vlcl9kaWQiOiJkaWQ6d2ViOmlzc3Vlci11bnN3LmNyZWR3b3Jrcy54eXoiLCJkZWZpbml0aW9uX2lkIjoidXJuOmNyZWR3b3JrczplZHVjYXRpb24iLCJkZWZpbml0aW9uX3ZlcnNpb24iOiIxIiwiY3JlZGVudGlhbF90eXBlIjoiVW5pdmVyc2l0eUVkdWNhdGlvbkNyZWRlbnRpYWwiLCJ2ZXJpZmllcl9kaWQiOiJkaWQ6d2ViOnBhcnRuZXIuZXhhbXBsZSIsInZlcmlmaWVyX29yaWdpbiI6Imh0dHBzOi8vcGFydG5lci5leGFtcGxlIiwidmVyaWZpZXJfcHVibGljX2p3a19zaGEyNTZfdGh1bWJwcmludCI6ImxxX1B0VzJGWDBKNnIxbWlJcWpreDFUdFo2R0JkR2JXb0VmZGc1Y1BkeUUiLCJwcm9maWxlX25hbWUiOiJlZHVjYXRpb25fZWxpZ2liaWxpdHkiLCJjbGFpbV9wYXRocyI6W1siY3JlZGVudGlhbFN1YmplY3QiLCJlbnJvbGxlZCJdLFsiY3JlZGVudGlhbFN1YmplY3QiLCJpbnN0aXR1dGlvbl9pZCJdXSwic3RhdHVzIjoiYWN0aXZlIn1dfQ.9fjD3np3eA0irl_dSOCTyKOPv8fpJvWE6ONgtGujNh7jWLGNgzsi9XmjsP0HYE9aVJQbvUvJDU8jPanGOc_OkA"
+}

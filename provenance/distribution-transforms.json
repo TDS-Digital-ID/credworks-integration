@@ -1,0 +1,73 @@
+{
+  "originalKit": "36dcc1b64637826a0193834d1c2a6ac451ac35d4",
+  "licenceDecisionCommit": "c851e8ae42fb6416d7f9f4066d18e8102a69e261",
+  "changes": [
+    {
+      "path": "ANDROID-PRIVACY.md",
+      "originalSha256": null,
+      "distributionSha256": "749dd90169413f0d41aab5f9fb03fc807a89e96d2d129044d6ce60b130f6fa54"
+    },
+    {
+      "path": "Cargo.toml",
+      "originalSha256": "cb4eef979b3abf319da2b5b067ae5740770a11ebe558f5de4662dc10bc6a4edc",
+      "distributionSha256": "c7ff4b7e337bad147665c362dc4d765f4e7d7bc5edfac0db6e24b1845535afda"
+    },
+    {
+      "path": "DISTRIBUTION.md",
+      "originalSha256": null,
+      "distributionSha256": "ea61f4f1d56558b98afb7a6a522d12402e1be40925334388f0efa1cd8a4e2e2f"
+    },
+    {
+      "path": "LICENSE",
+      "originalSha256": null,
+      "distributionSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "NOTICE",
+      "originalSha256": null,
+      "distributionSha256": "66fe074736dd7c090393fd928e9ac7a4db49b5691528b37a1c5a89bd28af48c1"
+    },
+    {
+      "path": "README.md",
+      "originalSha256": "53773885c107a2a26c64a3b404a899160b736a8a81a2ef68beebbd7c4607e90f",
+      "distributionSha256": "45f42becaee00496fe64423f4dbc796c3f61b5c182acf4f30fc0b5e5750f1bb0"
+    },
+    {
+      "path": "apps/education-sign-in/README.md",
+      "originalSha256": "a0955db8677b1fe3f5e630981ac9a87766ec7c407ba3df792d8fcc371823ee93",
+      "distributionSha256": "89e7e5e2e60d573ab03eb7ab0bfc4ec08424df252fb37fe32d0f8f46df38b0ea"
+    },
+    {
+      "path": "apps/education-sign-in/package.json",
+      "originalSha256": "49cde7c1b69c3f7a4f78202d1c8e833691481c871c04bab6b678bb12e92d9172",
+      "distributionSha256": "ede4a689be889bd5f3a79b625ad3ec3166e446e4d340c3bf7cd46c710fcbcaef"
+    },
+    {
+      "path": "apps/education-sign-in/src/public/fonts.md",
+      "originalSha256": "f2021055078937c9e85ccffbe58317a0e34890d1f30cfef1a6cac6573cf2ee12",
+      "distributionSha256": "a7e34b9fdf2ef7e887ee8692cb1ee6c9a116c75bf714782066c0fc373a1c4f63"
+    },
+    {
+      "path": "apps/partner-runtime/package.json",
+      "originalSha256": "70a6b04f977449a2f87fd536d0059587f8af169b6931cfeb79f7636ddbe3470c",
+      "distributionSha256": "2052c0b8ffd97394cb1533ba60d9e0973824f5612f1adf93592f02b7845e6553"
+    },
+    {
+      "path": "docs/education/overview.md",
+      "originalSha256": "338db1431f316a9b360127970cfa9db7f8924b99244750a52c8b6b399bf8958e",
+      "distributionSha256": "7efa8f205170661c66d8fb75c78a1532ab027fbd602d2d65768b4f213b6b873f"
+    },
+    {
+      "path": "package.json",
+      "originalSha256": "56ba18b9bc44c528ad7b265b2404d5a45f7b07045dd8cb3439651bccbbd465d0",
+      "distributionSha256": "b9db30b39833c1b1bafd577619d8bc3919423631e8aed3a7420c037c278ebcec"
+    },
+    {
+      "path": "packages/identity-core-node/package.json",
+      "originalSha256": "4e2b8bcd9815016fb3431c2ec16b572a539385f37a292f0f6994b06fd1e4c56e",
+      "distributionSha256": "aab748867ee48216003fee59f071dedfa149affee038ce3145321f3768447d4e"
+    }
+  ],
+  "preservedOriginalFiles": 99,
+  "limitation": "Original source-files.json has producer hashes only; left unchanged. This separate manifest records distribution deltas."
+}

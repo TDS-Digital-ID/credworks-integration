@@ -1,0 +1,26 @@
+{
+  "name": "credworks-education-integration",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.34.4",
+  "scripts": {
+    "build": "pnpm --filter @unsw-vc/identity-core-node build && pnpm --filter @unsw-vc/partner-runtime build && pnpm --filter @unsw-vc/education-sign-in build",
+    "lint": "pnpm -r lint",
+    "test:boundary": "node --import tsx --test tests/*.test.mjs",
+    "acceptance": "node --import tsx tool/education-http.ts",
+    "test:fixtures": "node tool/test-fixture-addon.mjs",
+    "check": "pnpm docs:check && pnpm lint && pnpm exec tsc -p tool/tsconfig.json && pnpm test:boundary && pnpm test:fixtures",
+    "register": "node --import tsx tool/register-verifier.ts",
+    "docs:check": "node tool/check-docs.mjs --root . && node --test tool/tests/docs.test.mjs"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "@types/node": "24.10.0",
+    "tsx": "^4.23.0"
+  },
+  "dependencies": {
+    "@unsw-vc/identity-core-node": "workspace:*"
+  },
+  "type": "module",
+  "license": "Apache-2.0"
+}

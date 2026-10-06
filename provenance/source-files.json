@@ -1,0 +1,320 @@
+{
+  "repository": "TDS-Digital-ID/university-vc-monorepo",
+  "revision": "14096ed41ee259e81414fcfa0c3b2ad622a5b426",
+  "files": [
+    {
+      "path": "Cargo.lock",
+      "source_sha256": "d552cd88b7ecbb73b564b106bb47f7b1b13ec09cf95b0e4edf067029824145bb"
+    },
+    {
+      "path": "Cargo.toml",
+      "source_sha256": "3f08c77619031ccdceb3d6b45e52ab4b5d97d895deb5801765ecd4f30c68d2a9"
+    },
+    {
+      "path": "apps/education-sign-in/Dockerfile",
+      "source_sha256": "c58b68e9f10a2801e39ff4380903cf2bcc6b9d4556dbcd3c005e05a6ef66a214"
+    },
+    {
+      "path": "apps/education-sign-in/README.md",
+      "source_sha256": "a0955db8677b1fe3f5e630981ac9a87766ec7c407ba3df792d8fcc371823ee93"
+    },
+    {
+      "path": "apps/education-sign-in/drizzle/0000_nifty_ego.sql",
+      "source_sha256": "86d93ee3f9ef861f403131e50231367dab1e9a87eb8e0e21fed652b0fa77786f"
+    },
+    {
+      "path": "apps/education-sign-in/drizzle/meta/0000_snapshot.json",
+      "source_sha256": "5f77b74095260d4214abe428639fd5de3609e0e0b09aabdc1b9128e461cd4aed"
+    },
+    {
+      "path": "apps/education-sign-in/drizzle/meta/_journal.json",
+      "source_sha256": "ed3128412d6d0f3adac27a7c255f01f92d5f4161b73b0f1cf3eb6c891af48a6e"
+    },
+    {
+      "path": "apps/education-sign-in/drizzle.config.ts",
+      "source_sha256": "bf1e21c3436e81e9bf79d55a2c06604525773777f6450eb3fbb2c73de42030da"
+    },
+    {
+      "path": "apps/education-sign-in/package.json",
+      "source_sha256": "0cefc252b9a42b2162f33967a273c97fabd2c69646585c9e10757df4caaa0a36"
+    },
+    {
+      "path": "apps/education-sign-in/src/accounts.ts",
+      "source_sha256": "f78c74d7c29cfeb54190f3a3beb0c3f2ae8e961adb30ebb7ce45a2f393370acf"
+    },
+    {
+      "path": "apps/education-sign-in/src/cli.ts",
+      "source_sha256": "5a5c687a23f0794e43d722c5eaca41a035a78a191972e1992304bfbde80a8ab9"
+    },
+    {
+      "path": "apps/education-sign-in/src/public/app.css",
+      "source_sha256": "04d3c9285e0a816de424ca28abc47725d8afecb016c1fcbd0c4a4f76a4c10918"
+    },
+    {
+      "path": "apps/education-sign-in/src/public/app.js",
+      "source_sha256": "d513bd354217d32a4448c3b88507f14295acc64ae39938805f4912e6c5599801"
+    },
+    {
+      "path": "apps/education-sign-in/src/public/fonts.md",
+      "source_sha256": "f2021055078937c9e85ccffbe58317a0e34890d1f30cfef1a6cac6573cf2ee12"
+    },
+    {
+      "path": "apps/education-sign-in/src/public/index.html",
+      "source_sha256": "509da3ef871d714caf4a8e3e9dbdf869b2d140c60bba0ab8c0297e5bca27682c"
+    },
+    {
+      "path": "apps/education-sign-in/src/public/mono-OFL.txt",
+      "source_sha256": "4abb88162e4c0c5f9fc6c2f15d7085f7b7e27fd89f541a13488e1bcb829bde3f"
+    },
+    {
+      "path": "apps/education-sign-in/src/public/mono.ttf",
+      "source_sha256": "e20c1df32aa2f886e828cfcc81ca5c405d3f3b160990f6b892923e2e449bf525"
+    },
+    {
+      "path": "apps/education-sign-in/src/public/openapi.json",
+      "source_sha256": "4bd96c12ca259a457aa383e62c8885e1c252b0642fb90eaba9016bb0b1cda576"
+    },
+    {
+      "path": "apps/education-sign-in/src/public/spectral-OFL.txt",
+      "source_sha256": "501d6ceca8e552630fe3aa9442b9a818565680a1a2f79f3fb8c13d6f309a9e98"
+    },
+    {
+      "path": "apps/education-sign-in/src/public/spectral.ttf",
+      "source_sha256": "c89021dc20720c8d0dcf40b0b2f6e00c13665fa8041717f581396f51b8c78f5d"
+    },
+    {
+      "path": "apps/education-sign-in/src/server.ts",
+      "source_sha256": "93dc49f72e882220263997c68fe4cb1a5e9018c2e242cb76d1a5fb4b2b02772a"
+    },
+    {
+      "path": "apps/education-sign-in/tsconfig.json",
+      "source_sha256": "c4adbe7c8f4fec9c24ee700a6ff0f51e5b6c5a8675082593d8102e5cad31b965"
+    },
+    {
+      "path": "apps/partner-runtime/Dockerfile",
+      "source_sha256": "56b2c8b629a9d7a429fbeb6ee4c3ee0b3c756eac7abbe6700b3000ebf46d1909"
+    },
+    {
+      "path": "apps/partner-runtime/README.md",
+      "source_sha256": "1a45b9d99d54d3b3910f8dc49e197d347c7a70c5c5f81581d018d2735840c471"
+    },
+    {
+      "path": "apps/partner-runtime/examples/verifier.json",
+      "source_sha256": "81eb0b2641602f0b19b95fbbbde7bc5b4735c7b4d446fc7e991f41beffe52634"
+    },
+    {
+      "path": "apps/partner-runtime/openapi.json",
+      "source_sha256": "9c46f81c3c04509e4854a619641644a760d07b24bf0d443734de3a0c46103680"
+    },
+    {
+      "path": "apps/partner-runtime/package.json",
+      "source_sha256": "aa5ecab9fee5263da9e23dac67347e4be65ef9042c3ed9ad78dda1ac3aeefd9b"
+    },
+    {
+      "path": "apps/partner-runtime/src/cli.ts",
+      "source_sha256": "65d5fafcdaeb3cfefa2a0be54c4e0010f8a93f3aa7b3f6dfe96cf5efd80f9d99"
+    },
+    {
+      "path": "apps/partner-runtime/src/evidence-cache.ts",
+      "source_sha256": "acd296a6e97b770786082784517d503864b7200d8b1ef10f6bece2b385049b4c"
+    },
+    {
+      "path": "apps/partner-runtime/src/runtime.ts",
+      "source_sha256": "41a0f56eeca49ce85f951ea0867844f369e269c11ecec3470e9bc1ecae0b3030"
+    },
+    {
+      "path": "apps/partner-runtime/src/sessions.ts",
+      "source_sha256": "f7a76416174326aec9e9aae8acc6ccba9743f9a5eea6ac16000aa3909f7f5e29"
+    },
+    {
+      "path": "apps/partner-runtime/tests/container.test.mjs",
+      "source_sha256": "79b15eea843677630ee41dc72b4f334fb347e183df24012716ad884fa136a356"
+    },
+    {
+      "path": "apps/partner-runtime/tests/evidence-network.test.mjs",
+      "source_sha256": "d3e87d83cbf775a98ea866aaee348f4cbf5575f1cc432678dfac8b6b6cfce9af"
+    },
+    {
+      "path": "apps/partner-runtime/tests/identity.test.mjs",
+      "source_sha256": "4499cac4be75838b3676b9de19440b3290e3bc591c8ad04bde6f2b6e9c06b48a"
+    },
+    {
+      "path": "apps/partner-runtime/tests/sessions.test.mjs",
+      "source_sha256": "bd6e218968211732e16b08d51a497b0d64206757da73d0c0bee22327ff0f1bac"
+    },
+    {
+      "path": "apps/partner-runtime/tool/check-packaged-addon.mjs",
+      "source_sha256": "0ee04228d3aa240dd9b2896c26b268237d110c4ce79746725e6567754ea59880"
+    },
+    {
+      "path": "apps/partner-runtime/tsconfig.json",
+      "source_sha256": "c4adbe7c8f4fec9c24ee700a6ff0f51e5b6c5a8675082593d8102e5cad31b965"
+    },
+    {
+      "path": "core/bindings-node/Cargo.toml",
+      "source_sha256": "e3935719980e2705cd860aab67d5c607ba56342dff479d922ad22ad4e03af9c2"
+    },
+    {
+      "path": "core/bindings-node/build.rs",
+      "source_sha256": "aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f"
+    },
+    {
+      "path": "core/bindings-node/src/lib.rs",
+      "source_sha256": "56bdc33fe04029c52ae595ccf98e20348430d48e116ac6d0b2e2e32ca367488f"
+    },
+    {
+      "path": "core/bindings-node/src/persistent_signer.rs",
+      "source_sha256": "bfcf5fe1f0d2e8ad8ae6f643fcdb2ed39163e4db4d89d94bce35edf0acf2afe5"
+    },
+    {
+      "path": "core/bindings-node/src/scalar_definitions.rs",
+      "source_sha256": "d5d543f6cf4b735bef06a95c4320bee6e909aafb70c0a09d7aea3d284be3c56a"
+    },
+    {
+      "path": "core/bindings-node/src/scoped_permissions.rs",
+      "source_sha256": "3a881060098887fe3f4f8960d659e66970480d8da9b17598dc1c85891acdf3de"
+    },
+    {
+      "path": "core/identity-core/Cargo.toml",
+      "source_sha256": "50b4b309f61491a33c7edae39f3c9a166e80a66d9b94502265e5b2a1a918104c"
+    },
+    {
+      "path": "core/identity-core/examples/conformance_surface.rs",
+      "source_sha256": "aada65b853977ad4e9f7b85654b5d6f0040c9a94291947d86444cb290284e89f"
+    },
+    {
+      "path": "core/identity-core/examples/vc_jose_cose_conformance_surface.rs",
+      "source_sha256": "0d7d1b92088302c8f360ca01aa9a218c31e9a8674663c0549f4895d2e695c0a5"
+    },
+    {
+      "path": "core/identity-core/examples/w3c_dm2_conformance_surface.rs",
+      "source_sha256": "933df249fceecdffe5ef6acaba14d68d3192127273bb388d228998708d101861"
+    },
+    {
+      "path": "core/identity-core/src/issuer_authorizations.rs",
+      "source_sha256": "6c0c8c865a1e8252d93d7a21dff802fb2c3e3e9bd45d9c024457f8a4f912b3cd"
+    },
+    {
+      "path": "core/identity-core/src/lib.rs",
+      "source_sha256": "6f797e7c2140107d0f42550195c45cc1103496fdbab1cda4fc25773e0c5ba603"
+    },
+    {
+      "path": "core/identity-core/src/local_signer.rs",
+      "source_sha256": "4ecfd114e377ae1a4e2ed1b4448da55d7766f45cdc4501f09d7058d41af2f74e"
+    },
+    {
+      "path": "core/identity-core/src/partner_identity_proof.rs",
+      "source_sha256": "4586ba44cac58128a1e583b1af6e4c373201a9f38b735b81a09598b420b19c36"
+    },
+    {
+      "path": "core/identity-core/src/scalar_definitions.rs",
+      "source_sha256": "2a61b195a61d8063ccb67ef364e46ce3c3fcfa0906fd998a6cbbef124709e8b6"
+    },
+    {
+      "path": "core/identity-core/src/scoped_permissions.rs",
+      "source_sha256": "f5ed54a59f32bdfb4e535608590515e38b0786f45063b827850860b1411d273d"
+    },
+    {
+      "path": "core/identity-core/src/w3c_vc_data_model.rs",
+      "source_sha256": "2734d90868682ad2002a22821b0bdcac2f6b0ba3c4d09496d6c40b1954ffce77"
+    },
+    {
+      "path": "core/identity-core/tests/local_signer.rs",
+      "source_sha256": "633b1905570f939ef352d0c53810973f70f86a7ef529518a12385a5eb48de731"
+    },
+    {
+      "path": "core/identity-core/tests/partner_identity_proof.rs",
+      "source_sha256": "2ce0291e08ee8e41cd29871ff7970337416df6b0a2275baccf20cfe13a4aedc2"
+    },
+    {
+      "path": "core/identity-core/tests/scalar_definitions.rs",
+      "source_sha256": "347e3618b1cb8e93852460bd496f4f53b88f6b8280227ebc24e7ac521f1c85ec"
+    },
+    {
+      "path": "core/identity-core/tests/scoped_permissions.rs",
+      "source_sha256": "f30881e060e217c0e6dcd6f1bcea440d33a1c18de056e14175e13ffffbb1071b"
+    },
+    {
+      "path": "infra/education-sign-in/compose.yml",
+      "source_sha256": "9076010e63e1f567af94a0ea0337a005f1e92a59d33c816548e367cebb6d55b9"
+    },
+    {
+      "path": "infra/partner/compose.yml",
+      "source_sha256": "c44cad2a35421ac0fd3ca8dd891944cb06ab874ee679e3a00dd9b196e4f63e68"
+    },
+    {
+      "path": "package.json",
+      "source_sha256": "cc229ee2e4aa4b7bb49e05425342426a6fe4847c70d94e5743af38f63142b0ed"
+    },
+    {
+      "path": "packages/identity-core-node/package.json",
+      "source_sha256": "2faaedf0e92e436bab2123863f0cd0d15fb810abeb10b42dcde4d9c5aff4e679"
+    },
+    {
+      "path": "packages/identity-core-node/src/index.ts",
+      "source_sha256": "81f01b65e815beda1b26ba8bbcd2d7ba4a871f8efc57422439878a1cdfeceb21"
+    },
+    {
+      "path": "packages/identity-core-node/tests/interop.test.mjs",
+      "source_sha256": "d131cff1aa1c4a367009e88c448cb13c0cf879fdfd0544a65800e8b4b35f4f5e"
+    },
+    {
+      "path": "packages/identity-core-node/tests/round-trip.test.mjs",
+      "source_sha256": "5716193b3b296e701a75ff6a8802c486b540aab541fb9ffc7256e777c6343ad2"
+    },
+    {
+      "path": "packages/identity-core-node/tests/scalar-definitions.test.mjs",
+      "source_sha256": "07dfda89d352bacfff3d82097b029e1d6720465c030c7bbc5715e1225b06535b"
+    },
+    {
+      "path": "packages/identity-core-node/tests/scoped-permissions.test.mjs",
+      "source_sha256": "361ff24586683f859900095156664ad1b35042bc3e76c6da381fd752cfb7181d"
+    },
+    {
+      "path": "packages/identity-core-node/tsconfig.json",
+      "source_sha256": "cd8ab898da88719f7b496c5005882145657c2a76b5df38a627d2dc8c1e86a122"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "source_sha256": "ffd33c26612689a835bf667b7f5150786ea3f4f4c88e5659ce804d62c8201609"
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "source_sha256": "9badda3d0bd96dc2bfb26705ee1b671940ea742bed4738fefa10a47199f8554c"
+    },
+    {
+      "path": "tsconfig.base.json",
+      "source_sha256": "09a82d82bb1b5ac4bbad9b5d3483f4bbc2ef79dc4fb27b74f841a93689e3e053"
+    },
+    {
+      "path": "usecases/webapp-explainer/example.json",
+      "source_sha256": "0bb2beac27b005f35e44ef65322c405319ab2487104a83ebc58dd3fc6b02c1fd"
+    },
+    {
+      "path": "vectors/conformance/scalar-definitions.json",
+      "source_sha256": "f5150f24d57dbed4a601fbc53aa0520cbde80a588623524aba4be2355c118962"
+    },
+    {
+      "path": "vectors/conformance/scoped-verifier-permissions.json",
+      "source_sha256": "c25d858c34c0e8e4dae98ab8caac04eea72f5ecec3bf24ab004156adeaae863b"
+    },
+    {
+      "path": "vectors/conformance/student-uc3.json",
+      "source_sha256": "5593b0cf8e73352dad8ad3ccc7c37a27ab1de19cfdad930c8cc3616041d93c12"
+    }
+  ],
+  "omitted_generated_files": [
+    {
+      "path": "packages/identity-core-node/native/index.cjs",
+      "source_sha256": "f91a34aac97f3aae733f1079645bc660ec05e07e357027459ecf6b43d7329adb"
+    },
+    {
+      "path": "packages/identity-core-node/native/index.d.ts",
+      "source_sha256": "27f25eea48537d3b5d978494ad4251f799d6efd653ae4d7d5b55d23b7a7e3e97"
+    },
+    {
+      "path": "packages/identity-core-node/native/index.js",
+      "source_sha256": "f91a34aac97f3aae733f1079645bc660ec05e07e357027459ecf6b43d7329adb"
+    }
+  ]
+}

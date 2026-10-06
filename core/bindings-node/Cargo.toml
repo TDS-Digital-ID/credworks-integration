@@ -1,0 +1,35 @@
+[package]
+name = "bindings-node"
+version = "0.1.0"
+description = "napi-rs binding crate for identity-core"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "identity_core_node"
+path = "src/lib.rs"
+
+[features]
+# Partner containers exclude demo signing identities; default demos/tests are unchanged.
+partner-runtime = []
+
+[dependencies]
+identity-core = { path = "../identity-core" }
+napi = "3"
+napi-derive = "3"
+p256 = { version = "0.14.0", features = ["ecdsa"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.150"
+
+zeroize = "1.8.2"
+
+[build-dependencies]
+napi-build = "2"
+
+[lints.rust]
+# napi-rs generates the Node-API FFI entrypoints for this crate. The VC core
+# remains under the workspace `unsafe_code = forbid` lint.
+unsafe_code = "allow"

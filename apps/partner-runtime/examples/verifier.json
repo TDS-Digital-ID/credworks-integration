@@ -1,0 +1,29 @@
+{
+  "issuerDid": "did:web:education.example",
+  "issuerJwk": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "REPLACE_WITH_PINNED_PUBLIC_X",
+    "y": "REPLACE_WITH_PINNED_PUBLIC_Y"
+  },
+  "registryOrigin": "https://registry.example",
+  "trustAnchorJwk": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "REPLACE_WITH_PINNED_PUBLIC_X",
+    "y": "REPLACE_WITH_PINNED_PUBLIC_Y"
+  },
+  "statusSources": [
+    {
+      "url": "https://status.example/education.jwt",
+      "publicJwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "REPLACE_WITH_PINNED_PUBLIC_X",
+        "y": "REPLACE_WITH_PINNED_PUBLIC_Y"
+      },
+      "purpose": "revocation"
+    }
+  ],
+  "maxCacheAgeSeconds": 300
+}

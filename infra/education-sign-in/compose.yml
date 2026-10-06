@@ -1,0 +1,46 @@
+services:
+  partner:
+    extends: { file: ../partner/compose.yml, service: partner }
+    ports: ["127.0.0.1:${EDUCATION_APP_HOST_PORT:-3082}:3082"]
+  application:
+    image: ${EDUCATION_APP_IMAGE:?set revision-tagged app image}
+    network_mode: service:partner
+    depends_on: [partner]
+    user: "10001:10001"
+    read_only: true
+    init: true
+    restart: unless-stopped
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 1
+    mem_limit: 256m
+    pids_limit: 64
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=16m"]
+    environment:
+      EDUCATION_APP_ORIGIN: ${EDUCATION_APP_ORIGIN:?set independently served HTTPS app origin}
+      EDUCATION_APP_PORT: 3082
+      EDUCATION_RUNTIME_MANAGEMENT: http://127.0.0.1:3081
+      PARTNER_MANAGEMENT_TOKEN: ${PARTNER_MANAGEMENT_TOKEN:?inject runtime management credential}
+      EDUCATION_TRUSTED_ISSUER: ${EDUCATION_TRUSTED_ISSUER:?pin accepted Education issuer DID}
+      EDUCATION_VERIFIER_DID: ${EDUCATION_VERIFIER_DID:?pin registered runtime DID}
+      EDUCATION_INSTITUTION: ${EDUCATION_INSTITUTION:?configure allowed institution}
+      EDUCATION_APP_DATABASE_URL: ${EDUCATION_APP_DATABASE_URL:?use dedicated app database}
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+  database:
+    image: postgres:17.10-alpine3.23
+    profiles: [local-db]
+    environment:
+      POSTGRES_USER: education
+      POSTGRES_DB: education
+      POSTGRES_PASSWORD: ${EDUCATION_DB_PASSWORD:?inject app database password}
+    volumes: [education_accounts:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U education -d education"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+volumes:
+  partner_identity:
+  education_accounts:
