@@ -1,6 +1,6 @@
 {
   "originalKit": "36dcc1b64637826a0193834d1c2a6ac451ac35d4",
-  "licenceDecisionCommit": "c851e8ae42fb6416d7f9f4066d18e8102a69e261",
+  "licenceDecisionCommit": "abef7a3",
   "changes": [
     {
       "path": "ANDROID-PRIVACY.md",
@@ -30,7 +30,7 @@
     {
       "path": "README.md",
       "originalSha256": "53773885c107a2a26c64a3b404a899160b736a8a81a2ef68beebbd7c4607e90f",
-      "distributionSha256": "45f42becaee00496fe64423f4dbc796c3f61b5c182acf4f30fc0b5e5750f1bb0"
+      "distributionSha256": "61273a676b8ab44245b5f3849dfdeea7a09a626f789502cde6c7fe2196d0d5fc"
     },
     {
       "path": "apps/education-sign-in/README.md",
@@ -68,6 +68,6 @@
       "distributionSha256": "aab748867ee48216003fee59f071dedfa149affee038ce3145321f3768447d4e"
     }
   ],
-  "preservedOriginalFiles": 99,
-  "limitation": "Original source-files.json has producer hashes only; left unchanged. This separate manifest records distribution deltas."
+  "limitation": "Original source-files.json has producer hashes only; left unchanged. This separate manifest records distribution deltas.",
+  "originalPathsRetained": 99
 }

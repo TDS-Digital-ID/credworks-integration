@@ -107,10 +107,10 @@ operational steps. The complete candidate/setup sibling will execute the full se
 
 ## Revision-labelled containers
 
-Build only from a clean committed checkout; use its full revision as the source label:
+Build from a checksum-verified source archive or clean committed checkout. Set `SOURCE_REVISION` to the full source revision recorded in its release manifest; a Git checkout may use its clean HEAD. This labels a new build, not the preserved historical image:
 
 ```sh
-REVISION=$(git rev-parse HEAD)
+REVISION=${SOURCE_REVISION:?set the full source revision from the release manifest}
 docker build --build-arg SOURCE_REVISION="$REVISION" -f apps/partner-runtime/Dockerfile -t "credworks-partner:git-$REVISION" .
 docker build --build-arg SOURCE_REVISION="$REVISION" -f apps/education-sign-in/Dockerfile -t "credworks-education:git-$REVISION" .
 ```
@@ -124,7 +124,8 @@ published management port. The build scans the production addon and removes the
 fixture-aware scanner before final COPY. Final artifact evidence records observed
 image IDs and layer checks separately from source provenance.
 
-Both repositories remain private. Project reuse licensing and public publication await
-human approval under #338; third-party font notices are included separately. This child
+The producer repositories remain private. Project-owned code is Apache-2.0; third-party
+font notices retain their own terms. Public preview availability and remaining acceptance
+are recorded separately under #338. This child
 prepares source/build delivery, not a complete release candidate. Public deployment and
 physical Android acceptance are **NOT RUN**.
