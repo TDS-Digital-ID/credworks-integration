@@ -3,7 +3,7 @@
 Project code is licensed under [Apache-2.0](LICENSE); third-party notices remain in force.
 Read the [distribution status and limits](DISTRIBUTION.md) before selecting an artifact.
 
-The [canonical partner integration guide](docs/partner/overview.md) covers generic setup, definitions, HTTP APIs and lifecycle operations on the revision-pinned #408 source. Start there for the configurable issuer/verifier kit. Both repositories remain private; physical and public release checks remain NOT RUN.
+The [canonical partner integration guide](docs/partner/overview.md) covers generic setup, definitions, HTTP APIs and lifecycle operations on the revision-pinned #408 source. Start there for the configurable issuer/verifier kit. Experimental releases are available in [the public distribution repository](https://github.com/TDS-Digital-ID/credworks-integration/releases). The producer repositories remain private. Complete public-only setup and physical acceptance remain incomplete; see the canonical guides for the current limits.
 
 The existing Education instructions below retain their original frozen source scope. The [canonical Education integration guide](docs/education/overview.md) covers setup, profiles, API, operations and preparation limits.
 

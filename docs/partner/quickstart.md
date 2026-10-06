@@ -15,10 +15,10 @@ pnpm docs:check
 pnpm exec tsc -p tool/tsconfig.json
 ```
 
-A fresh source build needs public package registries, not private-monorepo access. For local images build from a clean committed revision and keep the resulting image IDs separate from the prepared #408 image pins:
+A fresh source build needs public package registries, not private-monorepo access. For local images, set SOURCE_REVISION to the full source revision recorded in the selected release manifest. A clean Git checkout may use its full HEAD instead. Keep newly built image IDs separate from the published image pins:
 
 ```sh
-REVISION=$(git rev-parse HEAD)
+REVISION=${SOURCE_REVISION:?set the full source revision from the release manifest}
 docker build --build-arg SOURCE_REVISION="$REVISION" -f apps/partner-runtime/Dockerfile -t "credworks-partner:git-$REVISION" .
 docker image inspect "credworks-partner:git-$REVISION" --format '{{.Id}} {{index .Config.Labels "org.opencontainers.image.revision"}}'
 ```

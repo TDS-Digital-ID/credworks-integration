@@ -6,6 +6,8 @@ Read [setup and lifecycle](quickstart.md), [definitions and disclosure](definiti
 
 ## Revision and profile matrix
 
+The table records the earlier #408 preparation baseline. The public [Release B preview](https://github.com/TDS-Digital-ID/credworks-integration/releases/tag/release-b-preview-20261006) instead supplies image source dcef4b7721ad024ceb9d86133dc520ee66a92a13 and signed wallet source17c6d60b3196c40f6500adc391c6610ba5d52a89. Use the release manifest for exact checksums and image IDs; historical images below are not substitutes.
+
 A source label identifies the commit used to build an image. A later integration or documentation commit does not relabel that image.
 
 | Component | Prepared and checked combination |
@@ -26,16 +28,18 @@ A source label identifies the commit used to build an image. A later integration
 | #408 evidence | 130 runtime checks, 25 Node checks, 8 boundary checks, core/conformance 99 checks; software-holder HTTP checks; no physical observations |
 | Final generic candidate / Android | #410 records its exact source, APK checksum, signer and endpoint combination; this page does not claim that candidate run |
 
-The source export manifest and [packaging transforms](../../provenance/GENERIC-TRANSFORMS.md) describe original files and deliberate packaging changes. [Earlier generic acceptance evidence](../../provenance/GENERIC-ACCEPTANCE.md) distinguishes intermediate producer pins from later consumer checks. Final #408 closure records the production source/image pins above and its successful third standalone gate and exact-head CI. These are private local images, not public registry downloads. Other CPU architectures require their own build and inspection.
+The source export manifest and [packaging transforms](../../provenance/GENERIC-TRANSFORMS.md) describe original files and deliberate packaging changes. [Earlier generic acceptance evidence](../../provenance/GENERIC-ACCEPTANCE.md) distinguishes intermediate producer pins from later consumer checks. Final #408 closure records the production source/image pins above and its successful third standalone gate and exact-head CI. These historical image pins describe preparation, not the currently published image archive. Other CPU architectures require their own build and inspection.
 
 ## Availability and release limits
 
-Both TDS-Digital-ID/universityvc-integration and TDS-Digital-ID/university-vc-monorepo remain private. An authorized checkout can build without private-monorepo access, private build secrets or monorepo history. The source export is not a public release or a complete hosted sandbox. An operator must supply reachable HTTPS, independent registry/provider trust anchors, project ownership, PostgreSQL and persistent state.
+The public source and preview artifacts are in TDS-Digital-ID/credworks-integration. Both producer repositories remain private. Source builds require public package registries, not private-monorepo access or private build secrets. Project-owned code is Apache-2.0; third-party terms remain unchanged. Read the release manifest, required notices and corresponding-source attachments before using the image/APK downloads.
 
-Project reuse licensing, publication rights, protected Android release signing and physical public setup remain human prerequisites. Third-party notices do not grant project reuse rights. #338 owns Release A acceptance, #348 owns Release B acceptance, and both remain open. Release B publication follows Release A. Physical install/update, device key authorization, consent and public clean setup are NOT RUN by this documentation task. Host software-holder checks use self-asserted mock platform attestation and do not prove phone or hardware custody.
+Release A was published before B. Publication and release signing are complete for these previews; full acceptance is not. Remaining phone checks are operator-deferred. Startup intermittency remains unresolved, and the frozen generic APK lacks the later expired-receipt diagnostic correction. Existing physical failures and successes remain recorded; no clean-device or complete hardware acceptance is claimed.
+
+A complete public-only setup remains incomplete because the examples contain placeholder ecosystem configuration. Operators still need independently authenticated registry/provider roots, actual issuer/status endpoints and keys, and the accepted Education institution value. No public sandbox bootstrap manifest currently supplies these. Operator-owned HTTPS, databases and protected persistent identities are also required. Host software-holder checks use mock platform attestation and do not establish hardware custody.
 
 Unsupported options include dc+sd-jwt, other suites, Presentation Exchange, arbitrary DCQL controls, array-element disclosure, overlapping hidden ancestor/child paths, proximity transports, public iOS distribution and broad unrelated-wallet interoperability. There is one issuer identity per deployment. The kit makes no production key-custody, high-availability or institutional accreditation claim.
 
 ## One documentation source
 
-These five indexed pages are canonical. CredWorks imports reviewed committed files and both existing OpenAPI contracts into an offline snapshot with an immutable full kit revision and per-file SHA256 hashes. Site builds read that snapshot without fetching private repositories. Source edits come here first; #410 must correct instruction defects here and re-import the new pin. While access remains private, report sanitized failures in the monorepo GitHub issue tracker with source/image revisions and fixed refusal codes.
+These five indexed pages are canonical. CredWorks imports reviewed committed files and both existing OpenAPI contracts into an offline snapshot with an immutable full kit revision and per-file SHA256 hashes. Site builds read that snapshot without fetching repositories. Source edits come here first, then the site imports the reviewed distribution revision. Report sanitized failures through the [public issue tracker](https://github.com/TDS-Digital-ID/credworks-integration/issues), with source/image revisions and fixed refusal codes. Never include credentials, keys or bearer tokens.
