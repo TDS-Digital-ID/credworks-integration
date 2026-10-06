@@ -1,0 +1,61 @@
+{
+  "issuerDid": "did:web:issuer.example",
+  "issuerJwk": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "REPLACE_WITH_AUTHENTICATED_ISSUER_PUBLIC_X",
+    "y": "REPLACE_WITH_AUTHENTICATED_ISSUER_PUBLIC_Y"
+  },
+  "registryOrigin": "https://registry.example",
+  "trustAnchorJwk": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "REPLACE_WITH_PINNED_PUBLIC_X",
+    "y": "REPLACE_WITH_PINNED_PUBLIC_Y"
+  },
+  "statusSources": [
+    {
+      "url": "https://issuer.example/oid4vci/status/revocation.jwt",
+      "publicJwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "REPLACE_WITH_AUTHENTICATED_ISSUER_PUBLIC_X",
+        "y": "REPLACE_WITH_AUTHENTICATED_ISSUER_PUBLIC_Y"
+      },
+      "purpose": "revocation"
+    }
+  ],
+  "maxCacheAgeSeconds": 300,
+  "scalar": {
+    "registryDid": "did:web:registry.example",
+    "issuerKeyId": "did:web:issuer.example#key-1",
+    "definitions": [
+      {
+        "configurationId": "neutral-pass",
+        "authorizationId": "00000372-0000-4000-8000-000000000001",
+        "definitionId": "https://issuer.example/definitions/pass",
+        "definitionVersion": "1",
+        "credentialType": "NeutralPassCredential",
+        "profiles": [
+          {
+            "name": "neutral_check",
+            "permissionId": "00000372-0000-4000-8000-000000000002"
+          }
+        ]
+      },
+      {
+        "configurationId": "neutral-score",
+        "authorizationId": "00000372-0000-4000-8000-000000000003",
+        "definitionId": "https://issuer.example/definitions/score",
+        "definitionVersion": "1",
+        "credentialType": "NeutralScoreCredential",
+        "profiles": [
+          {
+            "name": "neutral_check",
+            "permissionId": "00000372-0000-4000-8000-000000000004"
+          }
+        ]
+      }
+    ]
+  }
+}

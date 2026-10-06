@@ -1,0 +1,131 @@
+{
+  "core_api": [
+    {
+      "id": "core_tampered_issuer_signature",
+      "expected_code": "INVALID_SIGNATURE",
+      "description": "issuer JWS signature byte is changed"
+    },
+    {
+      "id": "core_tampered_disclosure_digest",
+      "expected_code": "DISCLOSURE_DIGEST_MISMATCH",
+      "description": "a disclosed claim value no longer matches the issuer digest"
+    },
+    {
+      "id": "core_missing_required_disclosure",
+      "expected_code": "MISSING_DISCLOSURE",
+      "description": "a required UC3 disclosure is removed"
+    },
+    {
+      "id": "core_malformed_disclosure",
+      "expected_code": "JSON_SERIALIZATION",
+      "description": "a disclosure cannot be decoded as the SD-JWT disclosure tuple"
+    },
+    {
+      "id": "core_wrong_nonce",
+      "expected_code": "BINDING_CHECK_FAILED",
+      "description": "KB-JWT nonce does not match the verifier request"
+    },
+    {
+      "id": "core_wrong_audience",
+      "expected_code": "BINDING_CHECK_FAILED",
+      "description": "KB-JWT audience is cross-purposed to a different verifier"
+    },
+    {
+      "id": "core_expired_credential",
+      "expected_code": "FRESHNESS_CHECK_FAILED",
+      "description": "verification time is after credential expiry"
+    },
+    {
+      "id": "core_typ_downgrade",
+      "expected_code": "VERIFICATION_FAILED",
+      "description": "W3C VC SD-JWT is verified as if it were the IETF dc+sd-jwt interop profile"
+    },
+    {
+      "id": "core_stale_trust_list",
+      "expected_code": "TRUST_CHECK_FAILED",
+      "description": "trust list is used after its exp"
+    },
+    {
+      "id": "core_revoked_status_entry",
+      "expected_code": "STATUS_CHECK_FAILED",
+      "description": "status list has the credential's revocation bit set"
+    },
+    {
+      "id": "core_stale_status_list",
+      "expected_code": "STATUS_LIST_STALE",
+      "description": "status list is used at or after its validUntil"
+    }
+  ],
+  "protocol_seams": [
+    {
+      "id": "protocol_study_space_negative_matrix",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "-q",
+        "verifiers/study_space/tests/test_study_space.py::test_refuses_negative_presentations_with_stable_failure_codes"
+      ],
+      "expected_codes": [
+        "INVALID_SIGNATURE",
+        "TRUST_CHECK_FAILED",
+        "STATUS_CHECK_FAILED",
+        "BINDING_CHECK_FAILED",
+        "FRESHNESS_CHECK_FAILED",
+        "STUDY_SPACE_PROFILE_CHECK_FAILED"
+      ]
+    },
+    {
+      "id": "protocol_wallet_reverse_trust",
+      "command": [
+        "flutter",
+        "test",
+        "test/wallet_present_test.dart"
+      ],
+      "cwd": "apps/wallet",
+      "expected_codes": [
+        "WALLET_VERIFIER_UNACCREDITED",
+        "WALLET_VERIFIER_OVERBROAD"
+      ]
+    },
+    {
+      "id": "protocol_trust_registry_verifier_accreditation",
+      "command": [
+        "pnpm",
+        "--filter",
+        "@unsw-vc/trust-registry",
+        "exec",
+        "node",
+        "--import",
+        "tsx",
+        "--test",
+        "--test-name-pattern",
+        "answers verifier accreditation",
+        "tests/trust-registry.test.mjs"
+      ],
+      "expected_codes": [
+        "TRUST_REGISTRY_VERIFIER_UNACCREDITED",
+        "TRUST_REGISTRY_VERIFIER_OVERBROAD"
+      ]
+    },
+    {
+      "id": "protocol_oid4vci_bad_holder_proof",
+      "command": [
+        "pnpm",
+        "--filter",
+        "@unsw-vc/issuer-portal",
+        "exec",
+        "node",
+        "--import",
+        "tsx",
+        "--test",
+        "--test-name-pattern",
+        "refuses credential issuance when the holder proof does not match the c_nonce",
+        "tests/oid4vci.test.mjs"
+      ],
+      "expected_codes": [
+        "ISSUER_PORTAL_PROOF_INVALID"
+      ]
+    }
+  ]
+}

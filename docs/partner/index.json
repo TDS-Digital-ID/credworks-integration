@@ -1,0 +1,7 @@
+[
+  {"slug":"partner-overview","title":"Partner integration","order":1,"source":"overview.md"},
+  {"slug":"partner-quickstart","title":"Partner setup and lifecycle","order":2,"source":"quickstart.md"},
+  {"slug":"partner-definitions","title":"Definitions and disclosure","order":3,"source":"definitions.md"},
+  {"slug":"partner-api","title":"Partner HTTP API","order":4,"source":"api.md"},
+  {"slug":"partner-operations","title":"Partner operations and limits","order":5,"source":"operations.md"}
+]

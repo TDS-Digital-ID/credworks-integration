@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790799315403,
+      "tag": "0000_eminent_polaris",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790839579740,
+      "tag": "0001_verified_holder_binding",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790846203186,
+      "tag": "0002_issuance_revocation",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790875154748,
+      "tag": "0003_minor_the_leader",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790885517840,
+      "tag": "0004_credential_key_selection",
+      "breakpoints": true
+    }
+  ]
+}

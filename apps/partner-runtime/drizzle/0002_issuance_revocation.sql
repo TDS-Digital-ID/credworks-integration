@@ -1,0 +1,1 @@
+ALTER TABLE "partner_issuer_offers" ADD COLUMN "revoked_at" integer;

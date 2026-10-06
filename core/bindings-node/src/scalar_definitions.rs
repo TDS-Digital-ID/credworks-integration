@@ -87,3 +87,25 @@ pub fn verify_scalar_credential_authorization_raw(
         .map_err(super::to_napi_error)?,
     )
 }
+
+#[napi(js_name = "verifyScalarRenewalPredecessorRaw")]
+pub fn verify_scalar_renewal_predecessor_raw(
+    credential: String,
+    issuer_key_json: String,
+    authorization: String,
+    anchor_json: String,
+    registry_did: String,
+    now: i64,
+) -> Result<String> {
+    super::serialize(
+        &identity_core::verify_scalar_renewal_predecessor(
+            &credential,
+            &parse::<PublicJwk>(&issuer_key_json)?,
+            &authorization,
+            &parse::<PublicJwk>(&anchor_json)?,
+            &registry_did,
+            now,
+        )
+        .map_err(super::to_napi_error)?,
+    )
+}

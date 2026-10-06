@@ -1,9 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, rm, readFile, writeFile, chmod } from "node:fs/promises";
+import { mkdtemp, rm, readFile, writeFile, chmod, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { spawn } from "node:child_process";
+import { spawn, execFileSync } from "node:child_process";
 import { once } from "node:events";
 import { verifyCompactJwsJson } from "@unsw-vc/identity-core-node";
 
@@ -37,6 +37,41 @@ async function stop(proc) {
   proc.child.kill();
   await once(proc.child, "exit");
 }
+
+for (const name of ["PARTNER_ISSUER_CONFIG", "PARTNER_VERIFIER_CONFIG"])
+  for (const linked of [false, true])
+    test(`${name} refuses ${linked ? "symlinked " : ""}FIFO configuration without hanging startup`, async () => {
+      const root = await mkdtemp(join(tmpdir(), "partner-347-config-"));
+      const fifo = join(root, "config.fifo");
+      const path = linked ? join(root, "config.json") : fifo;
+      const env = {
+        PARTNER_ORIGIN: "https://partner.example",
+        PARTNER_STATE_DIR: join(root, "identity"),
+        PARTNER_UNLOCK_KEY: "JSUlJSUlJSUlJSUlJSUlJSUlJSUlJSUlJSUlJSUlJSU",
+        PARTNER_MANAGEMENT_TOKEN: "management-secret-with-32-characters",
+        [name]: path,
+      };
+      try {
+        execFileSync("mkfifo", [fifo]);
+        if (linked) await symlink(fifo, path);
+        const proc = run("start", env);
+        const timeout = setTimeout(() => proc.child.kill("SIGKILL"), 3000);
+        try {
+          const [code, signal] = await once(proc.child, "exit");
+          assert.equal(signal, null, "configuration read hung startup");
+          assert.equal(code, 1);
+          assert.match(proc.output(), /partner_identity_unavailable/);
+          assert(!proc.output().includes("READY"));
+          assert(!proc.output().includes(env.PARTNER_UNLOCK_KEY));
+          assert(!proc.output().includes(env.PARTNER_MANAGEMENT_TOKEN));
+          await assert.rejects(readFile(join(root, "identity", "identity.json")), { code: "ENOENT" });
+        } finally {
+          clearTimeout(timeout);
+        }
+      } finally {
+        await rm(root, { recursive: true, force: true });
+      }
+    });
 
 test("authenticated signing verifies under the public DID before and after process replacement", async () => {
   const root = await mkdtemp(join(tmpdir(), "partner-331-"));

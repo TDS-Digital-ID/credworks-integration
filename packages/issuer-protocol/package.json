@@ -1,0 +1,26 @@
+{
+  "name": "@unsw-vc/issuer-protocol",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@unsw-vc/identity-core-node": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.0",
+    "typescript": "5.9.3",
+    "tsx": "^4.23.0"
+  },
+  "files": [
+    "src"
+  ],
+  "license": "Apache-2.0"
+}

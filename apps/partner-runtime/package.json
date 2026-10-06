@@ -6,21 +6,29 @@
   "scripts": {
     "build": "tsc --noEmit",
     "lint": "tsc --noEmit",
-    "test": "node ../../tool/test-fixture-addon.mjs",
+    "test": "node --import tsx --test --test-concurrency=1 tests/*.test.mjs",
     "bootstrap": "node --import tsx src/cli.ts bootstrap",
-    "start": "node --import tsx src/cli.ts start"
+    "start": "node --import tsx src/cli.ts start",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node --import tsx src/issuer-migrate.ts"
   },
   "dependencies": {
     "@unsw-vc/identity-core-node": "workspace:*",
-    "tsx": "^4.23.0"
+    "tsx": "^4.23.0",
+    "drizzle-orm": "^0.45.2",
+    "pg": "^8.22.0",
+    "@unsw-vc/issuer-protocol": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "24.10.0",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "@types/pg": "^8.20.0",
+    "drizzle-kit": "^0.31.10"
   },
   "files": [
     "src",
-    "tool/check-packaged-addon.mjs"
+    "tool/check-packaged-addon.mjs",
+    "drizzle"
   ],
   "license": "Apache-2.0"
 }

@@ -11,6 +11,9 @@ export function httpClient(
     throw Error("HTTPS_OPTIONS_REFUSED");
   return (location, options = {}) =>
     new Promise((resolve, reject) => {
+      const responseLimit = options.responseLimit ?? 131072;
+      if (![131072, 262144].includes(responseLimit))
+        return reject(Error("HTTP_RESPONSE_LIMIT_REFUSED"));
       const url = new URL(location);
       const management =
         url.protocol === "http:" &&
@@ -24,8 +27,11 @@ export function httpClient(
       )
         return reject(Error("HTTP_LOCATION_REFUSED"));
       const request = management ? httpRequest : httpsRequest;
+      const requestLimit = options.requestLimit ?? 131072;
+      if (![131072, 262144].includes(requestLimit))
+        return reject(Error("HTTP_REQUEST_LIMIT_REFUSED"));
       const body = options.body;
-      if (body && Buffer.byteLength(body) > 131072)
+      if (body && Buffer.byteLength(body) > requestLimit)
         return reject(Error("HTTP_REQUEST_TOO_LARGE"));
       const req = request(
         url,
@@ -44,7 +50,7 @@ export function httpClient(
           const chunks = [];
           res.on("data", (chunk) => {
             bytes += chunk.length;
-            if (bytes > 131072) {
+            if (bytes > responseLimit) {
               res.destroy();
               reject(Error("HTTP_RESPONSE_TOO_LARGE"));
             } else chunks.push(chunk);

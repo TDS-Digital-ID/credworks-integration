@@ -1,0 +1,179 @@
+[
+  {
+    "method": "GET",
+    "path": "/.well-known/oauth-authorization-server",
+    "media": "-",
+    "security": [],
+    "curl": "curl --fail-with-body -X GET \"$ISSUER/.well-known/oauth-authorization-server\""
+  },
+  {
+    "method": "GET",
+    "path": "/.well-known/openid-credential-issuer",
+    "media": "-",
+    "security": [],
+    "curl": "curl --fail-with-body -X GET \"$ISSUER/.well-known/openid-credential-issuer\""
+  },
+  {
+    "method": "POST",
+    "path": "/management/sessions/{session_id}/issuance-offer",
+    "media": "application/json",
+    "security": [
+      "RuntimeBearer",
+      "SessionCapability"
+    ],
+    "curl": "curl --fail-with-body -X POST \"$MANAGEMENT/management/sessions/{session_id}/issuance-offer\" -H \"Authorization: Bearer $MANAGEMENT_TOKEN\" -H \"X-Session-Capability: $CAPABILITY\" -H \"Idempotency-Key: $IDEMPOTENCY_KEY\" -H 'Content-Type: application/json' --data '{\"configuration_id\":\"entitlement\",\"claims\":{\"enabled\":false,\"credits\":0},\"valid_from\":1790899200,\"valid_until\":1790902800,\"offer_expires_at\":1790899320,\"interaction_id\":\"application-operation-1\"}'"
+  },
+  {
+    "method": "POST",
+    "path": "/management/issuer/offers",
+    "media": "application/json",
+    "security": [
+      "RuntimeBearer"
+    ],
+    "curl": "curl --fail-with-body -X POST \"$MANAGEMENT/management/issuer/offers\" -H \"Authorization: Bearer $MANAGEMENT_TOKEN\" -H 'Content-Type: application/json' --data '{\"configuration_id\":\"entitlement\",\"claims\":{\"enabled\":false,\"credits\":0},\"valid_from\":1790899200,\"valid_until\":1790902800,\"offer_expires_at\":1790899320,\"recipient_jwk_thumbprint\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"}'"
+  },
+  {
+    "method": "GET",
+    "path": "/oid4vci/offers/{id}",
+    "media": "-",
+    "security": [],
+    "curl": "curl --fail-with-body -X GET \"$ISSUER/oid4vci/offers/{id}\""
+  },
+  {
+    "method": "POST",
+    "path": "/oid4vci/token",
+    "media": "application/x-www-form-urlencoded",
+    "security": [],
+    "curl": "curl --fail-with-body -X POST \"$ISSUER/oid4vci/token\" -H 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'grant_type=urn:ietf:params:oauth:grant-type:pre-authorized_code' --data-urlencode \"pre-authorized_code=$PRE_AUTHORIZED_CODE\""
+  },
+  {
+    "method": "POST",
+    "path": "/oid4vci/nonce",
+    "media": "-",
+    "security": [],
+    "curl": "curl --fail-with-body -X POST \"$ISSUER/oid4vci/nonce\""
+  },
+  {
+    "method": "POST",
+    "path": "/oid4vci/credential",
+    "media": "application/json",
+    "security": [
+      "IssuerToken"
+    ],
+    "curl": "curl --fail-with-body -X POST \"$ISSUER/oid4vci/credential\" -H \"Authorization: Bearer $ACCESS_TOKEN\" -H 'Content-Type: application/json' --data '{\"credential_configuration_id\":\"entitlement\",\"proofs\":{\"jwt\":[\"$HOLDER_PROOF\"]},\"wallet_instance_attestation\":\"$PROVIDER_ATTESTATION\"}'"
+  },
+  {
+    "method": "GET",
+    "path": "/oid4vci/status/revocation.jwt",
+    "media": "-",
+    "security": [],
+    "curl": "curl --fail-with-body -X GET \"$ISSUER/oid4vci/status/revocation.jwt\""
+  },
+  {
+    "method": "GET",
+    "path": "/management/issuer/issuances/{issuance_id}/status",
+    "media": "-",
+    "security": [
+      "RuntimeBearer"
+    ],
+    "curl": "curl --fail-with-body -X GET \"$MANAGEMENT/management/issuer/issuances/{issuance_id}/status\" -H \"Authorization: Bearer $MANAGEMENT_TOKEN\""
+  },
+  {
+    "method": "POST",
+    "path": "/management/issuer/issuances/{issuance_id}/status",
+    "media": "application/json",
+    "security": [
+      "RuntimeBearer"
+    ],
+    "curl": "curl --fail-with-body -X POST \"$MANAGEMENT/management/issuer/issuances/{issuance_id}/status\" -H \"Authorization: Bearer $MANAGEMENT_TOKEN\" -H 'Content-Type: application/json' --data '{\"state\":\"revoked\"}'"
+  },
+  {
+    "method": "POST",
+    "path": "/management/issuer/renewals",
+    "media": "application/json",
+    "security": [
+      "RuntimeBearer"
+    ],
+    "curl": "curl --fail-with-body -X POST \"$MANAGEMENT/management/issuer/renewals\" -H \"Authorization: Bearer $MANAGEMENT_TOKEN\" -H \"Idempotency-Key: $IDEMPOTENCY_KEY\" -H 'Content-Type: application/json' --data '{\"version\":1,\"predecessor_issuance_id\":\"AAAAAAAAAAAAAAAAAAAAAA\",\"configuration_id\":\"entitlement\",\"claims\":{\"enabled\":false,\"credits\":0},\"valid_from\":1790899200,\"valid_until\":1790902800,\"offer_expires_at\":1790899320}'"
+  },
+  {
+    "method": "GET",
+    "path": "/partner-renewals/{renewal_id}",
+    "media": "-",
+    "security": [],
+    "curl": "curl --fail-with-body -X GET \"$ISSUER/partner-renewals/{renewal_id}?capability=$RENEWAL_CAPABILITY\""
+  },
+  {
+    "method": "POST",
+    "path": "/partner-renewals/{renewal_id}/authorize",
+    "media": "application/json",
+    "security": [],
+    "curl": "curl --fail-with-body -X POST \"$ISSUER/partner-renewals/{renewal_id}/authorize\" -H 'Content-Type: application/json' --data '{\"version\":1,\"capability\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\"proof\":{\"proof_type\":\"jwt\",\"jwt\":\"$HOLDER_PROOF\"}}'"
+  },
+  {
+    "method": "POST",
+    "path": "/partner-renewals/{renewal_id}/status",
+    "media": "application/json",
+    "security": [],
+    "curl": "curl --fail-with-body -X POST \"$ISSUER/partner-renewals/{renewal_id}/status\" -H 'Content-Type: application/json' --data '{\"version\":1,\"proof\":{\"proof_type\":\"jwt\",\"jwt\":\"$HOLDER_PROOF\"}}'"
+  },
+  {
+    "method": "POST",
+    "path": "/partner-renewals/{renewal_id}/cancel",
+    "media": "application/json",
+    "security": [],
+    "curl": "curl --fail-with-body -X POST \"$ISSUER/partner-renewals/{renewal_id}/cancel\" -H 'Content-Type: application/json' --data '{\"version\":1,\"proof\":{\"proof_type\":\"jwt\",\"jwt\":\"$HOLDER_PROOF\"}}'"
+  },
+  {
+    "method": "POST",
+    "path": "/partner-renewals/{renewal_id}/receipts/{receipt_id}/successors/{successor_issuance_id}/confirm",
+    "media": "application/json",
+    "security": [],
+    "curl": "curl --fail-with-body -X POST \"$ISSUER/partner-renewals/{renewal_id}/receipts/{receipt_id}/successors/{successor_issuance_id}/confirm\" -H 'Content-Type: application/json' --data '{\"version\":1,\"event\":\"credential_accepted\",\"proof\":{\"proof_type\":\"jwt\",\"jwt\":\"$HOLDER_PROOF\"}}'"
+  },
+  {
+    "method": "GET",
+    "path": "/management/issuer/keys",
+    "media": "-",
+    "security": [
+      "RuntimeBearer"
+    ],
+    "curl": "curl --fail-with-body -X GET \"$MANAGEMENT/management/issuer/keys\" -H \"Authorization: Bearer $MANAGEMENT_TOKEN\""
+  },
+  {
+    "method": "POST",
+    "path": "/management/issuer/keys/stage",
+    "media": "application/json",
+    "security": [
+      "RuntimeBearer"
+    ],
+    "curl": "curl --fail-with-body -X POST \"$MANAGEMENT/management/issuer/keys/stage\" -H \"Authorization: Bearer $MANAGEMENT_TOKEN\" -H 'Content-Type: application/json' --data '{\"expected_revision\":0,\"project_id\":\"00000000-0000-4000-8000-000000000001\",\"issuer_registration_id\":\"00000000-0000-4000-8000-000000000001\",\"expected_registry_revision\":0,\"key_fragment\":\"credential-2\"}'"
+  },
+  {
+    "method": "POST",
+    "path": "/management/issuer/keys/proof",
+    "media": "application/json",
+    "security": [
+      "RuntimeBearer"
+    ],
+    "curl": "curl --fail-with-body -X POST \"$MANAGEMENT/management/issuer/keys/proof\" -H \"Authorization: Bearer $MANAGEMENT_TOKEN\" -H 'Content-Type: application/json' --data '{\"expected_revision\":1,\"challenge\":{\"operation\":\"rotate\",\"issuer_registration_id\":\"00000000-0000-4000-8000-000000000001\",\"expected_revision\":0,\"key_id\":\"did:web:issuer.example#credential-2\",\"proof_key_id\":\"did:web:issuer.example#credential-2\",\"challenge_id\":\"00000000-0000-4000-8000-000000000001\",\"nonce\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\"audience\":\"https://registry.example/issuer-key-proof\",\"expires_at\":\"2026-10-02T12:00:00Z\"}}'"
+  },
+  {
+    "method": "POST",
+    "path": "/management/issuer/keys/activate",
+    "media": "application/json",
+    "security": [
+      "RuntimeBearer"
+    ],
+    "curl": "curl --fail-with-body -X POST \"$MANAGEMENT/management/issuer/keys/activate\" -H \"Authorization: Bearer $MANAGEMENT_TOKEN\" -H 'Content-Type: application/json' --data '{\"expected_revision\":1,\"key_id\":\"did:web:issuer.example#credential-2\"}'"
+  },
+  {
+    "method": "POST",
+    "path": "/management/issuer/keys/abandon",
+    "media": "application/json",
+    "security": [
+      "RuntimeBearer"
+    ],
+    "curl": "curl --fail-with-body -X POST \"$MANAGEMENT/management/issuer/keys/abandon\" -H \"Authorization: Bearer $MANAGEMENT_TOKEN\" -H 'Content-Type: application/json' --data '{\"expected_revision\":1,\"key_id\":\"did:web:issuer.example#credential-2\"}'"
+  }
+]

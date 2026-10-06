@@ -1,4 +1,4 @@
-name: Standalone Education kit
+name: Standalone integration kit
 on: [push, pull_request]
 permissions:
   contents: read
@@ -19,9 +19,13 @@ jobs:
     env:
       CARGO_BUILD_JOBS: "2"
       EDUCATION_APP_DATABASE_URL: postgres://education:education@127.0.0.1:5432/education
-      EDUCATION_APP_TEST_PORT: "38721"
-      PARTNER_SESSION_HTTP_PORT: "38710"
-      PARTNER_EVIDENCE_HTTP_PORT: "38712"
+      EDUCATION_APP_TEST_PORT: "29270"
+      PARTNER_ISSUER_DATABASE_URL: postgres://education:education@127.0.0.1:5432/issuer
+      PARTNER_OTHER_ISSUER_DATABASE_URL: postgres://education:education@127.0.0.1:5432/other_issuer
+      PARTNER_ISSUER_HTTP_PORT: "29230"
+      PARTNER_ISSUER_CONTAINER_HTTP_PORT: "29250"
+      PARTNER_SESSION_HTTP_PORT: "29200"
+      PARTNER_EVIDENCE_HTTP_PORT: "29202"
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
@@ -35,6 +39,11 @@ jobs:
         with:
           toolchain: 1.92.0
       - run: pnpm install --frozen-lockfile
+      - name: Create dedicated standalone issuer ledgers
+        run: |
+          pnpm --filter @unsw-vc/partner-runtime exec node --input-type=module -e "import {Pool} from 'pg'; const p=new Pool({connectionString:process.env.EDUCATION_APP_DATABASE_URL}); try { await p.query('CREATE DATABASE issuer'); await p.query('CREATE DATABASE other_issuer'); } finally { await p.end(); }"
+          pnpm --filter @unsw-vc/partner-runtime db:migrate
+          PARTNER_ISSUER_DATABASE_URL="$PARTNER_OTHER_ISSUER_DATABASE_URL" pnpm --filter @unsw-vc/partner-runtime db:migrate
       - run: pnpm build
       - run: node apps/partner-runtime/tool/check-packaged-addon.mjs
       - run: cargo test --locked --package identity-core
@@ -45,6 +54,7 @@ jobs:
           docker build --build-arg SOURCE_REVISION="$GITHUB_SHA" -f apps/education-sign-in/Dockerfile -t "credworks-education:git-$GITHUB_SHA" .
       - name: Production container replacement and isolation
         env:
+          PARTNER_REQUIRE_ALL_CHECKS: "1"
           PARTNER_CONTAINER_IMAGE: credworks-partner:git-${{ github.sha }}
           PARTNER_CONTAINER_SOURCE_REVISION: ${{ github.sha }}
         run: pnpm test:fixtures

@@ -212,19 +212,30 @@ export type ScalarCredentialDefinition = {
   max_validity_seconds: number;
   claims: {
     name: string;
+    /** Exact object-property path; omitted means ["credentialSubject", name]. */
+    path?: string[];
     label: string;
-    value_type: "string" | "boolean" | "integer" | "number";
+    value_type: "string" | "boolean" | "integer" | "number" | "object" | "array";
     required: boolean;
   }[];
   profiles: { name: string; claim_paths: string[][] }[];
 };
 export type SubjectValidationMode = "complete" | "disclosed";
+export type CredentialKeyState = "current" | "retained" | "withdrawn";
+export type IssuerAuthorityPurpose = "issuance" | "verification";
+export type IssuerStatusAuthority = {
+  key_id: string;
+  public_jwk_sha256_thumbprint: string;
+};
 export type IssuerAuthorization = {
   credential_issuer_did: string;
   credential_issuer_key_id: string;
   credential_issuer_public_jwk_sha256_thumbprint: string;
   definition: ScalarCredentialDefinition;
   status: "active" | "inactive";
+  /** Both fields are absent for authenticated legacy entries, or present together. */
+  key_state?: CredentialKeyState;
+  status_authority?: IssuerStatusAuthority;
 };
 export type IssuerAuthorizations = {
   version: 1;
@@ -242,6 +253,8 @@ export type IssuerAuthorizationRequest = {
   definition_id: string;
   definition_version: string;
   credential_type: string;
+  /** Omission is issuance-safe; retained keys require explicit verification. */
+  purpose?: IssuerAuthorityPurpose;
 };
 
 export type ScopedVerifierPermission = {
@@ -482,6 +495,14 @@ type NativeBinding = {
     registryDid: string,
     now: number,
     modeJson: string,
+  ): string;
+  verifyScalarRenewalPredecessorRaw(
+    credential: string,
+    issuerKeyJson: string,
+    authorization: string,
+    anchorJson: string,
+    registryDid: string,
+    now: number,
   ): string;
   signScopedVerifierPermissionsRaw(
     payloadJson: string,
@@ -1208,6 +1229,29 @@ export function verifyScalarCredentialAuthorization(input: {
       input.registryDid,
       input.nowUnixSeconds,
       stringify(input.mode),
+    ),
+  );
+}
+
+/** Authenticates a complete predecessor at signed iat under current exact authority.
+ * Does not verify current status or confer presentation validity.
+ */
+export function verifyScalarRenewalPredecessor(input: {
+  compactSdJwt: string;
+  issuerJwk: PublicJwk;
+  compactAuthorization: string;
+  trustAnchorJwk: PublicJwk;
+  registryDid: string;
+  nowUnixSeconds: number;
+}): VerifiedSdJwtCredential {
+  return parseNativeJson(
+    native.verifyScalarRenewalPredecessorRaw(
+      input.compactSdJwt,
+      stringify(input.issuerJwk),
+      input.compactAuthorization,
+      stringify(input.trustAnchorJwk),
+      input.registryDid,
+      input.nowUnixSeconds,
     ),
   );
 }

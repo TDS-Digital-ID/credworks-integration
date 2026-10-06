@@ -68,6 +68,8 @@ fn authority() -> (IssuerAuthorizations, IssuerAuthorizationRequest) {
             .unwrap(),
         definition: definition(),
         status: identity_core::TrustListStatus::Active,
+        key_state: None,
+        status_authority: None,
     };
     let request = IssuerAuthorizationRequest {
         registry_did: "did:web:trust.example".into(),
@@ -77,6 +79,7 @@ fn authority() -> (IssuerAuthorizations, IssuerAuthorizationRequest) {
         definition_id: grant.definition.id.clone(),
         definition_version: grant.definition.version.clone(),
         credential_type: grant.definition.credential_type.clone(),
+        purpose: None,
     };
     (
         IssuerAuthorizations {
@@ -265,6 +268,179 @@ fn reserved_definition_namespace_cannot_be_aliased_by_uri_case() {
     assert_eq!(
         validate_scalar_definition(&definition).unwrap_err().code(),
         CoreErrorCode::InvalidInput
+    );
+}
+
+#[test]
+fn expired_predecessor_renewal_requires_current_exact_authority_without_restoring_validity() {
+    use identity_core::{sign_compact_jws_json, verify_scalar_renewal_predecessor};
+    let (mut document, request) = authority();
+    document.iat = 250;
+    document.exp = 350;
+    let (registry_signer, anchor) = signer(1);
+    let (issuer_signer, issuer_key) = signer(2);
+    let registry_header: JwsHeader = serde_json::from_value(json!({"alg":"ES256","typ":"issuer-authorizations+jwt","kid":"did:web:trust.example#key-1"})).unwrap();
+    let vc_header: JwsHeader = serde_json::from_value(
+        json!({"alg":"ES256","typ":"vc+sd-jwt","kid":"did:web:issuer.example#key-1"}),
+    )
+    .unwrap();
+    let payload = json!({
+        "@context":["https://www.w3.org/ns/credentials/v2",{"@vocab":"https://example.test/vocab#"}],
+        "type":["VerifiableCredential","ExampleMembershipCredential"],
+        "issuer":"did:web:issuer.example","iss":"did:web:issuer.example","iat":100,"exp":200,
+        "validFrom":"1970-01-01T00:01:40Z","validUntil":"1970-01-01T00:03:20Z",
+        "credentialDefinition":{"id":"urn:example:membership","version":"1"},
+        "credentialSubject":{"member":true},"cnf":{"jwk":issuer_key},
+        "credentialStatus":{"id":"https://status.example/1#0","type":"BitstringStatusListEntry","statusPurpose":"revocation","statusListIndex":"0","statusListCredential":"https://status.example/1"}
+    });
+    let sign_credential = |payload: &serde_json::Value| {
+        format!(
+            "{}~",
+            sign_compact_jws_json(&vc_header, payload, &issuer_signer, &KeyId::new("issuer"))
+                .unwrap()
+        )
+    };
+    let token = sign_credential(&payload);
+    let sign_grant = |document: &IssuerAuthorizations| {
+        sign_issuer_authorizations(
+            document,
+            &registry_header,
+            &registry_signer,
+            &KeyId::new("anchor"),
+        )
+        .unwrap()
+    };
+    let authorization = sign_grant(&document);
+    assert_eq!(
+        identity_core::verify_scalar_credential_authorization(
+            &token,
+            &issuer_key,
+            &authorization,
+            &anchor,
+            &request.registry_did,
+            300,
+            SubjectValidationMode::Complete
+        )
+        .unwrap_err()
+        .code(),
+        CoreErrorCode::FreshnessCheckFailed
+    );
+    let verified = verify_scalar_renewal_predecessor(
+        &token,
+        &issuer_key,
+        &authorization,
+        &anchor,
+        &request.registry_did,
+        300,
+    )
+    .unwrap();
+    assert_eq!(verified.processed_payload["iat"], json!(100));
+    assert_eq!(verified.processed_payload["exp"], json!(200));
+    assert_eq!(
+        verified.processed_payload["credentialSubject"],
+        json!({"member":true})
+    );
+    assert_eq!(
+        verify_scalar_renewal_predecessor(
+            &token,
+            &issuer_key,
+            &authorization,
+            &anchor,
+            &request.registry_did,
+            350
+        )
+        .unwrap_err()
+        .code(),
+        CoreErrorCode::FreshnessCheckFailed
+    );
+    assert_eq!(
+        verify_scalar_renewal_predecessor(
+            &token,
+            &issuer_key,
+            &authorization,
+            &anchor,
+            &request.registry_did,
+            249
+        )
+        .unwrap_err()
+        .code(),
+        CoreErrorCode::FreshnessCheckFailed
+    );
+    document.authorizations[0].status = identity_core::TrustListStatus::Inactive;
+    assert_eq!(
+        verify_scalar_renewal_predecessor(
+            &token,
+            &issuer_key,
+            &sign_grant(&document),
+            &anchor,
+            &request.registry_did,
+            300
+        )
+        .unwrap_err()
+        .code(),
+        CoreErrorCode::TrustCheckFailed
+    );
+    document.authorizations[0].status = identity_core::TrustListStatus::Active;
+    document.authorizations[0].definition.version = "2".into();
+    assert_eq!(
+        verify_scalar_renewal_predecessor(
+            &token,
+            &issuer_key,
+            &sign_grant(&document),
+            &anchor,
+            &request.registry_did,
+            300
+        )
+        .unwrap_err()
+        .code(),
+        CoreErrorCode::TrustCheckFailed
+    );
+    let mut future = payload.clone();
+    future["iat"] = json!(400);
+    future["exp"] = json!(500);
+    future["validFrom"] = json!("1970-01-01T00:06:40Z");
+    future["validUntil"] = json!("1970-01-01T00:08:20Z");
+    assert_eq!(
+        verify_scalar_renewal_predecessor(
+            &sign_credential(&future),
+            &issuer_key,
+            &authorization,
+            &anchor,
+            &request.registry_did,
+            300
+        )
+        .unwrap_err()
+        .code(),
+        CoreErrorCode::FreshnessCheckFailed
+    );
+    let mut invalid = payload.clone();
+    invalid["credentialSubject"]["member"] = json!("true");
+    assert_eq!(
+        verify_scalar_renewal_predecessor(
+            &sign_credential(&invalid),
+            &issuer_key,
+            &authorization,
+            &anchor,
+            &request.registry_did,
+            300
+        )
+        .unwrap_err()
+        .code(),
+        CoreErrorCode::InvalidInput
+    );
+    let (_, wrong_key) = signer(3);
+    assert_eq!(
+        verify_scalar_renewal_predecessor(
+            &token,
+            &wrong_key,
+            &authorization,
+            &anchor,
+            &request.registry_did,
+            300
+        )
+        .unwrap_err()
+        .code(),
+        CoreErrorCode::InvalidSignature
     );
 }
 

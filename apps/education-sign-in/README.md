@@ -18,7 +18,7 @@ bootstrap a persistent identity, configure independently pinned trust/status evi
 serve the public runtime at reachable HTTPS. Obtain holder-bound synthetic Education through
 the issuer's existing Government enrolment prerequisite. The application integrates only
 Education, not Government Identity. No operator host-table edit or new credential crypto is
-needed. Project-owned code is Apache-2.0 under root LICENSE. Public availability and remaining acceptance are tracked by #338;
+needed. Project-owned code is Apache-2.0 under the root LICENSE. Public checkout/export, exact signed artifact selection and public-release approval remain under #338;
 #349 delivers the kit, and #348 tracks the later Release B gate.
 
 Use installed pnpm/Node tooling and **a dedicated application Postgres database**. Never point

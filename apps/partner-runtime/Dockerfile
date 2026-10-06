@@ -18,7 +18,7 @@ RUN --mount=type=cache,id=vc363-cargo-registry,target=/usr/local/cargo/registry 
 
 FROM node:22.22.0-bookworm-slim AS runtime
 ARG SOURCE_REVISION
-LABEL org.opencontainers.image.title="CredWorks Education partner verifier" org.opencontainers.image.revision="${SOURCE_REVISION}"
+LABEL org.opencontainers.image.title="CredWorks partner issuer and verifier" org.opencontainers.image.revision="${SOURCE_REVISION}"
 RUN apt-get update && apt-get install --yes --no-install-recommends ca-certificates curl && rm -rf /var/lib/apt/lists/*
 RUN test "${#SOURCE_REVISION}" -eq 40 && test -z "$(printf '%s' "$SOURCE_REVISION" | tr -d '0-9a-f')" && groupadd --gid 10001 credworks && useradd --uid 10001 --gid credworks --no-create-home --shell /usr/sbin/nologin credworks && mkdir /state && chown 10001:10001 /state
 ENV NODE_ENV=production SOURCE_REVISION="${SOURCE_REVISION}"

@@ -2,7 +2,7 @@
 
 The actual OpenAPI documents are [runtime OpenAPI](../../apps/partner-runtime/openapi.json) and [application OpenAPI](../../apps/education-sign-in/src/public/openapi.json). They are imported verbatim at the same kit revision as these pages. The tables and curl examples below are checked against those contracts, not a replacement API.
 
-## Runtime routes
+## Education verifier runtime subset routes
 
 PUBLIC is the registered HTTPS origin. MGMT is exact loopback http://127.0.0.1:3081. Examples use placeholders; inject real capability/state/interaction values locally. Curl responses may contain protected capabilities: use mode-0600 files, not shared logs. A registry project bearer does not authorize runtime management.
 

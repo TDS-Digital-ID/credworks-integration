@@ -1,0 +1,69 @@
+{
+  "issuerDid": "did:web:issuer.example",
+  "issuerJwk": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "REPLACE_WITH_AUTHENTICATED_ISSUER_PUBLIC_X",
+    "y": "REPLACE_WITH_AUTHENTICATED_ISSUER_PUBLIC_Y"
+  },
+  "registryOrigin": "https://registry.example",
+  "trustAnchorJwk": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "REPLACE_WITH_PINNED_PUBLIC_X",
+    "y": "REPLACE_WITH_PINNED_PUBLIC_Y"
+  },
+  "statusSources": [
+    {
+      "url": "https://issuer.example/oid4vci/status/revocation.jwt",
+      "publicJwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "REPLACE_WITH_AUTHENTICATED_ISSUER_PUBLIC_X",
+        "y": "REPLACE_WITH_AUTHENTICATED_ISSUER_PUBLIC_Y"
+      },
+      "purpose": "revocation"
+    }
+  ],
+  "maxCacheAgeSeconds": 300,
+  "scalar": {
+    "registryDid": "did:web:registry.example",
+    "issuerKeyId": "did:web:issuer.example#key-1",
+    "definitions": [
+      {
+        "configurationId": "pair-v1",
+        "authorizationId": "00000375-0000-4000-8000-000000000001",
+        "definitionId": "https://issuer.example/definitions/pair",
+        "definitionVersion": "1",
+        "credentialType": "PartnerPair",
+        "profiles": [
+          {
+            "name": "left_only",
+            "permissionId": "00000375-0000-4000-8001-000000000011"
+          },
+          {
+            "name": "both",
+            "permissionId": "00000375-0000-4000-8001-000000000012"
+          },
+          {
+            "name": "whole",
+            "permissionId": "00000375-0000-4000-8001-000000000013"
+          }
+        ]
+      },
+      {
+        "configurationId": "snapshot-v1",
+        "authorizationId": "00000375-0000-4000-8000-000000000002",
+        "definitionId": "https://issuer.example/definitions/snapshot",
+        "definitionVersion": "1",
+        "credentialType": "PartnerSnapshot",
+        "profiles": [
+          {
+            "name": "whole",
+            "permissionId": "00000375-0000-4000-8001-000000000021"
+          }
+        ]
+      }
+    ]
+  }
+}

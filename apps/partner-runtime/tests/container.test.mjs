@@ -15,8 +15,8 @@ test(
   { skip: !image, timeout: 120000 },
   async () => {
     const suffix = core.randomUrlSafe(16).toLowerCase().replaceAll("_", "a"),
-      volume = "vc387-identity-" + suffix,
-      name = "vc387-runtime-" + suffix;
+      volume = "vc408-identity-" + suffix,
+      name = "vc408-runtime-" + suffix;
     const origin = "https://container" + suffix + ".example";
     const unlock = core.randomUrlSafe(32),
       token = core.randomUrlSafe(32);
@@ -89,14 +89,14 @@ test(
           "-v",
           volume + ":/state",
           "-p",
-          "127.0.0.1:38730:3080",
+          "127.0.0.1:29260:3080",
           image,
           "start",
         );
         for (let attempt = 0; attempt < 80; attempt++) {
           try {
             const response = await fetch(
-              "http://127.0.0.1:38730/.well-known/did.json",
+              "http://127.0.0.1:29260/.well-known/did.json",
             );
             if (response.status === 200) return response.json();
           } catch {}
@@ -109,7 +109,7 @@ test(
       assert.deepEqual(did.verificationMethod[0].publicKeyJwk, boot.publicJwk);
       assert.equal(
         (
-          await fetch("http://127.0.0.1:38730/management/sign", {
+          await fetch("http://127.0.0.1:29260/management/sign", {
             method: "POST",
           })
         ).status,
@@ -192,7 +192,7 @@ test(
   "actual Compose configuration bootstraps and starts the preserved partner identity",
   { skip: !image, timeout: 120000 },
   async () => {
-    const project = "vc387-compose-" + core.randomUrlSafe(16).toLowerCase().replaceAll("_", "a");
+    const project = "vc408-compose-" + core.randomUrlSafe(16).toLowerCase().replaceAll("_", "a");
     const environment = {
       ...process.env,
       PARTNER_IMAGE: image,
@@ -201,7 +201,7 @@ test(
       PARTNER_MANAGEMENT_TOKEN: core.randomUrlSafe(32),
       PARTNER_CONFIG_DIR: fileURLToPath(new URL("../examples/", import.meta.url)),
       PARTNER_VERIFIER_CONFIG: "",
-      PARTNER_HOST_PORT: "38731",
+      PARTNER_HOST_PORT: "29261",
     };
     const compose = (...args) => execFileSync("docker", [
       "compose", "-f", fileURLToPath(new URL("../../../infra/partner/compose.yml", import.meta.url)),
@@ -215,14 +215,14 @@ test(
       let document;
       for (let attempt = 0; attempt < 80; attempt++) {
         try {
-          const response = await fetch("http://127.0.0.1:38731/.well-known/did.json");
+          const response = await fetch("http://127.0.0.1:29261/.well-known/did.json");
           if (response.status === 200) { document = await response.json(); break; }
         } catch {}
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
       assert.equal(document?.id, identity.did, "Compose service readiness and identity");
       assert.deepEqual(document.verificationMethod[0].publicKeyJwk, identity.publicJwk);
-      assert.equal((await fetch("http://127.0.0.1:38731/management/sign", { method: "POST" })).status, 404);
+      assert.equal((await fetch("http://127.0.0.1:29261/management/sign", { method: "POST" })).status, 404);
     } finally {
       compose("down", "--volumes");
     }

@@ -1,0 +1,43 @@
+{
+  "pair-v1": {
+    "left": {
+      "name": "North"
+    },
+    "right": {
+      "name": "South"
+    },
+    "details": {
+      "settings": {
+        "enabled": false
+      },
+      "count": 7
+    },
+    "entries": [
+      {
+        "label": "Example",
+        "enabled": false
+      },
+      3.5,
+      [
+        "a",
+        true
+      ]
+    ]
+  },
+  "snapshot-v1": {
+    "details": {
+      "revision": 7,
+      "enabled": false
+    },
+    "entries": [
+      {
+        "label": "Example"
+      },
+      3.5,
+      [
+        "a",
+        true
+      ]
+    ]
+  }
+}

@@ -1,21 +1,31 @@
-# Education preview distribution
+# Distribution status
 
-Experimental preview for independent Education integration. Remaining physical phone tests were
-explicitly deferred by the operator; historical results and failures remain unchanged. Startup
-intermittency remains unresolved (#442). No clean-device or complete hardware acceptance is claimed.
+The operator delegated selection of reuse terms and public destination on 2026-10-06.
+Project-owned source is licensed under Apache-2.0; dependency and font licences remain unchanged.
+The planned distribution repository is `TDS-Digital-ID/credworks-integration`. The existing
+`universityvc-integration` and `university-vc-monorepo` repositories remain private.
+No public availability is claimed by this preparation commit.
 
-Project-owned code is Apache-2.0; third-party licences/notices remain in force. The distribution
-repository is TDS-Digital-ID/credworks-integration. Existing producer repositories remain private.
-This source is a finite export of kit36dcc1b64637826a0193834d1c2a6ac451ac35d4 with documented
-licence/status-only transforms. No project runtime implementation or dependency version changes.
-Original ed5b8bea images retain their build labels. The accompanying release-signed wallet uses
-Education source9130db0e727490857bebeef64b74cec19ee9297e and its own checksum.
+Release A is the frozen Education kit36dcc1b plus explicit distribution metadata changes,
+original ed5b8bea images and the established-signer Education9130db0 APK. Release B is the
+frozen generic kit083253f plus explicit distribution metadata changes, original dcef4b7 images
+and established-signer generic17c6d60 APK. A distribution manifest must identify all source
+revisions, transforms and checksums; do not label historical images as rebuilt from this commit.
+The source archives retain their embedded source/build provenance.
 
-Verify the release manifest and checksums, then use docs/education/quickstart.md from this source
-root. No private producer checkout is required. Provide your own durable partner origin, protected
-identity, database and independently authenticated registry/provider trust. Never reuse host-fixture
-keys or bypass authorisation, consent, TLS or trust checks. Preserve existing wallet data and keys.
+The operator explicitly deferred remaining physical-phone tests. Existing observations and
+failures remain preserved; unperformed checks stay NOT RUN. Software-holder tests use mock
+platform attestation and do not establish hardware acceptance. The intermittent startup issue
+#442 remains unresolved. The frozen generic APK does not include the later #445 expired-receipt
+diagnostic correction. Clean-device installation and published-only clean setup are not accepted.
+These are preview limitations, not a claim of completed release acceptance.
 
-Binary notices and exact corresponding Debian sources accompany image/APK distribution separately.
-No operator configuration, credentials, database snapshots or private Git history is distributed.
-Release A precedes Release B. Published-only setup must be recorded as performed, not inferred.
+Before public distribution, attach matching dependency/font notices and the reviewed finite
+source, images, signed APK, provenance and checksums. Exclude Git history, operator state,
+credentials, tunnel material, backups and private host evidence. Preserve installed wallet
+identity/data; do not uninstall or reset keys to force an update. Publish Release A before B.
+Keep #329/#338/#348 open while their remaining release criteria are unmet.
+
+The project licence text is the unchanged official Apache License, Version2.0 from
+https://www.apache.org/licenses/LICENSE-2.0.txt. Existing copyright, attribution and third-party
+licence notices are retained. No third-party work is relicensed by this project licence.

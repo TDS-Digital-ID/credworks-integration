@@ -21,8 +21,8 @@ async function fixture({
     stateDir: join(root, "identity"),
     unlockKey: core.randomUrlSafe(32),
     managementToken: core.randomUrlSafe(32),
-    publicPort: Number(process.env.PARTNER_SESSION_HTTP_PORT ?? 33170),
-    managementPort: Number(process.env.PARTNER_SESSION_HTTP_PORT ?? 33170) + 1,
+    publicPort: Number(process.env.PARTNER_SESSION_HTTP_PORT ?? 29200),
+    managementPort: Number(process.env.PARTNER_SESSION_HTTP_PORT ?? 29200) + 1,
   };
   const identity = openIdentity(config, true);
   let clock = Math.floor(Date.now() / 1000);

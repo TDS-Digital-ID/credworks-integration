@@ -1,0 +1,360 @@
+{
+  "document": {
+    "version": 1,
+    "id": "https://trust.example/issuer-authorizations/fixture-401.jwt",
+    "issuer": "did:web:trust.example",
+    "iat": 100,
+    "exp": 200,
+    "authorizations": [
+      {
+        "credential_issuer_did": "did:web:issuer.example",
+        "credential_issuer_key_id": "did:web:issuer.example#bootstrap-401",
+        "credential_issuer_public_jwk_sha256_thumbprint": "ubqfRs2E46IAjl7fjVnSodEEjTbN-7zH_K9IZn895T4",
+        "definition": {
+          "id": "urn:example:membership",
+          "version": "1",
+          "credential_type": "ExampleMembershipCredential",
+          "label": "Membership",
+          "max_validity_seconds": 3600,
+          "claims": [
+            {
+              "name": "member",
+              "label": "Member",
+              "value_type": "boolean",
+              "required": true
+            },
+            {
+              "name": "member_id",
+              "label": "Member ID",
+              "value_type": "string",
+              "required": true
+            },
+            {
+              "name": "score",
+              "label": "Score",
+              "value_type": "number",
+              "required": false
+            },
+            {
+              "name": "visits",
+              "label": "Visits",
+              "value_type": "integer",
+              "required": false
+            }
+          ],
+          "profiles": [
+            {
+              "name": "access",
+              "claim_paths": [
+                [
+                  "credentialSubject",
+                  "member"
+                ]
+              ]
+            },
+            {
+              "name": "sign_in",
+              "claim_paths": [
+                [
+                  "credentialSubject",
+                  "member"
+                ],
+                [
+                  "credentialSubject",
+                  "member_id"
+                ]
+              ]
+            }
+          ]
+        },
+        "status": "active",
+        "key_state": "retained",
+        "status_authority": {
+          "key_id": "did:web:issuer.example#bootstrap-401",
+          "public_jwk_sha256_thumbprint": "ubqfRs2E46IAjl7fjVnSodEEjTbN-7zH_K9IZn895T4"
+        }
+      },
+      {
+        "credential_issuer_did": "did:web:issuer.example",
+        "credential_issuer_key_id": "did:web:issuer.example#credential-401",
+        "credential_issuer_public_jwk_sha256_thumbprint": "b6o2xuGBRnZ8DbWLwMq3L9wR6mooHVook3MJwbOz4ag",
+        "definition": {
+          "id": "urn:example:membership",
+          "version": "1",
+          "credential_type": "ExampleMembershipCredential",
+          "label": "Membership",
+          "max_validity_seconds": 3600,
+          "claims": [
+            {
+              "name": "member",
+              "label": "Member",
+              "value_type": "boolean",
+              "required": true
+            },
+            {
+              "name": "member_id",
+              "label": "Member ID",
+              "value_type": "string",
+              "required": true
+            },
+            {
+              "name": "score",
+              "label": "Score",
+              "value_type": "number",
+              "required": false
+            },
+            {
+              "name": "visits",
+              "label": "Visits",
+              "value_type": "integer",
+              "required": false
+            }
+          ],
+          "profiles": [
+            {
+              "name": "access",
+              "claim_paths": [
+                [
+                  "credentialSubject",
+                  "member"
+                ]
+              ]
+            },
+            {
+              "name": "sign_in",
+              "claim_paths": [
+                [
+                  "credentialSubject",
+                  "member"
+                ],
+                [
+                  "credentialSubject",
+                  "member_id"
+                ]
+              ]
+            }
+          ]
+        },
+        "status": "active",
+        "key_state": "current",
+        "status_authority": {
+          "key_id": "did:web:issuer.example#bootstrap-401",
+          "public_jwk_sha256_thumbprint": "ubqfRs2E46IAjl7fjVnSodEEjTbN-7zH_K9IZn895T4"
+        }
+      }
+    ]
+  },
+  "withdrawn_document": {
+    "version": 1,
+    "id": "https://trust.example/issuer-authorizations/fixture-401.jwt",
+    "issuer": "did:web:trust.example",
+    "iat": 100,
+    "exp": 200,
+    "authorizations": [
+      {
+        "credential_issuer_did": "did:web:issuer.example",
+        "credential_issuer_key_id": "did:web:issuer.example#bootstrap-401",
+        "credential_issuer_public_jwk_sha256_thumbprint": "ubqfRs2E46IAjl7fjVnSodEEjTbN-7zH_K9IZn895T4",
+        "definition": {
+          "id": "urn:example:membership",
+          "version": "1",
+          "credential_type": "ExampleMembershipCredential",
+          "label": "Membership",
+          "max_validity_seconds": 3600,
+          "claims": [
+            {
+              "name": "member",
+              "label": "Member",
+              "value_type": "boolean",
+              "required": true
+            },
+            {
+              "name": "member_id",
+              "label": "Member ID",
+              "value_type": "string",
+              "required": true
+            },
+            {
+              "name": "score",
+              "label": "Score",
+              "value_type": "number",
+              "required": false
+            },
+            {
+              "name": "visits",
+              "label": "Visits",
+              "value_type": "integer",
+              "required": false
+            }
+          ],
+          "profiles": [
+            {
+              "name": "access",
+              "claim_paths": [
+                [
+                  "credentialSubject",
+                  "member"
+                ]
+              ]
+            },
+            {
+              "name": "sign_in",
+              "claim_paths": [
+                [
+                  "credentialSubject",
+                  "member"
+                ],
+                [
+                  "credentialSubject",
+                  "member_id"
+                ]
+              ]
+            }
+          ]
+        },
+        "status": "active",
+        "key_state": "withdrawn",
+        "status_authority": {
+          "key_id": "did:web:issuer.example#bootstrap-401",
+          "public_jwk_sha256_thumbprint": "ubqfRs2E46IAjl7fjVnSodEEjTbN-7zH_K9IZn895T4"
+        }
+      },
+      {
+        "credential_issuer_did": "did:web:issuer.example",
+        "credential_issuer_key_id": "did:web:issuer.example#credential-401",
+        "credential_issuer_public_jwk_sha256_thumbprint": "b6o2xuGBRnZ8DbWLwMq3L9wR6mooHVook3MJwbOz4ag",
+        "definition": {
+          "id": "urn:example:membership",
+          "version": "1",
+          "credential_type": "ExampleMembershipCredential",
+          "label": "Membership",
+          "max_validity_seconds": 3600,
+          "claims": [
+            {
+              "name": "member",
+              "label": "Member",
+              "value_type": "boolean",
+              "required": true
+            },
+            {
+              "name": "member_id",
+              "label": "Member ID",
+              "value_type": "string",
+              "required": true
+            },
+            {
+              "name": "score",
+              "label": "Score",
+              "value_type": "number",
+              "required": false
+            },
+            {
+              "name": "visits",
+              "label": "Visits",
+              "value_type": "integer",
+              "required": false
+            }
+          ],
+          "profiles": [
+            {
+              "name": "access",
+              "claim_paths": [
+                [
+                  "credentialSubject",
+                  "member"
+                ]
+              ]
+            },
+            {
+              "name": "sign_in",
+              "claim_paths": [
+                [
+                  "credentialSubject",
+                  "member"
+                ],
+                [
+                  "credentialSubject",
+                  "member_id"
+                ]
+              ]
+            }
+          ]
+        },
+        "status": "active",
+        "key_state": "current",
+        "status_authority": {
+          "key_id": "did:web:issuer.example#bootstrap-401",
+          "public_jwk_sha256_thumbprint": "ubqfRs2E46IAjl7fjVnSodEEjTbN-7zH_K9IZn895T4"
+        }
+      }
+    ]
+  },
+  "anchor": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "VZoUEjjdalHOQcimkkMK9LgdeKBLkCkK-xc7l-62utE",
+    "y": "yqcv1D0NMJLW4Ick44Q68Zq8mFNRogs_BVzXtJW8lrA",
+    "kid": "did:web:trust.example#fixture-401"
+  },
+  "bootstrap": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "bPpkoA0o5hSVUbBPCaIv_HzHT9QnBn8UEThR_f9oSpw",
+    "y": "puHVhx91KHoo9TnODly9uuwlzRXhTrYC23YR8YUUAR0",
+    "kid": "did:web:issuer.example#bootstrap-401"
+  },
+  "current": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "o5KyawUDpx8M4eAqyt8Z1yqE1iEbIckU7ovFjf6pJSk",
+    "y": "kLs8n58bWYtvl67SxI9MWfEhlNjrARRl_4jnVg0cVJM",
+    "kid": "did:web:issuer.example#credential-401"
+  },
+  "status_authority": {
+    "key_id": "did:web:issuer.example#bootstrap-401",
+    "public_jwk_sha256_thumbprint": "ubqfRs2E46IAjl7fjVnSodEEjTbN-7zH_K9IZn895T4"
+  },
+  "status": {
+    "id": "https://issuer.example/status/fixture-401#0",
+    "type": "BitstringStatusListEntry",
+    "statusPurpose": "revocation",
+    "statusListIndex": "0",
+    "statusListCredential": "https://issuer.example/status/fixture-401"
+  },
+  "old_request": {
+    "registry_did": "did:web:trust.example",
+    "credential_issuer_did": "did:web:issuer.example",
+    "credential_issuer_key_id": "did:web:issuer.example#bootstrap-401",
+    "credential_issuer_public_jwk": {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "bPpkoA0o5hSVUbBPCaIv_HzHT9QnBn8UEThR_f9oSpw",
+      "y": "puHVhx91KHoo9TnODly9uuwlzRXhTrYC23YR8YUUAR0",
+      "kid": "did:web:issuer.example#bootstrap-401"
+    },
+    "definition_id": "urn:example:membership",
+    "definition_version": "1",
+    "credential_type": "ExampleMembershipCredential"
+  },
+  "new_request": {
+    "registry_did": "did:web:trust.example",
+    "credential_issuer_did": "did:web:issuer.example",
+    "credential_issuer_key_id": "did:web:issuer.example#credential-401",
+    "credential_issuer_public_jwk": {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "o5KyawUDpx8M4eAqyt8Z1yqE1iEbIckU7ovFjf6pJSk",
+      "y": "kLs8n58bWYtvl67SxI9MWfEhlNjrARRl_4jnVg0cVJM",
+      "kid": "did:web:issuer.example#credential-401"
+    },
+    "definition_id": "urn:example:membership",
+    "definition_version": "1",
+    "credential_type": "ExampleMembershipCredential"
+  },
+  "compact_authorization": "eyJhbGciOiJFUzI1NiIsInR5cCI6Imlzc3Vlci1hdXRob3JpemF0aW9ucytqd3QiLCJraWQiOiJkaWQ6d2ViOnRydXN0LmV4YW1wbGUjZml4dHVyZS00MDEifQ.eyJ2ZXJzaW9uIjoxLCJpZCI6Imh0dHBzOi8vdHJ1c3QuZXhhbXBsZS9pc3N1ZXItYXV0aG9yaXphdGlvbnMvZml4dHVyZS00MDEuand0IiwiaXNzdWVyIjoiZGlkOndlYjp0cnVzdC5leGFtcGxlIiwiaWF0IjoxMDAsImV4cCI6MjAwLCJhdXRob3JpemF0aW9ucyI6W3siY3JlZGVudGlhbF9pc3N1ZXJfZGlkIjoiZGlkOndlYjppc3N1ZXIuZXhhbXBsZSIsImNyZWRlbnRpYWxfaXNzdWVyX2tleV9pZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjYm9vdHN0cmFwLTQwMSIsImNyZWRlbnRpYWxfaXNzdWVyX3B1YmxpY19qd2tfc2hhMjU2X3RodW1icHJpbnQiOiJ1YnFmUnMyRTQ2SUFqbDdmalZuU29kRUVqVGJOLTd6SF9LOUlabjg5NVQ0IiwiZGVmaW5pdGlvbiI6eyJpZCI6InVybjpleGFtcGxlOm1lbWJlcnNoaXAiLCJ2ZXJzaW9uIjoiMSIsImNyZWRlbnRpYWxfdHlwZSI6IkV4YW1wbGVNZW1iZXJzaGlwQ3JlZGVudGlhbCIsImxhYmVsIjoiTWVtYmVyc2hpcCIsIm1heF92YWxpZGl0eV9zZWNvbmRzIjozNjAwLCJjbGFpbXMiOlt7Im5hbWUiOiJtZW1iZXIiLCJsYWJlbCI6Ik1lbWJlciIsInZhbHVlX3R5cGUiOiJib29sZWFuIiwicmVxdWlyZWQiOnRydWV9LHsibmFtZSI6Im1lbWJlcl9pZCIsImxhYmVsIjoiTWVtYmVyIElEIiwidmFsdWVfdHlwZSI6InN0cmluZyIsInJlcXVpcmVkIjp0cnVlfSx7Im5hbWUiOiJzY29yZSIsImxhYmVsIjoiU2NvcmUiLCJ2YWx1ZV90eXBlIjoibnVtYmVyIiwicmVxdWlyZWQiOmZhbHNlfSx7Im5hbWUiOiJ2aXNpdHMiLCJsYWJlbCI6IlZpc2l0cyIsInZhbHVlX3R5cGUiOiJpbnRlZ2VyIiwicmVxdWlyZWQiOmZhbHNlfV0sInByb2ZpbGVzIjpbeyJuYW1lIjoiYWNjZXNzIiwiY2xhaW1fcGF0aHMiOltbImNyZWRlbnRpYWxTdWJqZWN0IiwibWVtYmVyIl1dfSx7Im5hbWUiOiJzaWduX2luIiwiY2xhaW1fcGF0aHMiOltbImNyZWRlbnRpYWxTdWJqZWN0IiwibWVtYmVyIl0sWyJjcmVkZW50aWFsU3ViamVjdCIsIm1lbWJlcl9pZCJdXX1dfSwic3RhdHVzIjoiYWN0aXZlIiwia2V5X3N0YXRlIjoicmV0YWluZWQiLCJzdGF0dXNfYXV0aG9yaXR5Ijp7ImtleV9pZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjYm9vdHN0cmFwLTQwMSIsInB1YmxpY19qd2tfc2hhMjU2X3RodW1icHJpbnQiOiJ1YnFmUnMyRTQ2SUFqbDdmalZuU29kRUVqVGJOLTd6SF9LOUlabjg5NVQ0In19LHsiY3JlZGVudGlhbF9pc3N1ZXJfZGlkIjoiZGlkOndlYjppc3N1ZXIuZXhhbXBsZSIsImNyZWRlbnRpYWxfaXNzdWVyX2tleV9pZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjY3JlZGVudGlhbC00MDEiLCJjcmVkZW50aWFsX2lzc3Vlcl9wdWJsaWNfandrX3NoYTI1Nl90aHVtYnByaW50IjoiYjZvMnh1R0JSblo4RGJXTHdNcTNMOXdSNm1vb0hWb29rM01Kd2JPejRhZyIsImRlZmluaXRpb24iOnsiaWQiOiJ1cm46ZXhhbXBsZTptZW1iZXJzaGlwIiwidmVyc2lvbiI6IjEiLCJjcmVkZW50aWFsX3R5cGUiOiJFeGFtcGxlTWVtYmVyc2hpcENyZWRlbnRpYWwiLCJsYWJlbCI6Ik1lbWJlcnNoaXAiLCJtYXhfdmFsaWRpdHlfc2Vjb25kcyI6MzYwMCwiY2xhaW1zIjpbeyJuYW1lIjoibWVtYmVyIiwibGFiZWwiOiJNZW1iZXIiLCJ2YWx1ZV90eXBlIjoiYm9vbGVhbiIsInJlcXVpcmVkIjp0cnVlfSx7Im5hbWUiOiJtZW1iZXJfaWQiLCJsYWJlbCI6Ik1lbWJlciBJRCIsInZhbHVlX3R5cGUiOiJzdHJpbmciLCJyZXF1aXJlZCI6dHJ1ZX0seyJuYW1lIjoic2NvcmUiLCJsYWJlbCI6IlNjb3JlIiwidmFsdWVfdHlwZSI6Im51bWJlciIsInJlcXVpcmVkIjpmYWxzZX0seyJuYW1lIjoidmlzaXRzIiwibGFiZWwiOiJWaXNpdHMiLCJ2YWx1ZV90eXBlIjoiaW50ZWdlciIsInJlcXVpcmVkIjpmYWxzZX1dLCJwcm9maWxlcyI6W3sibmFtZSI6ImFjY2VzcyIsImNsYWltX3BhdGhzIjpbWyJjcmVkZW50aWFsU3ViamVjdCIsIm1lbWJlciJdXX0seyJuYW1lIjoic2lnbl9pbiIsImNsYWltX3BhdGhzIjpbWyJjcmVkZW50aWFsU3ViamVjdCIsIm1lbWJlciJdLFsiY3JlZGVudGlhbFN1YmplY3QiLCJtZW1iZXJfaWQiXV19XX0sInN0YXR1cyI6ImFjdGl2ZSIsImtleV9zdGF0ZSI6ImN1cnJlbnQiLCJzdGF0dXNfYXV0aG9yaXR5Ijp7ImtleV9pZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjYm9vdHN0cmFwLTQwMSIsInB1YmxpY19qd2tfc2hhMjU2X3RodW1icHJpbnQiOiJ1YnFmUnMyRTQ2SUFqbDdmalZuU29kRUVqVGJOLTd6SF9LOUlabjg5NVQ0In19XX0.x0vOlLdWR5oNN1vKkPXsBavq80YxjY09QYm3isoisTVUX8loqUzNjwNVnjGI5pwnjTbKP7iy_l83U_qNAVT3Cw",
+  "withdrawn_authorization": "eyJhbGciOiJFUzI1NiIsInR5cCI6Imlzc3Vlci1hdXRob3JpemF0aW9ucytqd3QiLCJraWQiOiJkaWQ6d2ViOnRydXN0LmV4YW1wbGUjZml4dHVyZS00MDEifQ.eyJ2ZXJzaW9uIjoxLCJpZCI6Imh0dHBzOi8vdHJ1c3QuZXhhbXBsZS9pc3N1ZXItYXV0aG9yaXphdGlvbnMvZml4dHVyZS00MDEuand0IiwiaXNzdWVyIjoiZGlkOndlYjp0cnVzdC5leGFtcGxlIiwiaWF0IjoxMDAsImV4cCI6MjAwLCJhdXRob3JpemF0aW9ucyI6W3siY3JlZGVudGlhbF9pc3N1ZXJfZGlkIjoiZGlkOndlYjppc3N1ZXIuZXhhbXBsZSIsImNyZWRlbnRpYWxfaXNzdWVyX2tleV9pZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjYm9vdHN0cmFwLTQwMSIsImNyZWRlbnRpYWxfaXNzdWVyX3B1YmxpY19qd2tfc2hhMjU2X3RodW1icHJpbnQiOiJ1YnFmUnMyRTQ2SUFqbDdmalZuU29kRUVqVGJOLTd6SF9LOUlabjg5NVQ0IiwiZGVmaW5pdGlvbiI6eyJpZCI6InVybjpleGFtcGxlOm1lbWJlcnNoaXAiLCJ2ZXJzaW9uIjoiMSIsImNyZWRlbnRpYWxfdHlwZSI6IkV4YW1wbGVNZW1iZXJzaGlwQ3JlZGVudGlhbCIsImxhYmVsIjoiTWVtYmVyc2hpcCIsIm1heF92YWxpZGl0eV9zZWNvbmRzIjozNjAwLCJjbGFpbXMiOlt7Im5hbWUiOiJtZW1iZXIiLCJsYWJlbCI6Ik1lbWJlciIsInZhbHVlX3R5cGUiOiJib29sZWFuIiwicmVxdWlyZWQiOnRydWV9LHsibmFtZSI6Im1lbWJlcl9pZCIsImxhYmVsIjoiTWVtYmVyIElEIiwidmFsdWVfdHlwZSI6InN0cmluZyIsInJlcXVpcmVkIjp0cnVlfSx7Im5hbWUiOiJzY29yZSIsImxhYmVsIjoiU2NvcmUiLCJ2YWx1ZV90eXBlIjoibnVtYmVyIiwicmVxdWlyZWQiOmZhbHNlfSx7Im5hbWUiOiJ2aXNpdHMiLCJsYWJlbCI6IlZpc2l0cyIsInZhbHVlX3R5cGUiOiJpbnRlZ2VyIiwicmVxdWlyZWQiOmZhbHNlfV0sInByb2ZpbGVzIjpbeyJuYW1lIjoiYWNjZXNzIiwiY2xhaW1fcGF0aHMiOltbImNyZWRlbnRpYWxTdWJqZWN0IiwibWVtYmVyIl1dfSx7Im5hbWUiOiJzaWduX2luIiwiY2xhaW1fcGF0aHMiOltbImNyZWRlbnRpYWxTdWJqZWN0IiwibWVtYmVyIl0sWyJjcmVkZW50aWFsU3ViamVjdCIsIm1lbWJlcl9pZCJdXX1dfSwic3RhdHVzIjoiYWN0aXZlIiwia2V5X3N0YXRlIjoid2l0aGRyYXduIiwic3RhdHVzX2F1dGhvcml0eSI6eyJrZXlfaWQiOiJkaWQ6d2ViOmlzc3Vlci5leGFtcGxlI2Jvb3RzdHJhcC00MDEiLCJwdWJsaWNfandrX3NoYTI1Nl90aHVtYnByaW50IjoidWJxZlJzMkU0NklBamw3ZmpWblNvZEVFalRiTi03ekhfSzlJWm44OTVUNCJ9fSx7ImNyZWRlbnRpYWxfaXNzdWVyX2RpZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUiLCJjcmVkZW50aWFsX2lzc3Vlcl9rZXlfaWQiOiJkaWQ6d2ViOmlzc3Vlci5leGFtcGxlI2NyZWRlbnRpYWwtNDAxIiwiY3JlZGVudGlhbF9pc3N1ZXJfcHVibGljX2p3a19zaGEyNTZfdGh1bWJwcmludCI6ImI2bzJ4dUdCUm5aOERiV0x3TXEzTDl3UjZtb29IVm9vazNNSndiT3o0YWciLCJkZWZpbml0aW9uIjp7ImlkIjoidXJuOmV4YW1wbGU6bWVtYmVyc2hpcCIsInZlcnNpb24iOiIxIiwiY3JlZGVudGlhbF90eXBlIjoiRXhhbXBsZU1lbWJlcnNoaXBDcmVkZW50aWFsIiwibGFiZWwiOiJNZW1iZXJzaGlwIiwibWF4X3ZhbGlkaXR5X3NlY29uZHMiOjM2MDAsImNsYWltcyI6W3sibmFtZSI6Im1lbWJlciIsImxhYmVsIjoiTWVtYmVyIiwidmFsdWVfdHlwZSI6ImJvb2xlYW4iLCJyZXF1aXJlZCI6dHJ1ZX0seyJuYW1lIjoibWVtYmVyX2lkIiwibGFiZWwiOiJNZW1iZXIgSUQiLCJ2YWx1ZV90eXBlIjoic3RyaW5nIiwicmVxdWlyZWQiOnRydWV9LHsibmFtZSI6InNjb3JlIiwibGFiZWwiOiJTY29yZSIsInZhbHVlX3R5cGUiOiJudW1iZXIiLCJyZXF1aXJlZCI6ZmFsc2V9LHsibmFtZSI6InZpc2l0cyIsImxhYmVsIjoiVmlzaXRzIiwidmFsdWVfdHlwZSI6ImludGVnZXIiLCJyZXF1aXJlZCI6ZmFsc2V9XSwicHJvZmlsZXMiOlt7Im5hbWUiOiJhY2Nlc3MiLCJjbGFpbV9wYXRocyI6W1siY3JlZGVudGlhbFN1YmplY3QiLCJtZW1iZXIiXV19LHsibmFtZSI6InNpZ25faW4iLCJjbGFpbV9wYXRocyI6W1siY3JlZGVudGlhbFN1YmplY3QiLCJtZW1iZXIiXSxbImNyZWRlbnRpYWxTdWJqZWN0IiwibWVtYmVyX2lkIl1dfV19LCJzdGF0dXMiOiJhY3RpdmUiLCJrZXlfc3RhdGUiOiJjdXJyZW50Iiwic3RhdHVzX2F1dGhvcml0eSI6eyJrZXlfaWQiOiJkaWQ6d2ViOmlzc3Vlci5leGFtcGxlI2Jvb3RzdHJhcC00MDEiLCJwdWJsaWNfandrX3NoYTI1Nl90aHVtYnByaW50IjoidWJxZlJzMkU0NklBamw3ZmpWblNvZEVFalRiTi03ekhfSzlJWm44OTVUNCJ9fV19.XO7FtSzUEYGxWU1F5aoK89jQhRIBXXXD3x_XHSEvxHrt5-Ukii9XqThVrhlxYhjhWyiJbUn8Y7n1AsD8djXy7g",
+  "old_credential": "eyJhbGciOiJFUzI1NiIsInR5cCI6InZjK3NkLWp3dCIsImtpZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjYm9vdHN0cmFwLTQwMSJ9.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiLHsiQHZvY2FiIjoiaHR0cHM6Ly9leGFtcGxlLnRlc3Qvdm9jYWIjIn1dLCJfc2RfYWxnIjoic2hhLTI1NiIsImNuZiI6eyJqd2siOnsiY3J2IjoiUC0yNTYiLCJraWQiOiJmaXh0dXJlLTQwMS1ob2xkZXIiLCJrdHkiOiJFQyIsIngiOiJHemNRd1JpcWxRbnIzWUVkOV9oVE1KX2tVb2lTMW8taWl3TnlFWlVqUktVIiwieSI6InlPMU1pV3NkVVkyMXBiYy1MRklzN3BnZEYybXBnT1JFX2Q0d2o0M2ZiLTAifX0sImNyZWRlbnRpYWxEZWZpbml0aW9uIjp7ImlkIjoidXJuOmV4YW1wbGU6bWVtYmVyc2hpcCIsInZlcnNpb24iOiIxIn0sImNyZWRlbnRpYWxTdGF0dXMiOnsiaWQiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cy9maXh0dXJlLTQwMSMwIiwic3RhdHVzTGlzdENyZWRlbnRpYWwiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cy9maXh0dXJlLTQwMSIsInN0YXR1c0xpc3RJbmRleCI6IjAiLCJzdGF0dXNQdXJwb3NlIjoicmV2b2NhdGlvbiIsInR5cGUiOiJCaXRzdHJpbmdTdGF0dXNMaXN0RW50cnkifSwiY3JlZGVudGlhbFN1YmplY3QiOnsiX3NkIjpbIjV3azR4ZWR5N3FGZ3dMd2oyd2xyWDg2WUVyaUdaQjF4SHc1cWJMU2l4dE0iLCI3OGloRXp1TEVnbzdqcVE0WUp1SFZZdVdOazd0dGFKT3VzcEtRM1dOZUVJIiwiUWl3VXhtVmdfdThpVHRwYTlrM1FGOUlNd1htNlpBd05kdmVuUkwzSGYzZyIsImMzTEFFS0g4TWNlN05pMHpFa3Z5bDk3eVgzUVdlQ29BRTFjYm1qNE5McWciXX0sImV4cCI6MjAwLCJpYXQiOjEwMCwiaXNzIjoiZGlkOndlYjppc3N1ZXIuZXhhbXBsZSIsImlzc3VlciI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUiLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiRXhhbXBsZU1lbWJlcnNoaXBDcmVkZW50aWFsIl0sInZhbGlkRnJvbSI6IjE5NzAtMDEtMDFUMDA6MDE6NDBaIiwidmFsaWRVbnRpbCI6IjE5NzAtMDEtMDFUMDA6MDM6MjBaIn0.o7Q6-o8isgPxG6tC5-clvZK1XxedFVQU222U8g4fUcFy9jjqVQRI9QkFBFcFio_kRorNWjmOoe8XdT3pYyj8VA~WyJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRIiwibWVtYmVyIix0cnVlXQ~WyJBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnIiwibWVtYmVyX2lkIiwiZXhhbXBsZS1tZW1iZXItNDIiXQ~WyJBd01EQXdNREF3TURBd01EQXdNREF3Iiwic2NvcmUiLDMuNV0~WyJCQVFFQkFRRUJBUUVCQVFFQkFRRUJBIiwidmlzaXRzIiwyXQ~",
+  "new_credential": "eyJhbGciOiJFUzI1NiIsInR5cCI6InZjK3NkLWp3dCIsImtpZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjY3JlZGVudGlhbC00MDEifQ.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiLHsiQHZvY2FiIjoiaHR0cHM6Ly9leGFtcGxlLnRlc3Qvdm9jYWIjIn1dLCJfc2RfYWxnIjoic2hhLTI1NiIsImNuZiI6eyJqd2siOnsiY3J2IjoiUC0yNTYiLCJraWQiOiJmaXh0dXJlLTQwMS1ob2xkZXIiLCJrdHkiOiJFQyIsIngiOiJHemNRd1JpcWxRbnIzWUVkOV9oVE1KX2tVb2lTMW8taWl3TnlFWlVqUktVIiwieSI6InlPMU1pV3NkVVkyMXBiYy1MRklzN3BnZEYybXBnT1JFX2Q0d2o0M2ZiLTAifX0sImNyZWRlbnRpYWxEZWZpbml0aW9uIjp7ImlkIjoidXJuOmV4YW1wbGU6bWVtYmVyc2hpcCIsInZlcnNpb24iOiIxIn0sImNyZWRlbnRpYWxTdGF0dXMiOnsiaWQiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cy9maXh0dXJlLTQwMSMwIiwic3RhdHVzTGlzdENyZWRlbnRpYWwiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cy9maXh0dXJlLTQwMSIsInN0YXR1c0xpc3RJbmRleCI6IjAiLCJzdGF0dXNQdXJwb3NlIjoicmV2b2NhdGlvbiIsInR5cGUiOiJCaXRzdHJpbmdTdGF0dXNMaXN0RW50cnkifSwiY3JlZGVudGlhbFN1YmplY3QiOnsiX3NkIjpbIjV3azR4ZWR5N3FGZ3dMd2oyd2xyWDg2WUVyaUdaQjF4SHc1cWJMU2l4dE0iLCI3OGloRXp1TEVnbzdqcVE0WUp1SFZZdVdOazd0dGFKT3VzcEtRM1dOZUVJIiwiUWl3VXhtVmdfdThpVHRwYTlrM1FGOUlNd1htNlpBd05kdmVuUkwzSGYzZyIsImMzTEFFS0g4TWNlN05pMHpFa3Z5bDk3eVgzUVdlQ29BRTFjYm1qNE5McWciXX0sImV4cCI6MjAwLCJpYXQiOjEwMCwiaXNzIjoiZGlkOndlYjppc3N1ZXIuZXhhbXBsZSIsImlzc3VlciI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUiLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiRXhhbXBsZU1lbWJlcnNoaXBDcmVkZW50aWFsIl0sInZhbGlkRnJvbSI6IjE5NzAtMDEtMDFUMDA6MDE6NDBaIiwidmFsaWRVbnRpbCI6IjE5NzAtMDEtMDFUMDA6MDM6MjBaIn0.LTaNb3u4B9ZT6GQ8FBATmdvyX7MXLdlpalF-jLZzrQzuDwPTI-g8U0T_bz9-aUoGq1ZeE9-q5adZogZz9vxisQ~WyJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRIiwibWVtYmVyIix0cnVlXQ~WyJBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnIiwibWVtYmVyX2lkIiwiZXhhbXBsZS1tZW1iZXItNDIiXQ~WyJBd01EQXdNREF3TURBd01EQXdNREF3Iiwic2NvcmUiLDMuNV0~WyJCQVFFQkFRRUJBUUVCQVFFQkFRRUJBIiwidmlzaXRzIiwyXQ~",
+  "active_status": "eyJhbGciOiJFUzI1NiIsInR5cCI6InN0YXR1cy1saXN0K2p3dCIsImtpZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjYm9vdHN0cmFwLTQwMSJ9.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsIkJpdHN0cmluZ1N0YXR1c0xpc3RDcmVkZW50aWFsIl0sImlzc3VlciI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUiLCJjcmVkZW50aWFsU3ViamVjdCI6eyJpZCI6Imh0dHBzOi8vaXNzdWVyLmV4YW1wbGUvc3RhdHVzL2ZpeHR1cmUtNDAxI2xpc3QiLCJ0eXBlIjoiQml0c3RyaW5nU3RhdHVzTGlzdCIsInN0YXR1c1B1cnBvc2UiOiJyZXZvY2F0aW9uIiwiZW5jb2RlZExpc3QiOiJINHNJQUFBQUFBQUFfLTNBTVFFQUFBRENvUFZQYlF3ZktBQUFBQUFBQUFBQUFBQUFBQUFBQU9CdGh0SlVxd0JBQUFBIn0sInZhbGlkRnJvbSI6IjE5NzAtMDEtMDFUMDA6MDE6NDBaIiwidmFsaWRVbnRpbCI6IjE5NzAtMDEtMDFUMDA6MDM6MjBaIn0.T6U6ppkrn5d_NgSapnhychV3MJcNsh29k8JTSB5C67j9Y8PpW8kazRUpszOnoOtwsTk4X9mH1ecFtQL7RVQCIw",
+  "revoked_status": "eyJhbGciOiJFUzI1NiIsInR5cCI6InN0YXR1cy1saXN0K2p3dCIsImtpZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjYm9vdHN0cmFwLTQwMSJ9.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsIkJpdHN0cmluZ1N0YXR1c0xpc3RDcmVkZW50aWFsIl0sImlzc3VlciI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUiLCJjcmVkZW50aWFsU3ViamVjdCI6eyJpZCI6Imh0dHBzOi8vaXNzdWVyLmV4YW1wbGUvc3RhdHVzL2ZpeHR1cmUtNDAxI2xpc3QiLCJ0eXBlIjoiQml0c3RyaW5nU3RhdHVzTGlzdCIsInN0YXR1c1B1cnBvc2UiOiJyZXZvY2F0aW9uIiwiZW5jb2RlZExpc3QiOiJINHNJQUFBQUFBQUFfLTNBTVFFQUFBQUJNTkZGRjhPek5RQUFBQUFBQUFBQUFBQUFBQUFBQU1EYkFPUlpRMmNBUUFBQSJ9LCJ2YWxpZEZyb20iOiIxOTcwLTAxLTAxVDAwOjAxOjQwWiIsInZhbGlkVW50aWwiOiIxOTcwLTAxLTAxVDAwOjAzOjIwWiJ9.vnBqYXQq3LSG4RWggT24luY2h_Hle23nd-mk0kuUDZoJy8NEV6mKCief03qFOBdc-7UBAdOcImbLhSaGl8Nabw"
+}

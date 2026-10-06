@@ -8,7 +8,7 @@ test(
   "standalone application HTTP keeps Secure browser cookies and exact CSRF refusals",
   { skip: !database, timeout: 30000 },
   async () => {
-    const port = Number(process.env.EDUCATION_APP_TEST_PORT ?? 38721);
+    const port = Number(process.env.EDUCATION_APP_TEST_PORT ?? 29270);
     const origin = "https://application.example";
     const child = spawn(process.execPath, ["--import", "tsx", "src/cli.ts"], {
       cwd: fileURLToPath(
@@ -19,7 +19,7 @@ test(
         EDUCATION_APP_DATABASE_URL: database,
         EDUCATION_APP_ORIGIN: origin,
         EDUCATION_APP_PORT: String(port),
-        EDUCATION_RUNTIME_MANAGEMENT: "http://127.0.0.1:38722",
+        EDUCATION_RUNTIME_MANAGEMENT: "http://127.0.0.1:29271",
         PARTNER_MANAGEMENT_TOKEN: "bounded-test-management-credential-only",
         EDUCATION_TRUSTED_ISSUER: "did:web:education.example",
         EDUCATION_VERIFIER_DID: "did:web:partner.example",

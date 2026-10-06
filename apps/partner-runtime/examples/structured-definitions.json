@@ -1,0 +1,121 @@
+[
+  {
+    "id": "https://issuer.example/definitions/pair",
+    "version": "1",
+    "credential_type": "PartnerPair",
+    "label": "Neutral pair",
+    "max_validity_seconds": 3600,
+    "claims": [
+      {
+        "name": "name",
+        "path": [
+          "credentialSubject",
+          "left",
+          "name"
+        ],
+        "label": "Left name",
+        "value_type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "path": [
+          "credentialSubject",
+          "right",
+          "name"
+        ],
+        "label": "Right name",
+        "value_type": "string",
+        "required": true
+      },
+      {
+        "name": "details",
+        "label": "Complete details",
+        "value_type": "object",
+        "required": true
+      },
+      {
+        "name": "entries",
+        "label": "Complete entries",
+        "value_type": "array",
+        "required": true
+      }
+    ],
+    "profiles": [
+      {
+        "name": "left_only",
+        "claim_paths": [
+          [
+            "credentialSubject",
+            "left",
+            "name"
+          ]
+        ]
+      },
+      {
+        "name": "both",
+        "claim_paths": [
+          [
+            "credentialSubject",
+            "left",
+            "name"
+          ],
+          [
+            "credentialSubject",
+            "right",
+            "name"
+          ]
+        ]
+      },
+      {
+        "name": "whole",
+        "claim_paths": [
+          [
+            "credentialSubject",
+            "details"
+          ],
+          [
+            "credentialSubject",
+            "entries"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "https://issuer.example/definitions/snapshot",
+    "version": "1",
+    "credential_type": "PartnerSnapshot",
+    "label": "Neutral snapshot",
+    "max_validity_seconds": 3600,
+    "claims": [
+      {
+        "name": "details",
+        "label": "Snapshot details",
+        "value_type": "object",
+        "required": true
+      },
+      {
+        "name": "entries",
+        "label": "Snapshot entries",
+        "value_type": "array",
+        "required": true
+      }
+    ],
+    "profiles": [
+      {
+        "name": "whole",
+        "claim_paths": [
+          [
+            "credentialSubject",
+            "details"
+          ],
+          [
+            "credentialSubject",
+            "entries"
+          ]
+        ]
+      }
+    ]
+  }
+]

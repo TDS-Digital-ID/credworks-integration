@@ -6,7 +6,7 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
-const port = Number(process.env.PARTNER_EVIDENCE_HTTP_PORT ?? 33172);
+const port = Number(process.env.PARTNER_EVIDENCE_HTTP_PORT ?? 29202);
 
 test(
   "default evidence transport retains TLS checks and bounds response bytes, redirects and deadline",

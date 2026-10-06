@@ -9,6 +9,31 @@ use std::collections::{HashMap, HashSet};
 use url::Url;
 pub const ISSUER_AUTHORIZATIONS_TYP: &str = "issuer-authorizations+jwt";
 pub const ISSUER_AUTHORIZATIONS_MAX_TTL_SECONDS: i64 = 86_400;
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum CredentialKeyState {
+    Current,
+    Retained,
+    Withdrawn,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum IssuerAuthorityPurpose {
+    Issuance,
+    Verification,
+}
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct IssuerStatusAuthority {
+    pub key_id: String,
+    pub public_jwk_sha256_thumbprint: String,
+}
+// Missing optional fields preserve legacy bytes; explicit null is unsupported vocabulary.
+fn present<'de, D: serde::Deserializer<'de>, T: Deserialize<'de>>(
+    deserializer: D,
+) -> Result<Option<T>, D::Error> {
+    T::deserialize(deserializer).map(Some)
+}
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct IssuerAuthorizations {
@@ -27,6 +52,18 @@ pub struct IssuerAuthorization {
     pub credential_issuer_public_jwk_sha256_thumbprint: String,
     pub definition: ScalarCredentialDefinition,
     pub status: TrustListStatus,
+    #[serde(
+        default,
+        deserialize_with = "present",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub key_state: Option<CredentialKeyState>,
+    #[serde(
+        default,
+        deserialize_with = "present",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub status_authority: Option<IssuerStatusAuthority>,
 }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -38,6 +75,12 @@ pub struct IssuerAuthorizationRequest {
     pub definition_id: String,
     pub definition_version: String,
     pub credential_type: String,
+    #[serde(
+        default,
+        deserialize_with = "present",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub purpose: Option<IssuerAuthorityPurpose>,
 }
 fn denied(message: &str) -> CoreError {
     CoreError::new(CoreErrorCode::TrustCheckFailed, message)
@@ -95,12 +138,69 @@ fn validate_document(document: &IssuerAuthorizations) -> CoreResult<()> {
     }
     let mut scopes = HashSet::new();
     let mut definitions = HashMap::new();
+    let mut keys = HashMap::new();
+    let mut status_authorities = HashMap::new();
+    let mut current_keys = HashMap::new();
+    let mut issuer_keys: HashMap<&str, HashSet<&str>> = HashMap::new();
+    let mut legacy_issuers = HashSet::new();
     for grant in &document.authorizations {
         valid_did(&grant.credential_issuer_did)?;
         valid_key_id(
             &grant.credential_issuer_did,
             &grant.credential_issuer_key_id,
         )?;
+        if grant.key_state.is_some() != grant.status_authority.is_some() {
+            return Err(denied(
+                "key state and status authority must be declared together",
+            ));
+        }
+        if let Some(status) = &grant.status_authority {
+            valid_key_id(&grant.credential_issuer_did, &status.key_id)?;
+            if b64_decode(&status.public_jwk_sha256_thumbprint).map_or(true, |pin| pin.len() != 32)
+            {
+                return Err(denied("invalid status key pin"));
+            }
+        }
+        let did = grant.credential_issuer_did.as_str();
+        let key_id = grant.credential_issuer_key_id.as_str();
+        let pin = grant
+            .credential_issuer_public_jwk_sha256_thumbprint
+            .as_str();
+        let state = grant.key_state.unwrap_or(CredentialKeyState::Current);
+        if keys
+            .insert((did, key_id), (pin, state))
+            .is_some_and(|previous| previous != (pin, state))
+        {
+            return Err(denied(
+                "conflicting credential key pin or state across definitions",
+            ));
+        }
+        if state == CredentialKeyState::Current
+            && current_keys
+                .insert(did, key_id)
+                .is_some_and(|previous| previous != key_id)
+        {
+            return Err(denied("multiple current credential keys for issuer"));
+        }
+        issuer_keys.entry(did).or_default().insert(key_id);
+        if grant.key_state.is_none() {
+            legacy_issuers.insert(did);
+        }
+        let status = grant
+            .status_authority
+            .as_ref()
+            .map_or((key_id, pin), |status| {
+                (
+                    status.key_id.as_str(),
+                    status.public_jwk_sha256_thumbprint.as_str(),
+                )
+            });
+        if status_authorities
+            .insert(did, status)
+            .is_some_and(|previous| previous != status)
+        {
+            return Err(denied("conflicting status authority for issuer"));
+        }
         validate_scalar_definition(&grant.definition)?;
         if definitions
             .insert(
@@ -123,6 +223,19 @@ fn validate_document(document: &IssuerAuthorizations) -> CoreResult<()> {
             return Err(denied(
                 "invalid key pin or duplicate issuer definition scope",
             ));
+        }
+    }
+    if legacy_issuers.iter().any(|did| issuer_keys[did].len() > 1) {
+        return Err(denied(
+            "multi-key issuer history requires explicit key state",
+        ));
+    }
+    for (did, (key_id, pin)) in status_authorities {
+        if keys
+            .get(&(did, key_id))
+            .is_some_and(|(credential_pin, _)| *credential_pin != pin)
+        {
+            return Err(denied("status authority reassigns an existing key ID"));
         }
     }
     Ok(())
@@ -180,6 +293,13 @@ pub fn verify_issuer_authorization(
         .into_iter()
         .find(|grant| {
             grant.status == TrustListStatus::Active
+                && match grant.key_state.unwrap_or(CredentialKeyState::Current) {
+                    CredentialKeyState::Current => true,
+                    CredentialKeyState::Retained => {
+                        request.purpose == Some(IssuerAuthorityPurpose::Verification)
+                    }
+                    CredentialKeyState::Withdrawn => false,
+                }
                 && grant.credential_issuer_did == request.credential_issuer_did
                 && grant.credential_issuer_key_id == request.credential_issuer_key_id
                 && grant.credential_issuer_public_jwk_sha256_thumbprint == pin
@@ -202,11 +322,65 @@ pub fn verify_scalar_credential_authorization(
     now: i64,
     mode: crate::SubjectValidationMode,
 ) -> CoreResult<crate::VerifiedSdJwtCredential> {
+    verify_scalar_credential_at_times(
+        compact_credential,
+        issuer_key,
+        compact_authorization,
+        anchor,
+        registry_did,
+        (now, now),
+        mode,
+    )
+}
+
+/// Authenticate an exact renewal predecessor at its signed issuance time, with current authority.
+/// Does not verify current status or confer presentation validity. No caller-selected backdating.
+pub fn verify_scalar_renewal_predecessor(
+    compact_credential: &str,
+    issuer_key: &PublicJwk,
+    compact_authorization: &str,
+    anchor: &PublicJwk,
+    registry_did: &str,
+    authority_now: i64,
+) -> CoreResult<crate::VerifiedSdJwtCredential> {
+    let (issuer_jwt, _, _) = crate::split_sd_jwt(compact_credential)?;
+    let (_, authenticated_payload): (JwsHeader, serde_json::Value) =
+        verify_compact_jws_json(issuer_jwt, issuer_key)?;
+    let credential_time = authenticated_payload
+        .get("iat")
+        .and_then(serde_json::Value::as_i64)
+        .ok_or_else(|| denied("credential iat required"))?;
+    if credential_time > authority_now {
+        return Err(CoreError::new(
+            CoreErrorCode::FreshnessCheckFailed,
+            "renewal predecessor issued after authority observation",
+        ));
+    }
+    verify_scalar_credential_at_times(
+        compact_credential,
+        issuer_key,
+        compact_authorization,
+        anchor,
+        registry_did,
+        (credential_time, authority_now),
+        crate::SubjectValidationMode::Complete,
+    )
+}
+
+fn verify_scalar_credential_at_times(
+    compact_credential: &str,
+    issuer_key: &PublicJwk,
+    compact_authorization: &str,
+    anchor: &PublicJwk,
+    registry_did: &str,
+    times: (i64, i64),
+    mode: crate::SubjectValidationMode,
+) -> CoreResult<crate::VerifiedSdJwtCredential> {
     let verified = crate::verify_sd_jwt_credential(
         compact_credential,
         issuer_key,
         &crate::SdJwtCredentialVerificationOptions {
-            now_unix_seconds: now,
+            now_unix_seconds: times.0,
             required_claims: vec![],
             format: crate::CredentialFormat::W3cVcDataModel,
         },
@@ -251,8 +425,20 @@ pub fn verify_scalar_credential_authorization(
         definition_id: text(reference.get("id"))?,
         definition_version: text(reference.get("version"))?,
         credential_type: text(types.get(1))?,
+        purpose: Some(IssuerAuthorityPurpose::Verification),
     };
-    let grant = verify_issuer_authorization(compact_authorization, anchor, &request, now)?;
+    let grant = verify_issuer_authorization(compact_authorization, anchor, &request, times.1)?;
+    if verified.disclosed_claim_paths.iter().any(|path| {
+        !grant
+            .definition
+            .claims
+            .iter()
+            .any(|claim| claim.full_path() == *path)
+    }) {
+        return Err(denied(
+            "disclosure must name an exact authorized claim path",
+        ));
+    }
     let iat = payload
         .get("iat")
         .and_then(serde_json::Value::as_i64)
@@ -298,9 +484,11 @@ pub fn verify_scalar_credential_authorization(
         .get("credentialSubject")
         .cloned()
         .ok_or_else(|| denied("credential subject required"))?;
-    if let Some(object) = subject.as_object_mut() {
-        object.remove("_sd");
-    }
+    crate::scalar_definitions::remove_structural_sd_metadata(
+        &grant.definition,
+        &mut subject,
+        &mut vec!["credentialSubject".into()],
+    );
     crate::validate_scalar_subject(&grant.definition, &subject, mode)?;
     Ok(verified)
 }

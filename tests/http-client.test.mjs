@@ -39,7 +39,9 @@ test("public HTTPS client rejects redirects and streamed oversized responses wit
       req.on("data", (chunk) => {
         presentationBytes += chunk.length;
       });
-      if (req.url === "/redirect") {
+      if (req.url === "/history") {
+        res.end("x".repeat(200000));
+      } else if (req.url === "/redirect") {
         res.writeHead(302, { location: "/success" });
         res.end();
       } else if (req.url === "/large") {
@@ -73,6 +75,9 @@ test("public HTTPS client rejects redirects and streamed oversized responses wit
     await assert.rejects(client(origin + "/large"), {
       message: "HTTP_RESPONSE_TOO_LARGE",
     });
+    await assert.rejects(client(origin + '/history'), { message: 'HTTP_RESPONSE_TOO_LARGE' });
+    assert.equal((await client(origin + '/history', { responseLimit: 262144 })).text.length, 200000);
+    await assert.rejects(client(origin + '/history', { responseLimit: Infinity }), { message: 'HTTP_RESPONSE_LIMIT_REFUSED' });
     let clock = 10;
     const delayed = httpClient(
       {
@@ -96,6 +101,9 @@ test("public HTTPS client rejects redirects and streamed oversized responses wit
       { message: "FRESHNESS_CHECK_FAILED" },
     );
     assert.equal(presentationBytes, 0);
+    await assert.rejects(client(origin + '/definition', { method: 'POST', body: 'x'.repeat(200000) }), { message: 'HTTP_REQUEST_TOO_LARGE' });
+    assert.equal((await client(origin + '/definition', { method: 'POST', body: 'x'.repeat(200000), requestLimit: 262144 })).status, 503);
+    await assert.rejects(client(origin + '/definition', { method: 'POST', body: 'x', requestLimit: Infinity }), { message: 'HTTP_REQUEST_LIMIT_REFUSED' });
     const response = await client(origin + "/failure");
     assert.equal(response.status, 503);
   } finally {

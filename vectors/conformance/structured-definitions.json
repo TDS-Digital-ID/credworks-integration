@@ -1,0 +1,821 @@
+{
+  "definition": {
+    "id": "urn:example:structured",
+    "version": "1",
+    "credential_type": "ExampleStructuredCredential",
+    "label": "Structured example",
+    "max_validity_seconds": 3600,
+    "claims": [
+      {
+        "name": "name",
+        "path": [
+          "credentialSubject",
+          "left",
+          "name"
+        ],
+        "label": "Left name",
+        "value_type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "path": [
+          "credentialSubject",
+          "right",
+          "name"
+        ],
+        "label": "Right name",
+        "value_type": "string",
+        "required": true
+      },
+      {
+        "name": "details",
+        "label": "Complete details",
+        "value_type": "object",
+        "required": true
+      },
+      {
+        "name": "entries",
+        "label": "Complete entries",
+        "value_type": "array",
+        "required": true
+      }
+    ],
+    "profiles": [
+      {
+        "name": "left_only",
+        "claim_paths": [
+          [
+            "credentialSubject",
+            "left",
+            "name"
+          ]
+        ]
+      },
+      {
+        "name": "whole",
+        "claim_paths": [
+          [
+            "credentialSubject",
+            "details"
+          ],
+          [
+            "credentialSubject",
+            "entries"
+          ]
+        ]
+      }
+    ]
+  },
+  "subject": {
+    "left": {
+      "name": "North"
+    },
+    "right": {
+      "name": "South"
+    },
+    "details": {
+      "settings": {
+        "enabled": false
+      },
+      "count": 7
+    },
+    "entries": [
+      {
+        "label": "Example",
+        "enabled": false
+      },
+      3.5,
+      [
+        "a",
+        true
+      ]
+    ]
+  },
+  "header": {
+    "alg": "ES256",
+    "typ": "issuer-authorizations+jwt",
+    "kid": "did:web:trust.example#fixture-374"
+  },
+  "issuer_header": {
+    "alg": "ES256",
+    "typ": "vc+sd-jwt",
+    "kid": "did:web:issuer.example#fixture-374"
+  },
+  "anchor": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "Q-n4kA9egXDe_CVZOWrPXRYGkD-oq0pHefLtfZuFRAo",
+    "y": "0134QoWG8C5u3HlQXlHZwvHuRStuHfUd1X1On0M_Zb4",
+    "kid": "did:web:trust.example#fixture-374"
+  },
+  "issuer_jwk": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "gK82QHODfR2SGk6dQAEsp71hUECapAhxDV3XaamC9JI",
+    "y": "Qo67xIjrd49Tg6WAomtVSL5k_t5PJ-0jOFz7u_1WjJ8",
+    "kid": "did:web:issuer.example#fixture-374"
+  },
+  "document": {
+    "version": 1,
+    "id": "https://trust.example/issuer-authorizations/fixture-374.jwt",
+    "issuer": "did:web:trust.example",
+    "iat": 100,
+    "exp": 200,
+    "authorizations": [
+      {
+        "credential_issuer_did": "did:web:issuer.example",
+        "credential_issuer_key_id": "did:web:issuer.example#fixture-374",
+        "credential_issuer_public_jwk_sha256_thumbprint": "aJL5gjzQUCHfQ4RpGyLSJvPpy3DjKr6Sl4aH1FkOZjM",
+        "definition": {
+          "id": "urn:example:structured",
+          "version": "1",
+          "credential_type": "ExampleStructuredCredential",
+          "label": "Structured example",
+          "max_validity_seconds": 3600,
+          "claims": [
+            {
+              "name": "name",
+              "path": [
+                "credentialSubject",
+                "left",
+                "name"
+              ],
+              "label": "Left name",
+              "value_type": "string",
+              "required": true
+            },
+            {
+              "name": "name",
+              "path": [
+                "credentialSubject",
+                "right",
+                "name"
+              ],
+              "label": "Right name",
+              "value_type": "string",
+              "required": true
+            },
+            {
+              "name": "details",
+              "label": "Complete details",
+              "value_type": "object",
+              "required": true
+            },
+            {
+              "name": "entries",
+              "label": "Complete entries",
+              "value_type": "array",
+              "required": true
+            }
+          ],
+          "profiles": [
+            {
+              "name": "left_only",
+              "claim_paths": [
+                [
+                  "credentialSubject",
+                  "left",
+                  "name"
+                ]
+              ]
+            },
+            {
+              "name": "whole",
+              "claim_paths": [
+                [
+                  "credentialSubject",
+                  "details"
+                ],
+                [
+                  "credentialSubject",
+                  "entries"
+                ]
+              ]
+            }
+          ]
+        },
+        "status": "active"
+      }
+    ]
+  },
+  "compact_authorization": "eyJhbGciOiJFUzI1NiIsInR5cCI6Imlzc3Vlci1hdXRob3JpemF0aW9ucytqd3QiLCJraWQiOiJkaWQ6d2ViOnRydXN0LmV4YW1wbGUjZml4dHVyZS0zNzQifQ.eyJ2ZXJzaW9uIjoxLCJpZCI6Imh0dHBzOi8vdHJ1c3QuZXhhbXBsZS9pc3N1ZXItYXV0aG9yaXphdGlvbnMvZml4dHVyZS0zNzQuand0IiwiaXNzdWVyIjoiZGlkOndlYjp0cnVzdC5leGFtcGxlIiwiaWF0IjoxMDAsImV4cCI6MjAwLCJhdXRob3JpemF0aW9ucyI6W3siY3JlZGVudGlhbF9pc3N1ZXJfZGlkIjoiZGlkOndlYjppc3N1ZXIuZXhhbXBsZSIsImNyZWRlbnRpYWxfaXNzdWVyX2tleV9pZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjZml4dHVyZS0zNzQiLCJjcmVkZW50aWFsX2lzc3Vlcl9wdWJsaWNfandrX3NoYTI1Nl90aHVtYnByaW50IjoiYUpMNWdqelFVQ0hmUTRScEd5TFNKdlBweTNEaktyNlNsNGFIMUZrT1pqTSIsImRlZmluaXRpb24iOnsiaWQiOiJ1cm46ZXhhbXBsZTpzdHJ1Y3R1cmVkIiwidmVyc2lvbiI6IjEiLCJjcmVkZW50aWFsX3R5cGUiOiJFeGFtcGxlU3RydWN0dXJlZENyZWRlbnRpYWwiLCJsYWJlbCI6IlN0cnVjdHVyZWQgZXhhbXBsZSIsIm1heF92YWxpZGl0eV9zZWNvbmRzIjozNjAwLCJjbGFpbXMiOlt7Im5hbWUiOiJuYW1lIiwicGF0aCI6WyJjcmVkZW50aWFsU3ViamVjdCIsImxlZnQiLCJuYW1lIl0sImxhYmVsIjoiTGVmdCBuYW1lIiwidmFsdWVfdHlwZSI6InN0cmluZyIsInJlcXVpcmVkIjp0cnVlfSx7Im5hbWUiOiJuYW1lIiwicGF0aCI6WyJjcmVkZW50aWFsU3ViamVjdCIsInJpZ2h0IiwibmFtZSJdLCJsYWJlbCI6IlJpZ2h0IG5hbWUiLCJ2YWx1ZV90eXBlIjoic3RyaW5nIiwicmVxdWlyZWQiOnRydWV9LHsibmFtZSI6ImRldGFpbHMiLCJsYWJlbCI6IkNvbXBsZXRlIGRldGFpbHMiLCJ2YWx1ZV90eXBlIjoib2JqZWN0IiwicmVxdWlyZWQiOnRydWV9LHsibmFtZSI6ImVudHJpZXMiLCJsYWJlbCI6IkNvbXBsZXRlIGVudHJpZXMiLCJ2YWx1ZV90eXBlIjoiYXJyYXkiLCJyZXF1aXJlZCI6dHJ1ZX1dLCJwcm9maWxlcyI6W3sibmFtZSI6ImxlZnRfb25seSIsImNsYWltX3BhdGhzIjpbWyJjcmVkZW50aWFsU3ViamVjdCIsImxlZnQiLCJuYW1lIl1dfSx7Im5hbWUiOiJ3aG9sZSIsImNsYWltX3BhdGhzIjpbWyJjcmVkZW50aWFsU3ViamVjdCIsImRldGFpbHMiXSxbImNyZWRlbnRpYWxTdWJqZWN0IiwiZW50cmllcyJdXX1dfSwic3RhdHVzIjoiYWN0aXZlIn1dfQ.yT5IpvoTY9B-hU2bDVxK0iJ2DLG--hsvq8e8e0lwKB_0c03nDyHMytxtX92P5vM7ZFfc7Ai1cJxHf3gFbJNymg",
+  "compact_credential": "eyJhbGciOiJFUzI1NiIsInR5cCI6InZjK3NkLWp3dCIsImtpZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjZml4dHVyZS0zNzQifQ.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiLHsiQHZvY2FiIjoiaHR0cHM6Ly9leGFtcGxlLnRlc3Qvdm9jYWIjIn1dLCJfc2RfYWxnIjoic2hhLTI1NiIsImNuZiI6eyJqd2siOnsiY3J2IjoiUC0yNTYiLCJraWQiOiJmaXh0dXJlLTM3NC1ob2xkZXIiLCJrdHkiOiJFQyIsIngiOiJ3VDNQRmEzaXB6ZzhOVmlTTEo4VHczWjQ1UjZOZ1pQTXZjcWNnV29WQUU4IiwieSI6IlpLbUcxSjlmWjU0ZnIzXzBLaXlLazJSRDVuamJLLXZzZDJDUWJNelE3dzAifX0sImNyZWRlbnRpYWxEZWZpbml0aW9uIjp7ImlkIjoidXJuOmV4YW1wbGU6c3RydWN0dXJlZCIsInZlcnNpb24iOiIxIn0sImNyZWRlbnRpYWxTdGF0dXMiOnsiaWQiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cyMwIiwic3RhdHVzTGlzdENyZWRlbnRpYWwiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cyIsInN0YXR1c0xpc3RJbmRleCI6IjAiLCJzdGF0dXNQdXJwb3NlIjoicmV2b2NhdGlvbiIsInR5cGUiOiJCaXRzdHJpbmdTdGF0dXNMaXN0RW50cnkifSwiY3JlZGVudGlhbFN1YmplY3QiOnsiX3NkIjpbIjRicVhjVncyRnFrTTVSRFRWeWVaM1pUbWNfTkc1UFl5b2ViVUZaMUdDTHciLCI4bHZRSmpTSEw3WDRnRllOMHZOeXZIZDlPQVRIOG4ybzFhVVRUandHcUNrIl0sImxlZnQiOnsiX3NkIjpbIlBkZGoxWnV0ekcyOTBoODVUYkl5M0RpZ2dUM2RlaTlNRU5MLVlJc3B5QU0iXX0sInJpZ2h0Ijp7Il9zZCI6WyJKLTlmMVpKSmNTb0ZyeUZaTGttS2ZPdDU1a2FLTll2ZXg3MmwzcXp4bmM4Il19fSwiZXhwIjoyMDAsImlhdCI6MTAwLCJpc3MiOiJkaWQ6d2ViOmlzc3Vlci5leGFtcGxlIiwiaXNzdWVyIjoiZGlkOndlYjppc3N1ZXIuZXhhbXBsZSIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJFeGFtcGxlU3RydWN0dXJlZENyZWRlbnRpYWwiXSwidmFsaWRGcm9tIjoiMTk3MC0wMS0wMVQwMDowMTo0MFoiLCJ2YWxpZFVudGlsIjoiMTk3MC0wMS0wMVQwMDowMzoyMFoifQ.hStA1i-6G0YznXvd5NOYnszw3aCCnN-MxWqOQo6csBXpDXIWjc-j-UZoE5XS8ZKYeR_3lwm5IMptGxopBQ2-OQ~WyJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRIiwibmFtZSIsIk5vcnRoIl0~WyJBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnIiwibmFtZSIsIlNvdXRoIl0~WyJBd01EQXdNREF3TURBd01EQXdNREF3IiwiZGV0YWlscyIseyJjb3VudCI6Nywic2V0dGluZ3MiOnsiZW5hYmxlZCI6ZmFsc2V9fV0~WyJCQVFFQkFRRUJBUUVCQVFFQkFRRUJBIiwiZW50cmllcyIsW3siZW5hYmxlZCI6ZmFsc2UsImxhYmVsIjoiRXhhbXBsZSJ9LDMuNSxbImEiLHRydWVdXV0~",
+  "presentations": [
+    {
+      "profile": {
+        "name": "left_only",
+        "claim_paths": [
+          [
+            "credentialSubject",
+            "left",
+            "name"
+          ]
+        ]
+      },
+      "nonce": "fixture-374-left_only",
+      "presentation": "eyJhbGciOiJFUzI1NiIsInR5cCI6InZjK3NkLWp3dCIsImtpZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjZml4dHVyZS0zNzQifQ.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiLHsiQHZvY2FiIjoiaHR0cHM6Ly9leGFtcGxlLnRlc3Qvdm9jYWIjIn1dLCJfc2RfYWxnIjoic2hhLTI1NiIsImNuZiI6eyJqd2siOnsiY3J2IjoiUC0yNTYiLCJraWQiOiJmaXh0dXJlLTM3NC1ob2xkZXIiLCJrdHkiOiJFQyIsIngiOiJ3VDNQRmEzaXB6ZzhOVmlTTEo4VHczWjQ1UjZOZ1pQTXZjcWNnV29WQUU4IiwieSI6IlpLbUcxSjlmWjU0ZnIzXzBLaXlLazJSRDVuamJLLXZzZDJDUWJNelE3dzAifX0sImNyZWRlbnRpYWxEZWZpbml0aW9uIjp7ImlkIjoidXJuOmV4YW1wbGU6c3RydWN0dXJlZCIsInZlcnNpb24iOiIxIn0sImNyZWRlbnRpYWxTdGF0dXMiOnsiaWQiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cyMwIiwic3RhdHVzTGlzdENyZWRlbnRpYWwiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cyIsInN0YXR1c0xpc3RJbmRleCI6IjAiLCJzdGF0dXNQdXJwb3NlIjoicmV2b2NhdGlvbiIsInR5cGUiOiJCaXRzdHJpbmdTdGF0dXNMaXN0RW50cnkifSwiY3JlZGVudGlhbFN1YmplY3QiOnsiX3NkIjpbIjRicVhjVncyRnFrTTVSRFRWeWVaM1pUbWNfTkc1UFl5b2ViVUZaMUdDTHciLCI4bHZRSmpTSEw3WDRnRllOMHZOeXZIZDlPQVRIOG4ybzFhVVRUandHcUNrIl0sImxlZnQiOnsiX3NkIjpbIlBkZGoxWnV0ekcyOTBoODVUYkl5M0RpZ2dUM2RlaTlNRU5MLVlJc3B5QU0iXX0sInJpZ2h0Ijp7Il9zZCI6WyJKLTlmMVpKSmNTb0ZyeUZaTGttS2ZPdDU1a2FLTll2ZXg3MmwzcXp4bmM4Il19fSwiZXhwIjoyMDAsImlhdCI6MTAwLCJpc3MiOiJkaWQ6d2ViOmlzc3Vlci5leGFtcGxlIiwiaXNzdWVyIjoiZGlkOndlYjppc3N1ZXIuZXhhbXBsZSIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJFeGFtcGxlU3RydWN0dXJlZENyZWRlbnRpYWwiXSwidmFsaWRGcm9tIjoiMTk3MC0wMS0wMVQwMDowMTo0MFoiLCJ2YWxpZFVudGlsIjoiMTk3MC0wMS0wMVQwMDowMzoyMFoifQ.hStA1i-6G0YznXvd5NOYnszw3aCCnN-MxWqOQo6csBXpDXIWjc-j-UZoE5XS8ZKYeR_3lwm5IMptGxopBQ2-OQ~WyJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRIiwibmFtZSIsIk5vcnRoIl0~eyJhbGciOiJFUzI1NiIsInR5cCI6ImtiK2p3dCIsImtpZCI6ImZpeHR1cmUtMzc0LWhvbGRlciJ9.eyJhdWQiOiJodHRwczovL3ZlcmlmaWVyLmV4YW1wbGUiLCJub25jZSI6ImZpeHR1cmUtMzc0LWxlZnRfb25seSIsInNkX2hhc2giOiJLMGlGWWZIbkFIdkpsSnZVWlZmTE5SVnQ2bDY1Ukp2aTYxeEl2VFNOUUNFIiwiaWF0IjoxNTB9.bUYnI7s-7zA0Q86Nga9yJCDZ7kCPjNDZlyBpuCelWmoC5pVMCzCd16rh3Sg_01ms7oTAUnxJCByKlDWbdnBQuQ",
+      "disclosed_credential": "eyJhbGciOiJFUzI1NiIsInR5cCI6InZjK3NkLWp3dCIsImtpZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjZml4dHVyZS0zNzQifQ.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiLHsiQHZvY2FiIjoiaHR0cHM6Ly9leGFtcGxlLnRlc3Qvdm9jYWIjIn1dLCJfc2RfYWxnIjoic2hhLTI1NiIsImNuZiI6eyJqd2siOnsiY3J2IjoiUC0yNTYiLCJraWQiOiJmaXh0dXJlLTM3NC1ob2xkZXIiLCJrdHkiOiJFQyIsIngiOiJ3VDNQRmEzaXB6ZzhOVmlTTEo4VHczWjQ1UjZOZ1pQTXZjcWNnV29WQUU4IiwieSI6IlpLbUcxSjlmWjU0ZnIzXzBLaXlLazJSRDVuamJLLXZzZDJDUWJNelE3dzAifX0sImNyZWRlbnRpYWxEZWZpbml0aW9uIjp7ImlkIjoidXJuOmV4YW1wbGU6c3RydWN0dXJlZCIsInZlcnNpb24iOiIxIn0sImNyZWRlbnRpYWxTdGF0dXMiOnsiaWQiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cyMwIiwic3RhdHVzTGlzdENyZWRlbnRpYWwiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cyIsInN0YXR1c0xpc3RJbmRleCI6IjAiLCJzdGF0dXNQdXJwb3NlIjoicmV2b2NhdGlvbiIsInR5cGUiOiJCaXRzdHJpbmdTdGF0dXNMaXN0RW50cnkifSwiY3JlZGVudGlhbFN1YmplY3QiOnsiX3NkIjpbIjRicVhjVncyRnFrTTVSRFRWeWVaM1pUbWNfTkc1UFl5b2ViVUZaMUdDTHciLCI4bHZRSmpTSEw3WDRnRllOMHZOeXZIZDlPQVRIOG4ybzFhVVRUandHcUNrIl0sImxlZnQiOnsiX3NkIjpbIlBkZGoxWnV0ekcyOTBoODVUYkl5M0RpZ2dUM2RlaTlNRU5MLVlJc3B5QU0iXX0sInJpZ2h0Ijp7Il9zZCI6WyJKLTlmMVpKSmNTb0ZyeUZaTGttS2ZPdDU1a2FLTll2ZXg3MmwzcXp4bmM4Il19fSwiZXhwIjoyMDAsImlhdCI6MTAwLCJpc3MiOiJkaWQ6d2ViOmlzc3Vlci5leGFtcGxlIiwiaXNzdWVyIjoiZGlkOndlYjppc3N1ZXIuZXhhbXBsZSIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJFeGFtcGxlU3RydWN0dXJlZENyZWRlbnRpYWwiXSwidmFsaWRGcm9tIjoiMTk3MC0wMS0wMVQwMDowMTo0MFoiLCJ2YWxpZFVudGlsIjoiMTk3MC0wMS0wMVQwMDowMzoyMFoifQ.hStA1i-6G0YznXvd5NOYnszw3aCCnN-MxWqOQo6csBXpDXIWjc-j-UZoE5XS8ZKYeR_3lwm5IMptGxopBQ2-OQ~WyJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRIiwibmFtZSIsIk5vcnRoIl0~"
+    },
+    {
+      "profile": {
+        "name": "whole",
+        "claim_paths": [
+          [
+            "credentialSubject",
+            "details"
+          ],
+          [
+            "credentialSubject",
+            "entries"
+          ]
+        ]
+      },
+      "nonce": "fixture-374-whole",
+      "presentation": "eyJhbGciOiJFUzI1NiIsInR5cCI6InZjK3NkLWp3dCIsImtpZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjZml4dHVyZS0zNzQifQ.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiLHsiQHZvY2FiIjoiaHR0cHM6Ly9leGFtcGxlLnRlc3Qvdm9jYWIjIn1dLCJfc2RfYWxnIjoic2hhLTI1NiIsImNuZiI6eyJqd2siOnsiY3J2IjoiUC0yNTYiLCJraWQiOiJmaXh0dXJlLTM3NC1ob2xkZXIiLCJrdHkiOiJFQyIsIngiOiJ3VDNQRmEzaXB6ZzhOVmlTTEo4VHczWjQ1UjZOZ1pQTXZjcWNnV29WQUU4IiwieSI6IlpLbUcxSjlmWjU0ZnIzXzBLaXlLazJSRDVuamJLLXZzZDJDUWJNelE3dzAifX0sImNyZWRlbnRpYWxEZWZpbml0aW9uIjp7ImlkIjoidXJuOmV4YW1wbGU6c3RydWN0dXJlZCIsInZlcnNpb24iOiIxIn0sImNyZWRlbnRpYWxTdGF0dXMiOnsiaWQiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cyMwIiwic3RhdHVzTGlzdENyZWRlbnRpYWwiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cyIsInN0YXR1c0xpc3RJbmRleCI6IjAiLCJzdGF0dXNQdXJwb3NlIjoicmV2b2NhdGlvbiIsInR5cGUiOiJCaXRzdHJpbmdTdGF0dXNMaXN0RW50cnkifSwiY3JlZGVudGlhbFN1YmplY3QiOnsiX3NkIjpbIjRicVhjVncyRnFrTTVSRFRWeWVaM1pUbWNfTkc1UFl5b2ViVUZaMUdDTHciLCI4bHZRSmpTSEw3WDRnRllOMHZOeXZIZDlPQVRIOG4ybzFhVVRUandHcUNrIl0sImxlZnQiOnsiX3NkIjpbIlBkZGoxWnV0ekcyOTBoODVUYkl5M0RpZ2dUM2RlaTlNRU5MLVlJc3B5QU0iXX0sInJpZ2h0Ijp7Il9zZCI6WyJKLTlmMVpKSmNTb0ZyeUZaTGttS2ZPdDU1a2FLTll2ZXg3MmwzcXp4bmM4Il19fSwiZXhwIjoyMDAsImlhdCI6MTAwLCJpc3MiOiJkaWQ6d2ViOmlzc3Vlci5leGFtcGxlIiwiaXNzdWVyIjoiZGlkOndlYjppc3N1ZXIuZXhhbXBsZSIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJFeGFtcGxlU3RydWN0dXJlZENyZWRlbnRpYWwiXSwidmFsaWRGcm9tIjoiMTk3MC0wMS0wMVQwMDowMTo0MFoiLCJ2YWxpZFVudGlsIjoiMTk3MC0wMS0wMVQwMDowMzoyMFoifQ.hStA1i-6G0YznXvd5NOYnszw3aCCnN-MxWqOQo6csBXpDXIWjc-j-UZoE5XS8ZKYeR_3lwm5IMptGxopBQ2-OQ~WyJBd01EQXdNREF3TURBd01EQXdNREF3IiwiZGV0YWlscyIseyJjb3VudCI6Nywic2V0dGluZ3MiOnsiZW5hYmxlZCI6ZmFsc2V9fV0~WyJCQVFFQkFRRUJBUUVCQVFFQkFRRUJBIiwiZW50cmllcyIsW3siZW5hYmxlZCI6ZmFsc2UsImxhYmVsIjoiRXhhbXBsZSJ9LDMuNSxbImEiLHRydWVdXV0~eyJhbGciOiJFUzI1NiIsInR5cCI6ImtiK2p3dCIsImtpZCI6ImZpeHR1cmUtMzc0LWhvbGRlciJ9.eyJhdWQiOiJodHRwczovL3ZlcmlmaWVyLmV4YW1wbGUiLCJub25jZSI6ImZpeHR1cmUtMzc0LXdob2xlIiwic2RfaGFzaCI6IkNxQWZQdDZjMnJfNzFpWGlRZWFMMkd5di1xbURtWk1DeTZKUmkxQW1lU2ciLCJpYXQiOjE1MH0.FlQBdotKPtHxauwHspU4M4H3lXutYJSbpBLlPrx9TE-jB7Nc4mxPXUbCsDLy5g_WkAuYXGX3t-lb6gdXxqE_6A",
+      "disclosed_credential": "eyJhbGciOiJFUzI1NiIsInR5cCI6InZjK3NkLWp3dCIsImtpZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjZml4dHVyZS0zNzQifQ.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiLHsiQHZvY2FiIjoiaHR0cHM6Ly9leGFtcGxlLnRlc3Qvdm9jYWIjIn1dLCJfc2RfYWxnIjoic2hhLTI1NiIsImNuZiI6eyJqd2siOnsiY3J2IjoiUC0yNTYiLCJraWQiOiJmaXh0dXJlLTM3NC1ob2xkZXIiLCJrdHkiOiJFQyIsIngiOiJ3VDNQRmEzaXB6ZzhOVmlTTEo4VHczWjQ1UjZOZ1pQTXZjcWNnV29WQUU4IiwieSI6IlpLbUcxSjlmWjU0ZnIzXzBLaXlLazJSRDVuamJLLXZzZDJDUWJNelE3dzAifX0sImNyZWRlbnRpYWxEZWZpbml0aW9uIjp7ImlkIjoidXJuOmV4YW1wbGU6c3RydWN0dXJlZCIsInZlcnNpb24iOiIxIn0sImNyZWRlbnRpYWxTdGF0dXMiOnsiaWQiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cyMwIiwic3RhdHVzTGlzdENyZWRlbnRpYWwiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cyIsInN0YXR1c0xpc3RJbmRleCI6IjAiLCJzdGF0dXNQdXJwb3NlIjoicmV2b2NhdGlvbiIsInR5cGUiOiJCaXRzdHJpbmdTdGF0dXNMaXN0RW50cnkifSwiY3JlZGVudGlhbFN1YmplY3QiOnsiX3NkIjpbIjRicVhjVncyRnFrTTVSRFRWeWVaM1pUbWNfTkc1UFl5b2ViVUZaMUdDTHciLCI4bHZRSmpTSEw3WDRnRllOMHZOeXZIZDlPQVRIOG4ybzFhVVRUandHcUNrIl0sImxlZnQiOnsiX3NkIjpbIlBkZGoxWnV0ekcyOTBoODVUYkl5M0RpZ2dUM2RlaTlNRU5MLVlJc3B5QU0iXX0sInJpZ2h0Ijp7Il9zZCI6WyJKLTlmMVpKSmNTb0ZyeUZaTGttS2ZPdDU1a2FLTll2ZXg3MmwzcXp4bmM4Il19fSwiZXhwIjoyMDAsImlhdCI6MTAwLCJpc3MiOiJkaWQ6d2ViOmlzc3Vlci5leGFtcGxlIiwiaXNzdWVyIjoiZGlkOndlYjppc3N1ZXIuZXhhbXBsZSIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJFeGFtcGxlU3RydWN0dXJlZENyZWRlbnRpYWwiXSwidmFsaWRGcm9tIjoiMTk3MC0wMS0wMVQwMDowMTo0MFoiLCJ2YWxpZFVudGlsIjoiMTk3MC0wMS0wMVQwMDowMzoyMFoifQ.hStA1i-6G0YznXvd5NOYnszw3aCCnN-MxWqOQo6csBXpDXIWjc-j-UZoE5XS8ZKYeR_3lwm5IMptGxopBQ2-OQ~WyJBd01EQXdNREF3TURBd01EQXdNREF3IiwiZGV0YWlscyIseyJjb3VudCI6Nywic2V0dGluZ3MiOnsiZW5hYmxlZCI6ZmFsc2V9fV0~WyJCQVFFQkFRRUJBUUVCQVFFQkFRRUJBIiwiZW50cmllcyIsW3siZW5hYmxlZCI6ZmFsc2UsImxhYmVsIjoiRXhhbXBsZSJ9LDMuNSxbImEiLHRydWVdXV0~"
+    }
+  ],
+  "array_element_credential": "eyJhbGciOiJFUzI1NiIsInR5cCI6InZjK3NkLWp3dCIsImtpZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjZml4dHVyZS0zNzQifQ.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiLHsiQHZvY2FiIjoiaHR0cHM6Ly9leGFtcGxlLnRlc3Qvdm9jYWIjIn1dLCJjbmYiOnsiandrIjp7ImNydiI6IlAtMjU2Iiwia2lkIjoiZml4dHVyZS0zNzQtaG9sZGVyIiwia3R5IjoiRUMiLCJ4Ijoid1QzUEZhM2lwemc4TlZpU0xKOFR3M1o0NVI2TmdaUE12Y3FjZ1dvVkFFOCIsInkiOiJaS21HMUo5Zlo1NGZyM18wS2l5S2syUkQ1bmpiSy12c2QyQ1FiTXpRN3cwIn19LCJjcmVkZW50aWFsRGVmaW5pdGlvbiI6eyJpZCI6InVybjpleGFtcGxlOnN0cnVjdHVyZWQiLCJ2ZXJzaW9uIjoiMSJ9LCJjcmVkZW50aWFsU3RhdHVzIjp7ImlkIjoiaHR0cHM6Ly9pc3N1ZXIuZXhhbXBsZS9zdGF0dXMjMCIsInN0YXR1c0xpc3RDcmVkZW50aWFsIjoiaHR0cHM6Ly9pc3N1ZXIuZXhhbXBsZS9zdGF0dXMiLCJzdGF0dXNMaXN0SW5kZXgiOiIwIiwic3RhdHVzUHVycG9zZSI6InJldm9jYXRpb24iLCJ0eXBlIjoiQml0c3RyaW5nU3RhdHVzTGlzdEVudHJ5In0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImRldGFpbHMiOnsiY291bnQiOjcsInNldHRpbmdzIjp7ImVuYWJsZWQiOmZhbHNlfX0sImVudHJpZXMiOlt7Ii4uLiI6ImJFemxhQlRfeG5MMVpUTHNIcXRfRjlWMUhaVHE2cGs2dkNsUnUzVGJsQ2cifV0sImxlZnQiOnsibmFtZSI6Ik5vcnRoIn0sInJpZ2h0Ijp7Im5hbWUiOiJTb3V0aCJ9fSwiZXhwIjoyMDAsImlhdCI6MTAwLCJpc3MiOiJkaWQ6d2ViOmlzc3Vlci5leGFtcGxlIiwiaXNzdWVyIjoiZGlkOndlYjppc3N1ZXIuZXhhbXBsZSIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJFeGFtcGxlU3RydWN0dXJlZENyZWRlbnRpYWwiXSwidmFsaWRGcm9tIjoiMTk3MC0wMS0wMVQwMDowMTo0MFoiLCJ2YWxpZFVudGlsIjoiMTk3MC0wMS0wMVQwMDowMzoyMFoifQ.Fa4PDfiwcp4ojyH3ab6wNP7eQdKilemZs1t6oGZk17pzhJAHlcTlSBT4s1Od6kP1fQIz5oY5zTqLgvq8qF_R_Q~WyJhcnJheS1zYWx0IiwiU2VjcmV0Il0~",
+  "invalid_subjects": [
+    {
+      "left": {
+        "name": "North",
+        "extra": true
+      },
+      "right": {
+        "name": "South"
+      },
+      "details": {
+        "settings": {
+          "enabled": false
+        },
+        "count": 7
+      },
+      "entries": [
+        {
+          "label": "Example",
+          "enabled": false
+        },
+        3.5,
+        [
+          "a",
+          true
+        ]
+      ]
+    },
+    {
+      "left": [
+        "North"
+      ],
+      "right": {
+        "name": "South"
+      },
+      "details": {
+        "settings": {
+          "enabled": false
+        },
+        "count": 7
+      },
+      "entries": [
+        {
+          "label": "Example",
+          "enabled": false
+        },
+        3.5,
+        [
+          "a",
+          true
+        ]
+      ]
+    },
+    {
+      "left": {
+        "name": "North"
+      },
+      "right": {
+        "name": "South"
+      },
+      "details": [],
+      "entries": [
+        {
+          "label": "Example",
+          "enabled": false
+        },
+        3.5,
+        [
+          "a",
+          true
+        ]
+      ]
+    },
+    {
+      "left": {
+        "name": "North"
+      },
+      "right": {
+        "name": "South"
+      },
+      "details": {
+        "settings": {
+          "enabled": false
+        },
+        "count": 7
+      },
+      "entries": [
+        null
+      ]
+    },
+    {
+      "left": {
+        "name": "North"
+      },
+      "right": {
+        "name": "South"
+      },
+      "details": {
+        "settings": {
+          "enabled": false
+        },
+        "count": 7
+      },
+      "entries": [
+        {
+          "_sd": []
+        }
+      ]
+    },
+    {
+      "left": {
+        "name": "North"
+      },
+      "right": {
+        "name": "South"
+      },
+      "details": {
+        "settings": {
+          "enabled": false
+        },
+        "count": 7
+      },
+      "entries": [
+        {
+          "...": "hidden"
+        }
+      ]
+    },
+    {
+      "left": {
+        "name": "North"
+      },
+      "right": {
+        "name": "South"
+      },
+      "details": {
+        "settings": {
+          "enabled": false
+        },
+        "count": 7
+      },
+      "entries": [
+        {
+          "issuer": "override"
+        }
+      ]
+    },
+    {
+      "left": {
+        "name": "North"
+      },
+      "right": {
+        "name": "South"
+      },
+      "details": {
+        "settings": {
+          "enabled": false
+        },
+        "count": 7
+      },
+      "entries": [
+        9007199254740992
+      ]
+    },
+    {
+      "left": {
+        "name": "North"
+      },
+      "right": {
+        "name": "South"
+      },
+      "details": {
+        "settings": {
+          "enabled": false
+        },
+        "count": 7
+      },
+      "entries": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    }
+  ],
+  "invalid_definitions": [
+    {
+      "id": "urn:example:structured",
+      "version": "1",
+      "credential_type": "ExampleStructuredCredential",
+      "label": "Structured example",
+      "max_validity_seconds": 3600,
+      "claims": [
+        {
+          "name": "name",
+          "path": [
+            "credentialSubject",
+            "left",
+            "name"
+          ],
+          "label": "Left name",
+          "value_type": "string",
+          "required": true
+        },
+        {
+          "name": "name",
+          "path": [
+            "credentialSubject",
+            "right",
+            "name"
+          ],
+          "label": "Right name",
+          "value_type": "string",
+          "required": true
+        },
+        {
+          "name": "details",
+          "label": "Complete details",
+          "value_type": "object",
+          "required": true
+        },
+        {
+          "name": "entries",
+          "label": "Complete entries",
+          "value_type": "array",
+          "required": true
+        },
+        {
+          "name": "left",
+          "label": "Ancestor",
+          "value_type": "object",
+          "required": false
+        }
+      ],
+      "profiles": [
+        {
+          "name": "left_only",
+          "claim_paths": [
+            [
+              "credentialSubject",
+              "left",
+              "name"
+            ]
+          ]
+        },
+        {
+          "name": "whole",
+          "claim_paths": [
+            [
+              "credentialSubject",
+              "details"
+            ],
+            [
+              "credentialSubject",
+              "entries"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "urn:example:structured",
+      "version": "1",
+      "credential_type": "ExampleStructuredCredential",
+      "label": "Structured example",
+      "max_validity_seconds": 3600,
+      "claims": [
+        {
+          "name": "name",
+          "path": [
+            "credentialSubject",
+            "left",
+            "0"
+          ],
+          "label": "Left name",
+          "value_type": "string",
+          "required": true
+        },
+        {
+          "name": "name",
+          "path": [
+            "credentialSubject",
+            "right",
+            "name"
+          ],
+          "label": "Right name",
+          "value_type": "string",
+          "required": true
+        },
+        {
+          "name": "details",
+          "label": "Complete details",
+          "value_type": "object",
+          "required": true
+        },
+        {
+          "name": "entries",
+          "label": "Complete entries",
+          "value_type": "array",
+          "required": true
+        }
+      ],
+      "profiles": [
+        {
+          "name": "left_only",
+          "claim_paths": [
+            [
+              "credentialSubject",
+              "left",
+              "name"
+            ]
+          ]
+        },
+        {
+          "name": "whole",
+          "claim_paths": [
+            [
+              "credentialSubject",
+              "details"
+            ],
+            [
+              "credentialSubject",
+              "entries"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "urn:example:structured",
+      "version": "1",
+      "credential_type": "ExampleStructuredCredential",
+      "label": "Structured example",
+      "max_validity_seconds": 3600,
+      "claims": [
+        {
+          "name": "name",
+          "path": [
+            "credentialSubject",
+            "left",
+            "name"
+          ],
+          "label": "Left name",
+          "value_type": "string",
+          "required": true
+        },
+        {
+          "name": "name",
+          "path": [
+            "credentialSubject",
+            "right",
+            "name"
+          ],
+          "label": "Right name",
+          "value_type": "string",
+          "required": true
+        },
+        {
+          "name": "details",
+          "label": "Complete details",
+          "value_type": "object",
+          "required": true
+        },
+        {
+          "name": "entries",
+          "label": "Complete entries",
+          "value_type": "array",
+          "required": true
+        }
+      ],
+      "profiles": [
+        {
+          "name": "ambiguous",
+          "claim_paths": [
+            [
+              "credentialSubject",
+              "name"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "malformed_definitions": [
+    {
+      "id": "urn:example:structured",
+      "version": "1",
+      "credential_type": "ExampleStructuredCredential",
+      "label": "Structured example",
+      "max_validity_seconds": 3600,
+      "claims": [
+        {
+          "name": "name",
+          "path": null,
+          "label": "Left name",
+          "value_type": "string",
+          "required": true
+        },
+        {
+          "name": "name",
+          "path": [
+            "credentialSubject",
+            "right",
+            "name"
+          ],
+          "label": "Right name",
+          "value_type": "string",
+          "required": true
+        },
+        {
+          "name": "details",
+          "label": "Complete details",
+          "value_type": "object",
+          "required": true
+        },
+        {
+          "name": "entries",
+          "label": "Complete entries",
+          "value_type": "array",
+          "required": true
+        }
+      ],
+      "profiles": [
+        {
+          "name": "left_only",
+          "claim_paths": [
+            [
+              "credentialSubject",
+              "left",
+              "name"
+            ]
+          ]
+        },
+        {
+          "name": "whole",
+          "claim_paths": [
+            [
+              "credentialSubject",
+              "details"
+            ],
+            [
+              "credentialSubject",
+              "entries"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "urn:example:structured",
+      "version": "1",
+      "credential_type": "ExampleStructuredCredential",
+      "label": "Structured example",
+      "max_validity_seconds": 3600,
+      "claims": [
+        {
+          "name": "name",
+          "path": [
+            "credentialSubject",
+            "left",
+            "name"
+          ],
+          "label": "Left name",
+          "value_type": "string",
+          "required": true,
+          "properties": {}
+        },
+        {
+          "name": "name",
+          "path": [
+            "credentialSubject",
+            "right",
+            "name"
+          ],
+          "label": "Right name",
+          "value_type": "string",
+          "required": true
+        },
+        {
+          "name": "details",
+          "label": "Complete details",
+          "value_type": "object",
+          "required": true
+        },
+        {
+          "name": "entries",
+          "label": "Complete entries",
+          "value_type": "array",
+          "required": true
+        }
+      ],
+      "profiles": [
+        {
+          "name": "left_only",
+          "claim_paths": [
+            [
+              "credentialSubject",
+              "left",
+              "name"
+            ]
+          ]
+        },
+        {
+          "name": "whole",
+          "claim_paths": [
+            [
+              "credentialSubject",
+              "details"
+            ],
+            [
+              "credentialSubject",
+              "entries"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "overlapping_credential": "eyJhbGciOiJFUzI1NiIsInR5cCI6InZjK3NkLWp3dCIsImtpZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjZml4dHVyZS0zNzQifQ.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiLHsiQHZvY2FiIjoiaHR0cHM6Ly9leGFtcGxlLnRlc3Qvdm9jYWIjIn1dLCJfc2RfYWxnIjoic2hhLTI1NiIsImNuZiI6eyJqd2siOnsiY3J2IjoiUC0yNTYiLCJraWQiOiJmaXh0dXJlLTM3NC1ob2xkZXIiLCJrdHkiOiJFQyIsIngiOiJ3VDNQRmEzaXB6ZzhOVmlTTEo4VHczWjQ1UjZOZ1pQTXZjcWNnV29WQUU4IiwieSI6IlpLbUcxSjlmWjU0ZnIzXzBLaXlLazJSRDVuamJLLXZzZDJDUWJNelE3dzAifX0sImNyZWRlbnRpYWxEZWZpbml0aW9uIjp7ImlkIjoidXJuOmV4YW1wbGU6c3RydWN0dXJlZCIsInZlcnNpb24iOiIxIn0sImNyZWRlbnRpYWxTdGF0dXMiOnsiaWQiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cyMwIiwic3RhdHVzTGlzdENyZWRlbnRpYWwiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cyIsInN0YXR1c0xpc3RJbmRleCI6IjAiLCJzdGF0dXNQdXJwb3NlIjoicmV2b2NhdGlvbiIsInR5cGUiOiJCaXRzdHJpbmdTdGF0dXNMaXN0RW50cnkifSwiY3JlZGVudGlhbFN1YmplY3QiOnsiX3NkIjpbIjhRMUdUeXVMVUkwSk5iV3lWZ0h2MFVKYlZKTzlUejk0ZVpyQmhSY2VjTG8iXSwiZGV0YWlscyI6eyJjb3VudCI6Nywic2V0dGluZ3MiOnsiZW5hYmxlZCI6ZmFsc2V9fSwiZW50cmllcyI6W3siZW5hYmxlZCI6ZmFsc2UsImxhYmVsIjoiRXhhbXBsZSJ9LDMuNSxbImEiLHRydWVdXSwicmlnaHQiOnsibmFtZSI6IlNvdXRoIn19LCJleHAiOjIwMCwiaWF0IjoxMDAsImlzcyI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUiLCJpc3N1ZXIiOiJkaWQ6d2ViOmlzc3Vlci5leGFtcGxlIiwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsIkV4YW1wbGVTdHJ1Y3R1cmVkQ3JlZGVudGlhbCJdLCJ2YWxpZEZyb20iOiIxOTcwLTAxLTAxVDAwOjAxOjQwWiIsInZhbGlkVW50aWwiOiIxOTcwLTAxLTAxVDAwOjAzOjIwWiJ9.O0j53cWgcOyvMSnVEHihgNfv6BnVTxmON1airzyehEDUudvpmrWEpJRrvQsltT9wovV0bX7hPg64AJ8Vikq9Rg~WyJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRIiwibmFtZSIsIk5vcnRoIl0~WyJBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnIiwibGVmdCIseyJfc2QiOlsiUGRkajFadXR6RzI5MGg4NVRiSXkzRGlnZ1QzZGVpOU1FTkwtWUlzcHlBTSJdfV0~",
+  "ancestor_credential": "eyJhbGciOiJFUzI1NiIsInR5cCI6InZjK3NkLWp3dCIsImtpZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjZml4dHVyZS0zNzQifQ.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiLHsiQHZvY2FiIjoiaHR0cHM6Ly9leGFtcGxlLnRlc3Qvdm9jYWIjIn1dLCJfc2RfYWxnIjoic2hhLTI1NiIsImNuZiI6eyJqd2siOnsiY3J2IjoiUC0yNTYiLCJraWQiOiJmaXh0dXJlLTM3NC1ob2xkZXIiLCJrdHkiOiJFQyIsIngiOiJ3VDNQRmEzaXB6ZzhOVmlTTEo4VHczWjQ1UjZOZ1pQTXZjcWNnV29WQUU4IiwieSI6IlpLbUcxSjlmWjU0ZnIzXzBLaXlLazJSRDVuamJLLXZzZDJDUWJNelE3dzAifX0sImNyZWRlbnRpYWxEZWZpbml0aW9uIjp7ImlkIjoidXJuOmV4YW1wbGU6c3RydWN0dXJlZCIsInZlcnNpb24iOiIxIn0sImNyZWRlbnRpYWxTdGF0dXMiOnsiaWQiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cyMwIiwic3RhdHVzTGlzdENyZWRlbnRpYWwiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cyIsInN0YXR1c0xpc3RJbmRleCI6IjAiLCJzdGF0dXNQdXJwb3NlIjoicmV2b2NhdGlvbiIsInR5cGUiOiJCaXRzdHJpbmdTdGF0dXNMaXN0RW50cnkifSwiY3JlZGVudGlhbFN1YmplY3QiOnsiX3NkIjpbIldZb3RxV29yS2FyUkxiaGE1R2NaRVowZTJHUTVXTnJEbDA1b0hLRDVSVWsiXSwiZGV0YWlscyI6eyJjb3VudCI6Nywic2V0dGluZ3MiOnsiZW5hYmxlZCI6ZmFsc2V9fSwiZW50cmllcyI6W3siZW5hYmxlZCI6ZmFsc2UsImxhYmVsIjoiRXhhbXBsZSJ9LDMuNSxbImEiLHRydWVdXSwicmlnaHQiOnsibmFtZSI6IlNvdXRoIn19LCJleHAiOjIwMCwiaWF0IjoxMDAsImlzcyI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUiLCJpc3N1ZXIiOiJkaWQ6d2ViOmlzc3Vlci5leGFtcGxlIiwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsIkV4YW1wbGVTdHJ1Y3R1cmVkQ3JlZGVudGlhbCJdLCJ2YWxpZEZyb20iOiIxOTcwLTAxLTAxVDAwOjAxOjQwWiIsInZhbGlkVW50aWwiOiIxOTcwLTAxLTAxVDAwOjAzOjIwWiJ9.jds8MEfI9hJNCzAyFgTGhyqFA-zcVvgKX3zZdWJy24bSIxsaJ7MfyWdD9Z_Smo9HMxiY_RgvT3oKmEI8PnChMA~WyJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRIiwibGVmdCIseyJuYW1lIjoiTm9ydGgifV0~",
+  "partial_whole_credential": "eyJhbGciOiJFUzI1NiIsInR5cCI6InZjK3NkLWp3dCIsImtpZCI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUjZml4dHVyZS0zNzQifQ.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvbnMvY3JlZGVudGlhbHMvdjIiLHsiQHZvY2FiIjoiaHR0cHM6Ly9leGFtcGxlLnRlc3Qvdm9jYWIjIn1dLCJfc2RfYWxnIjoic2hhLTI1NiIsImNuZiI6eyJqd2siOnsiY3J2IjoiUC0yNTYiLCJraWQiOiJmaXh0dXJlLTM3NC1ob2xkZXIiLCJrdHkiOiJFQyIsIngiOiJ3VDNQRmEzaXB6ZzhOVmlTTEo4VHczWjQ1UjZOZ1pQTXZjcWNnV29WQUU4IiwieSI6IlpLbUcxSjlmWjU0ZnIzXzBLaXlLazJSRDVuamJLLXZzZDJDUWJNelE3dzAifX0sImNyZWRlbnRpYWxEZWZpbml0aW9uIjp7ImlkIjoidXJuOmV4YW1wbGU6c3RydWN0dXJlZCIsInZlcnNpb24iOiIxIn0sImNyZWRlbnRpYWxTdGF0dXMiOnsiaWQiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cyMwIiwic3RhdHVzTGlzdENyZWRlbnRpYWwiOiJodHRwczovL2lzc3Vlci5leGFtcGxlL3N0YXR1cyIsInN0YXR1c0xpc3RJbmRleCI6IjAiLCJzdGF0dXNQdXJwb3NlIjoicmV2b2NhdGlvbiIsInR5cGUiOiJCaXRzdHJpbmdTdGF0dXNMaXN0RW50cnkifSwiY3JlZGVudGlhbFN1YmplY3QiOnsiZGV0YWlscyI6eyJfc2QiOlsiMmJBZkROSFFaX2Rvb05aY0VIN2VSM01WTDV6UTVzNUhLcU8zN0d0dkE0RSJdLCJzZXR0aW5ncyI6eyJlbmFibGVkIjpmYWxzZX19LCJlbnRyaWVzIjpbeyJlbmFibGVkIjpmYWxzZSwibGFiZWwiOiJFeGFtcGxlIn0sMy41LFsiYSIsdHJ1ZV1dLCJsZWZ0Ijp7Im5hbWUiOiJOb3J0aCJ9LCJyaWdodCI6eyJuYW1lIjoiU291dGgifX0sImV4cCI6MjAwLCJpYXQiOjEwMCwiaXNzIjoiZGlkOndlYjppc3N1ZXIuZXhhbXBsZSIsImlzc3VlciI6ImRpZDp3ZWI6aXNzdWVyLmV4YW1wbGUiLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiRXhhbXBsZVN0cnVjdHVyZWRDcmVkZW50aWFsIl0sInZhbGlkRnJvbSI6IjE5NzAtMDEtMDFUMDA6MDE6NDBaIiwidmFsaWRVbnRpbCI6IjE5NzAtMDEtMDFUMDA6MDM6MjBaIn0.P0_O69-mefVLrbGvWQXk9RVM37o3iAw7ENpxOI4LljWMLgdR5Aja5gfHIPeJfwZkVE6YM4rXdQ5NDE9kJjHXTw~WyJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRIiwiY291bnQiLDdd~"
+}

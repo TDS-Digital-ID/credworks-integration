@@ -18,11 +18,12 @@ services:
       PARTNER_MANAGEMENT_TOKEN: ${PARTNER_MANAGEMENT_TOKEN:?inject runtime management credential}
       PARTNER_PUBLIC_PORT: 3080
       PARTNER_MANAGEMENT_PORT: 3081
+      PARTNER_ISSUER_CONFIG: ${PARTNER_ISSUER_CONFIG:-}
       PARTNER_VERIFIER_CONFIG: ${PARTNER_VERIFIER_CONFIG:-}
     ports: ["127.0.0.1:${PARTNER_HOST_PORT:-3080}:3080"]
     volumes:
       - partner_identity:/state
-      - ${PARTNER_CONFIG_DIR:?set absolute public configuration directory}:/config:ro
+      - ${PARTNER_CONFIG_DIR:?set absolute protected configuration directory}:/config:ro
     logging:
       driver: json-file
       options: { max-size: "10m", max-file: "3" }

@@ -1,0 +1,31 @@
+# Optional independently owned issuer database. Existing verifier-only Compose
+# remains database-free. Use local-db only when not supplying an external DB.
+services:
+  partner:
+    extends:
+      file: ../partner/compose.yml
+      service: partner
+    environment:
+      PARTNER_ISSUER_CONFIG: /config/issuer.json
+  issuer-db:
+    profiles: [local-db]
+    image: postgres:17.10-alpine3.23
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: partner_issuer
+      POSTGRES_USER: credworks
+      POSTGRES_PASSWORD: ${PARTNER_ISSUER_POSTGRES_PASSWORD:?inject dedicated issuer database secret}
+    volumes: [issuer_database:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U credworks -d partner_issuer"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    cpus: 1
+    mem_limit: 256m
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+volumes:
+  partner_identity:
+  issuer_database:

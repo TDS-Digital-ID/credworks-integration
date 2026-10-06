@@ -9,9 +9,10 @@ pub use partner_identity_proof::{PartnerIdentityProofOptions, verify_partner_ide
 
 mod issuer_authorizations;
 pub use issuer_authorizations::{
-    ISSUER_AUTHORIZATIONS_MAX_TTL_SECONDS, ISSUER_AUTHORIZATIONS_TYP, IssuerAuthorization,
-    IssuerAuthorizationRequest, IssuerAuthorizations, sign_issuer_authorizations,
-    verify_issuer_authorization, verify_scalar_credential_authorization,
+    CredentialKeyState, ISSUER_AUTHORIZATIONS_MAX_TTL_SECONDS, ISSUER_AUTHORIZATIONS_TYP,
+    IssuerAuthorityPurpose, IssuerAuthorization, IssuerAuthorizationRequest, IssuerAuthorizations,
+    IssuerStatusAuthority, sign_issuer_authorizations, verify_issuer_authorization,
+    verify_scalar_credential_authorization, verify_scalar_renewal_predecessor,
 };
 
 mod scalar_definitions;

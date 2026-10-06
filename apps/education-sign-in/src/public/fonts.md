@@ -12,4 +12,4 @@ The binary name tables contain the corresponding copyright and SIL Open Font Lic
 - https://github.com/google/fonts/blob/main/ofl/splinesansmono/OFL.txt
 
 Upstream projects: https://github.com/productiontype/Spectral and https://github.com/SorkinType/SplineSansMono.
-These font licences apply to the fonts. Project-owned code is Apache-2.0 under root LICENSE; public distribution and remaining acceptance remain separately tracked.
+These font licences apply to the fonts. Project-owned code is Apache-2.0 under the root LICENSE; public distribution and remaining acceptance are tracked by Education #338 and Release B #348.

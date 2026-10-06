@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "CredWorks Education partner runtime",
+    "title": "CredWorks partner issuer and verifier",
     "version": "0.1.0",
-    "description": "Supported profile: W3C SD-JWT+KB, ES256, DCQL literal scalar Education paths, decentralized_identifier request client ID, direct_post vp_token. Ephemeral sessions/cache, persistent encrypted Rust identity. Container/public distribution and physical observations are separately recorded. Stable codes and limitations are documented in README."
+    "description": "Supported profile: W3C SD-JWT+KB, ES256, DCQL literal full subject paths with explicit issuer/definition/version policy, decentralized_identifier request client ID, direct_post vp_token. Ephemeral sessions/cache, persistent encrypted Rust identity. Container/public distribution and physical observations are separately recorded. Stable codes and limitations are documented in README. Optional durable generic issuer: pre-authorized-code, vc+sd-jwt, ES256, recipient-bound JWK proof and accredited wallet-instance attestation. App-local PostgreSQL ledger; independently pinned registry authority. Other issuance grants/formats are unsupported. Scalar verification uses six common credworks_scalar fields plus exactly one legacy key-ID or bounded authenticated credential-key set. Upgrade consumers before enabling sets. Generic schema and exact paths come from authenticated immutable registered definitions. Education behavior remains unchanged when scalar config is absent."
   },
   "paths": {
     "/.well-known/did.json": {
@@ -51,7 +51,7 @@
             }
           }
         ],
-        "description": "Stored ES256 oauth-authz-req+jwt. Exact Education DCQL, decentralized_identifier client ID, vp_token, direct_post, nonce/state, fixed creation plus120-second expiry. Retrieval never extends expiry. Capability is public ceremony data, never application correlation. Retrieval additionally enforces current exact permission and cache freshness before returning the unchanged signed request.",
+        "description": "Stored ES256 oauth-authz-req+jwt. Exact Education DCQL, decentralized_identifier client ID, vp_token, direct_post, nonce/state, fixed creation plus120-second maximum expiry. Retrieval never extends expiry. Capability is public ceremony data, never application correlation. Retrieval additionally enforces current exact permission and cache freshness before returning the unchanged signed request. Scalar mode supplies authenticated definition-derived DCQL with credworks_scalar as documented by the CredWorksScalarRequestExtension schema. Scalar requests additionally retain their original cache/authority/permission/status deadline across refresh; set requests cap signed exp to that minimum. Each session freezes allowed issuer IDs/public pins; refresh can withdraw, never add members. Generic scalar/structured compact Request Objects fit the 262144-byte consumer cap. The approved 64-path, 16-component profile can exceed 65536 bytes; legacy/DID transport caps remain separate.",
         "responses": {
           "200": {
             "description": "Signed authorization request",
@@ -284,7 +284,7 @@
             "RuntimeBearer": []
           }
         ],
-        "description": "Requires fresh exact issuer/type/definition/profile/origin/key scope. Protect returned correlation_capability in the initiating application interaction. No account, eligibility or cookie decision. Maximum100 retained sessions; management bodies4KiB.",
+        "description": "Requires fresh exact issuer/type/definition/profile/origin/key scope. Protect returned correlation_capability in the initiating application interaction. No account, eligibility or cookie decision. Maximum100 retained sessions; management bodies4KiB. Scalar mode additionally requires the explicit local configuration_id. Callers cannot supply issuers, definitions, claim paths or publication destinations.",
         "requestBody": {
           "required": true,
           "content": {
@@ -455,7 +455,7 @@
             }
           }
         ],
-        "description": "One-time atomic consumption. Public state cannot authorize retrieval. Results are retained until creation plus 240 seconds; completed ceremonies are not subject to the 120-second request-completion deadline. Verified claims are delivered only before the immutable original evidence/credential deadline and while current exact permission and credential status remain valid. Refusal consumes the result without claims. Refresh cannot extend its original deadline. Verified enrolled=false remains a value for caller policy.",
+        "description": "One-time atomic consumption. A linking result refuses ordinary consumption with RESULT_LINKED; a committed link is consumed. Public state cannot authorize retrieval. Results are retained until creation plus 240 seconds; completed ceremonies are not subject to the 120-second request-completion deadline. Verified claims are delivered only before the immutable original evidence/credential deadline and while current exact permission and credential status remain valid. Refusal consumes the result without claims. Refresh cannot extend its original deadline. Verified enrolled=false remains a value for caller policy.",
         "requestBody": {
           "required": true,
           "content": {
@@ -637,6 +637,1812 @@
           }
         }
       }
+    },
+    "/.well-known/oauth-authorization-server": {
+      "get": {
+        "operationId": "issuerAuthorizationMetadata",
+        "description": "Supported pre-authorized-code grant only. Issuer enabled configuration required. Anonymous token endpoint still requires recipient-authorized confidential code.",
+        "servers": [
+          {
+            "url": "https://partner.example",
+            "description": "Configured HTTPS public origin; never forward management routes"
+          }
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "OAuth authorization server metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/.well-known/openid-credential-issuer": {
+      "get": {
+        "operationId": "issuerMetadata",
+        "description": "Exact scalar configuration metadata includes credworks_issuer_authorization.path, definition_id and definition_version. Resolve path only against independently pinned registry origin; metadata never supplies trust.",
+        "servers": [
+          {
+            "url": "https://partner.example",
+            "description": "Configured HTTPS public origin; never forward management routes"
+          }
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Credential issuer metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Current signed issuer authority unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/sessions/{session_id}/issuance-offer": {
+      "post": {
+        "operationId": "createVerifiedHolderOffer",
+        "description": "Protected local-runtime continuation. Both issuer and verifier roles are required. Atomically links a permitted completed verification to one holder-bound scalar offer. Exact capability, interaction and identical issuance payload authorize retries, including after committed lost replies and restart. Issuer and holder are server-derived; arbitrary remote verifier references, public state and caller holder fields cannot authorize issuance. Effective offer/token expiry cannot exceed the original session/evidence/credential deadline. Current exact source key/scope/permission/status and output issuer authority are rechecked through issuance. The seven-field wallet request and public accepted ACK remain unchanged. Code redemption remains one-time; lost token replies are fail-closed.",
+        "servers": [
+          {
+            "url": "http://127.0.0.1:3081",
+            "description": "Protected application listener in runtime network namespace"
+          }
+        ],
+        "security": [
+          {
+            "RuntimeBearer": [],
+            "SessionCapability": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifiedHolderOfferInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Original confidential offer, created or recovered for identical authenticated input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerOfferCreated"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ISSUER_OFFER_BAD_REQUEST, ISSUER_CONFIGURATION_UNKNOWN, ISSUER_VALUES_INVALID or ISSUER_VALIDITY_INVALID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Runtime authentication refused",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "JSON required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "EVIDENCE_STALE, ISSUER_AUTHORITY_UNAVAILABLE, ISSUER_BINDING_UNAVAILABLE or ISSUER_STATE_UNAVAILABLE",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ISSUER_BINDING_MISMATCH, VERIFICATION_NOT_PERMITTED, current source permission/authority or status refusal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "RESULT_PENDING, RESULT_CONSUMED, ISSUER_BINDING_MISMATCH or ISSUER_OFFER_CONSUMED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{43}$"
+            }
+          }
+        ]
+      }
+    },
+    "/management/issuer/offers": {
+      "post": {
+        "operationId": "createIssuerOffer",
+        "description": "Management authorizes intended holder before issuing an expiring capability. Core validates complete subject and immutable validity against exact current signed definition authority.",
+        "servers": [
+          {
+            "url": "http://127.0.0.1:3081",
+            "description": "Protected application listener in runtime network namespace"
+          }
+        ],
+        "security": [
+          {
+            "RuntimeBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssuerOfferInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Authorized confidential offer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerOfferCreated"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ISSUER_OFFER_BAD_REQUEST, ISSUER_CONFIGURATION_UNKNOWN, ISSUER_VALUES_INVALID or ISSUER_VALIDITY_INVALID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Runtime authentication refused",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "JSON required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "ISSUER_AUTHORITY_UNAVAILABLE or ISSUER_STATE_UNAVAILABLE",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oid4vci/offers/{id}": {
+      "get": {
+        "operationId": "retrieveIssuerOffer",
+        "description": "Confidential bearer URL. Strict single code query field; only active unconsumed offer retrievable. No-store and no-referrer.",
+        "servers": [
+          {
+            "url": "https://partner.example",
+            "description": "Configured HTTPS public origin; never forward management routes"
+          }
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{22}$"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{43}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Standard credential offer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CredentialOffer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, expired, consumed or mismatched capability",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerProtocolError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oid4vci/token": {
+      "post": {
+        "operationId": "redeemIssuerCode",
+        "description": "Atomically consumes one pre-authorized code. Reuse and expiry return invalid_grant; token deadline is min(redemption+300, credential deadline).",
+        "servers": [
+          {
+            "url": "https://partner.example",
+            "description": "Configured HTTPS public origin; never forward management routes"
+          }
+        ],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/IssuerTokenInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recipient-bound token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerTokenResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_grant or invalid_request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerProtocolError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "request_too_large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerProtocolError"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "request_deadline",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerProtocolError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oid4vci/nonce": {
+      "post": {
+        "operationId": "issuerNonce",
+        "description": "Bounded nonce allocation with immutable 300-second lifetime.",
+        "servers": [
+          {
+            "url": "https://partner.example",
+            "description": "Configured HTTPS public origin; never forward management routes"
+          }
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Nonce for actual signed holder proof",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerNonce"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Sanitized allocation failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerProtocolError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oid4vci/credential": {
+      "post": {
+        "operationId": "issueScalarCredential",
+        "description": "Actual proof and provider attestation must match application-authorized holder. Commit signed credential and status allocation atomically before response. Completed retries return the same committed bytes only for original token/holder/nonce before original deadlines, without another allocation. A renewal successor additionally returns x_credworks_renewal; signing, delivery and HTTP acknowledgement never retire its predecessor.",
+        "servers": [
+          {
+            "url": "https://partner.example",
+            "description": "Configured HTTPS public origin; never forward management routes"
+          }
+        ],
+        "security": [
+          {
+            "IssuerToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssuerCredentialInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Exact committed credential",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerCredentialResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input/proof/WIA or expired transaction bounds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerProtocolError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "invalid_token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerProtocolError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "request_too_large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerProtocolError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "issuer_authority_unavailable or temporarily_unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerProtocolError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "server_error, never credentials or diagnostics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerProtocolError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oid4vci/status/revocation.jwt": {
+      "get": {
+        "operationId": "issuerRevocationStatus",
+        "description": "Public persistent signed BitstringStatusListCredential. Fresh 300-second snapshot preserves allocated indices/revocation bits across idle and restart.",
+        "servers": [
+          {
+            "url": "https://partner.example",
+            "description": "Configured HTTPS public origin; never forward management routes"
+          }
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Signed ES256 status list",
+            "content": {
+              "application/statuslist+jwt": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "status_not_found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerProtocolError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "temporarily_unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerProtocolError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/issuer/issuances/{issuance_id}/status": {
+      "get": {
+        "servers": [
+          {
+            "url": "http://127.0.0.1:3081",
+            "description": "Protected application listener; never forward publicly"
+          }
+        ],
+        "security": [
+          {
+            "RuntimeBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "issuance_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{22}$"
+            },
+            "description": "Existing offer ID only after a credential has been durably issued; not a holder or raw status index."
+          }
+        ],
+        "operationId": "readIssuerIssuanceStatus",
+        "description": "Credential-free exact-instance diagnostics. No-store. Generic status has one revocation entry; suspension and reinstatement are unsupported.",
+        "responses": {
+          "200": {
+            "description": "Exact committed issuance state; references derived from the identity-bound ledger. Retried revocation keeps its original time; legacy signed revocations have unknown time.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerIssuanceStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Runtime management bearer required; holder proof, issuer token and registry project credentials are refused.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ISSUER_ISSUANCE_NOT_FOUND in this runtime ledger.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ISSUER_ISSUANCE_NOT_ISSUED: offered, redeemed or failed protocol state is not an issued credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "ISSUER_STATE_UNAVAILABLE: unavailable or inconsistent identity, allocation, signed publication or revocation history. Retry the same exact issuance to reconcile an interrupted outcome; never reset the ledger.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "servers": [
+          {
+            "url": "http://127.0.0.1:3081",
+            "description": "Protected application listener; never forward publicly"
+          }
+        ],
+        "security": [
+          {
+            "RuntimeBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "issuance_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{22}$"
+            },
+            "description": "Existing offer ID only after a credential has been durably issued; not a holder or raw status index."
+          }
+        ],
+        "operationId": "revokeIssuerIssuance",
+        "description": "Atomically and permanently revoke one committed credential. Server derives credential ID and status list/index. Exact repeated requests are idempotent across processes and replacement; retirement remains authorized after new-issuance grant withdrawal. No-store.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssuerRevocationInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Exact committed issuance state; references derived from the identity-bound ledger. Retried revocation keeps its original time; legacy signed revocations have unknown time.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerIssuanceStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Runtime management bearer required; holder proof, issuer token and registry project credentials are refused.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ISSUER_ISSUANCE_NOT_FOUND in this runtime ledger.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ISSUER_ISSUANCE_NOT_ISSUED: offered, redeemed or failed protocol state is not an issued credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "ISSUER_STATE_UNAVAILABLE: unavailable or inconsistent identity, allocation, signed publication or revocation history. Retry the same exact issuance to reconcile an interrupted outcome; never reset the ledger.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ISSUER_STATUS_BAD_REQUEST for malformed JSON, unknown fields or missing state; ISSUER_STATUS_UNSUPPORTED for any state other than revoked.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "REQUEST_TOO_LARGE: JSON body exceeds 1024 bytes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "ISSUER_STATUS_BAD_REQUEST: application/json required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "REQUEST_DEADLINE: request body exceeded the 5-second bound.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/issuer/renewals": {
+      "post": {
+        "operationId": "createIssuerRenewal",
+        "description": "Authorizes one immutable exact predecessor replacement, with holder derived from the retained authenticated credential. Current exact definition authority is required. Identical private Idempotency-Key plus identical body returns the original operation; changed input conflicts. Initial phase is awaiting_holder with no successor. No-store. JSON UTF-8 body is bounded at 262144 bytes. Authorization lease: now < offer_expires_at <= now+600 and <= valid_until. Predecessor may be expired but must be unrevoked. Never forward publicly.",
+        "servers": [
+          {
+            "url": "http://127.0.0.1:3081",
+            "description": "Protected application listener; never forward publicly"
+          }
+        ],
+        "security": [
+          {
+            "RuntimeBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{43}$"
+            },
+            "description": "Private 43-character URL-safe correlation capability. Retain it and the exact input for retry; never log it."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssuerRenewalInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Original operation, including on identical retry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerRenewalCreated"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ISSUER_RENEWAL_BAD_REQUEST, ISSUER_CONFIGURATION_UNKNOWN, ISSUER_VALUES_INVALID or ISSUER_VALIDITY_INVALID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Runtime management bearer required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ISSUER_RENEWAL_NOT_FOUND: exact predecessor is absent from this issuer ledger.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ISSUER_RENEWAL_CONFLICT, ISSUER_RENEWAL_BINDING_MISMATCH or ISSUER_RENEWAL_NOT_CONFIRMABLE.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "ISSUER_RENEWAL_EXPIRED: original lease expired before commit.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "REQUEST_DEADLINE: body exceeded the 5-second bound.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "REQUEST_TOO_LARGE: JSON body exceeds 262144 bytes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "ISSUER_RENEWAL_BAD_REQUEST: application/json required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "ISSUER_AUTHORITY_UNAVAILABLE or ISSUER_STATE_UNAVAILABLE; preserve the operation and retry/reconcile, never reset durable state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/partner-renewals/{renewal_id}": {
+      "get": {
+        "operationId": "readIssuerRenewalRequest",
+        "description": "Read confidential proposed replacement while awaiting_holder and before original expiry. Authenticate issuer/definition and exact held predecessor before consent. The capability grants no holder or issuance authority. Exactly one capability query field is required.",
+        "servers": [
+          {
+            "url": "https://partner.example",
+            "description": "Configured HTTPS public origin; never forward management routes"
+          }
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "renewal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{22}$"
+            }
+          },
+          {
+            "name": "capability",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{43}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current exact operation state; no-store and no-referrer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerRenewalRequest"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ISSUER_RENEWAL_BAD_REQUEST: require exactly one well-formed capability query field.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ISSUER_RENEWAL_NOT_FOUND: operation or capability does not match.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ISSUER_RENEWAL_CONFLICT, ISSUER_RENEWAL_BINDING_MISMATCH or ISSUER_RENEWAL_NOT_CONFIRMABLE.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "ISSUER_AUTHORITY_UNAVAILABLE or ISSUER_STATE_UNAVAILABLE; preserve the operation and retry/reconcile, never reset durable state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "ISSUER_RENEWAL_EXPIRED: expiry equality refuses the request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/partner-renewals/{renewal_id}/authorize": {
+      "post": {
+        "operationId": "authorizeIssuerRenewal",
+        "description": "Fresh predecessor-holder proof audience is the exact canonical authorize URI. Obtain nonce through POST /oid4vci/nonce. Atomically consume nonce and allocate the sole successor offer. Fresh authorized retry returns the same offer and original expiry; never restores a consumed code. Existing OID4VCI/WIA remain required for issuance.",
+        "servers": [
+          {
+            "url": "https://partner.example",
+            "description": "Configured HTTPS public origin; never forward management routes"
+          }
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "renewal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{22}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssuerRenewalAuthorizeInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current exact operation state; no-store and no-referrer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerRenewalAuthorized"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ISSUER_RENEWAL_BAD_REQUEST or ISSUER_RENEWAL_INVALID_PROOF. Exact JSON fields and application/json are required; public POST queries are refused.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ISSUER_RENEWAL_NOT_FOUND: operation or capability does not match.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ISSUER_RENEWAL_CONFLICT, ISSUER_RENEWAL_BINDING_MISMATCH or ISSUER_RENEWAL_NOT_CONFIRMABLE.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "ISSUER_AUTHORITY_UNAVAILABLE or ISSUER_STATE_UNAVAILABLE; preserve the operation and retry/reconcile, never reset durable state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "REQUEST_DEADLINE: body exceeded the 5-second bound.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "REQUEST_TOO_LARGE: public JSON proof body exceeds 16384 bytes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "ISSUER_RENEWAL_EXPIRED: original lease expiry equality refuses authorization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/partner-renewals/{renewal_id}/status": {
+      "post": {
+        "operationId": "reconcileIssuerRenewal",
+        "description": "Fresh same-holder proof audience equals this canonical status URI. Retrieves current operation and reconciles an already persisted retiring phase to completed. Does not confirm an awaiting_receipt operation or require a spent code/token; confirmed retirement remains recoverable after credential expiry or later urgent revocation.",
+        "servers": [
+          {
+            "url": "https://partner.example",
+            "description": "Configured HTTPS public origin; never forward management routes"
+          }
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "renewal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{22}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssuerRenewalOperationInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current exact operation state; no-store and no-referrer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerRenewalResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ISSUER_RENEWAL_BAD_REQUEST or ISSUER_RENEWAL_INVALID_PROOF. Exact JSON fields and application/json are required; public POST queries are refused.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ISSUER_RENEWAL_NOT_FOUND: operation or capability does not match.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ISSUER_RENEWAL_CONFLICT, ISSUER_RENEWAL_BINDING_MISMATCH or ISSUER_RENEWAL_NOT_CONFIRMABLE.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "ISSUER_AUTHORITY_UNAVAILABLE or ISSUER_STATE_UNAVAILABLE; preserve the operation and retry/reconcile, never reset durable state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "REQUEST_DEADLINE: body exceeded the 5-second bound.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "REQUEST_TOO_LARGE: public JSON proof body exceeds 16384 bytes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/partner-renewals/{renewal_id}/cancel": {
+      "post": {
+        "operationId": "cancelIssuerRenewal",
+        "description": "Fresh predecessor-holder proof audience equals this canonical cancel URI. Before issuance invalidate only its unissued offer. After issuance atomically revoke only its unconfirmed successor before releasing the live predecessor lease. Confirmation winning first forbids cancellation. Preserve predecessor, unrelated instances and every existing urgent revocation.",
+        "servers": [
+          {
+            "url": "https://partner.example",
+            "description": "Configured HTTPS public origin; never forward management routes"
+          }
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "renewal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{22}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssuerRenewalOperationInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current exact operation state; no-store and no-referrer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerRenewalResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ISSUER_RENEWAL_BAD_REQUEST or ISSUER_RENEWAL_INVALID_PROOF. Exact JSON fields and application/json are required; public POST queries are refused.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ISSUER_RENEWAL_NOT_FOUND: operation or capability does not match.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ISSUER_RENEWAL_CONFLICT, ISSUER_RENEWAL_BINDING_MISMATCH or ISSUER_RENEWAL_NOT_CONFIRMABLE.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "ISSUER_AUTHORITY_UNAVAILABLE or ISSUER_STATE_UNAVAILABLE; preserve the operation and retry/reconcile, never reset durable state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "REQUEST_DEADLINE: body exceeded the 5-second bound.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "REQUEST_TOO_LARGE: public JSON proof body exceeds 16384 bytes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/partner-renewals/{renewal_id}/receipts/{receipt_id}/successors/{successor_issuance_id}/confirm": {
+      "post": {
+        "operationId": "confirmIssuerRenewalReceipt",
+        "description": "Holder assertion of verified durable successor storage. Verify exact signed successor/predecessor identities and durably save successor plus pending confirmation before signing or sending. Fresh same-holder proof audience equals the entire canonical receipt/successor URI. First confirmation requires current exact definition authority and unexpired unrevoked successor. Persist retiring first, then reconcile monotonic exact predecessor retirement. Fresh retries retain original receipt and one retirement effect; issuer cannot inspect device storage.",
+        "servers": [
+          {
+            "url": "https://partner.example",
+            "description": "Configured HTTPS public origin; never forward management routes"
+          }
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "renewal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{22}$"
+            }
+          },
+          {
+            "name": "receipt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{43}$"
+            }
+          },
+          {
+            "name": "successor_issuance_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{22}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssuerRenewalConfirmInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current exact operation state; no-store and no-referrer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerRenewalResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ISSUER_RENEWAL_BAD_REQUEST or ISSUER_RENEWAL_INVALID_PROOF. Exact JSON fields and application/json are required; public POST queries are refused.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ISSUER_RENEWAL_NOT_FOUND: operation or capability does not match.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ISSUER_RENEWAL_CONFLICT, ISSUER_RENEWAL_BINDING_MISMATCH or ISSUER_RENEWAL_NOT_CONFIRMABLE.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "ISSUER_AUTHORITY_UNAVAILABLE or ISSUER_STATE_UNAVAILABLE; preserve the operation and retry/reconcile, never reset durable state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "REQUEST_DEADLINE: body exceeded the 5-second bound.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "REQUEST_TOO_LARGE: public JSON proof body exceeds 16384 bytes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/issuer/keys": {
+      "get": {
+        "operationId": "inspectIssuerKeys",
+        "description": "Inspect local revision, exact selected key, immutable public history and pending original request. This is coordination state, not signed registry authority. Protected runtime bearer; no-store. POST bodies are exact JSON objects bounded to 4096 UTF-8 bytes with a five-second read deadline. Never forward publicly.",
+        "servers": [
+          {
+            "url": "http://127.0.0.1:3081",
+            "description": "Protected application listener; never forward publicly"
+          }
+        ],
+        "security": [
+          {
+            "RuntimeBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Local credential-key state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerKeyState"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ISSUER_KEY_BAD_REQUEST"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "ISSUER_KEY_PROOF_REFUSED"
+          },
+          "409": {
+            "description": "ISSUER_KEY_REVISION_CONFLICT, ISSUER_KEY_CONFLICT or ISSUER_KEY_LIMIT"
+          },
+          "503": {
+            "description": "ISSUER_KEY_STATE_UNAVAILABLE or ISSUER_AUTHORITY_UNAVAILABLE; restore complete consistent backup for established missing material"
+          }
+        }
+      }
+    },
+    "/management/issuer/keys/stage": {
+      "post": {
+        "operationId": "stageIssuerKeys",
+        "description": "Persist preparing intent before exclusive sealed-file creation and directory sync. An identical pending request retries its original material. Staging pauses new minting. IDs, including abandoned attempts, are never reused. Protected runtime bearer; no-store. POST bodies are exact JSON objects bounded to 4096 UTF-8 bytes with a five-second read deadline. Never forward publicly.",
+        "servers": [
+          {
+            "url": "http://127.0.0.1:3081",
+            "description": "Protected application listener; never forward publicly"
+          }
+        ],
+        "security": [
+          {
+            "RuntimeBearer": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Local credential-key state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerKeyState"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ISSUER_KEY_BAD_REQUEST"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "ISSUER_KEY_PROOF_REFUSED"
+          },
+          "409": {
+            "description": "ISSUER_KEY_REVISION_CONFLICT, ISSUER_KEY_CONFLICT or ISSUER_KEY_LIMIT"
+          },
+          "503": {
+            "description": "ISSUER_KEY_STATE_UNAVAILABLE or ISSUER_AUTHORITY_UNAVAILABLE; restore complete consistent backup for established missing material"
+          },
+          "408": {
+            "description": "REQUEST_DEADLINE; request body did not complete within five seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "REQUEST_TOO_LARGE; request body exceeds 4096 UTF-8 bytes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssuerKeyStageInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/issuer/keys/proof": {
+      "post": {
+        "operationId": "proofIssuerKeys",
+        "description": "Return a Rust-signed proof for the exact staged key and original registry challenge. Audience, owner, revision, key IDs, nonce and deadline must match. Expiry is at most 60 seconds and never extends the challenge. Protected runtime bearer; no-store. POST bodies are exact JSON objects bounded to 4096 UTF-8 bytes with a five-second read deadline. Never forward publicly.",
+        "servers": [
+          {
+            "url": "http://127.0.0.1:3081",
+            "description": "Protected application listener; never forward publicly"
+          }
+        ],
+        "security": [
+          {
+            "RuntimeBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fresh proof",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "jwt"
+                  ],
+                  "properties": {
+                    "jwt": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ISSUER_KEY_BAD_REQUEST"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "ISSUER_KEY_PROOF_REFUSED"
+          },
+          "409": {
+            "description": "ISSUER_KEY_REVISION_CONFLICT, ISSUER_KEY_CONFLICT or ISSUER_KEY_LIMIT"
+          },
+          "503": {
+            "description": "ISSUER_KEY_STATE_UNAVAILABLE or ISSUER_AUTHORITY_UNAVAILABLE; restore complete consistent backup for established missing material"
+          },
+          "408": {
+            "description": "REQUEST_DEADLINE; request body did not complete within five seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "REQUEST_TOO_LARGE; request body exceeds 4096 UTF-8 bytes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssuerKeyProofInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/issuer/keys/activate": {
+      "post": {
+        "operationId": "activateIssuerKeys",
+        "description": "Authenticate every configured per-definition current grant through the core under the identity lock, including immutable candidate pin and unchanged bootstrap status authority. Select credential signing only. Inspect durable state after a lost reply. Protected runtime bearer; no-store. POST bodies are exact JSON objects bounded to 4096 UTF-8 bytes with a five-second read deadline. Never forward publicly.",
+        "servers": [
+          {
+            "url": "http://127.0.0.1:3081",
+            "description": "Protected application listener; never forward publicly"
+          }
+        ],
+        "security": [
+          {
+            "RuntimeBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Local credential-key state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerKeyState"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ISSUER_KEY_BAD_REQUEST"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "ISSUER_KEY_PROOF_REFUSED"
+          },
+          "409": {
+            "description": "ISSUER_KEY_REVISION_CONFLICT, ISSUER_KEY_CONFLICT or ISSUER_KEY_LIMIT"
+          },
+          "503": {
+            "description": "ISSUER_KEY_STATE_UNAVAILABLE or ISSUER_AUTHORITY_UNAVAILABLE; restore complete consistent backup for established missing material"
+          },
+          "408": {
+            "description": "REQUEST_DEADLINE; request body did not complete within five seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "REQUEST_TOO_LARGE; request body exceeds 4096 UTF-8 bytes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssuerKeySelectionInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/issuer/keys/abandon": {
+      "post": {
+        "operationId": "abandonIssuerKeys",
+        "description": "Abandon the exact pending attempt, retaining its immutable ID and any material. Does not reverse registry publication or restore issuance authority. Preparing without public material can be abandoned after restart. Protected runtime bearer; no-store. POST bodies are exact JSON objects bounded to 4096 UTF-8 bytes with a five-second read deadline. Never forward publicly.",
+        "servers": [
+          {
+            "url": "http://127.0.0.1:3081",
+            "description": "Protected application listener; never forward publicly"
+          }
+        ],
+        "security": [
+          {
+            "RuntimeBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Local credential-key state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuerKeyState"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ISSUER_KEY_BAD_REQUEST"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "ISSUER_KEY_PROOF_REFUSED"
+          },
+          "409": {
+            "description": "ISSUER_KEY_REVISION_CONFLICT, ISSUER_KEY_CONFLICT or ISSUER_KEY_LIMIT"
+          },
+          "503": {
+            "description": "ISSUER_KEY_STATE_UNAVAILABLE or ISSUER_AUTHORITY_UNAVAILABLE; restore complete consistent backup for established missing material"
+          },
+          "408": {
+            "description": "REQUEST_DEADLINE; request body did not complete within five seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "REQUEST_TOO_LARGE; request body exceeds 4096 UTF-8 bytes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssuerKeySelectionInput"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -651,6 +2457,11 @@
         "in": "header",
         "name": "X-Session-Capability",
         "description": "Protected application interaction capability returned on creation; distinct from public state/request capability"
+      },
+      "IssuerToken": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Opaque token issued by this deployment for one recipient-authorized offer; original expiry and holder binding apply"
       }
     },
     "schemas": {
@@ -664,7 +2475,7 @@
             "properties": {
               "code": {
                 "type": "string",
-                "description": "Runtime codes: SESSION_BAD_REQUEST, RESPONSE_BAD_REQUEST, RESPONSE_STATE_MISMATCH, SESSION_ACCESS_DENIED, SCOPE_NOT_PERMITTED, SESSION_NOT_FOUND, REQUEST_DEADLINE, REQUEST_TOO_LARGE, SESSION_CAPACITY, RESULT_PENDING, RESULT_CONSUMED, SESSION_ALREADY_COMPLETED, SESSION_EXPIRED, EVIDENCE_UNAVAILABLE, EVIDENCE_STALE, EVIDENCE_REFRESH_FAILED, PERMISSION_VERSION_UNSUPPORTED. Protected refused results additionally preserve validated identity-core enum codes, or PRESENTATION_VERIFICATION_FAILED for unknown exceptions; no diagnostic text."
+                "description": "Runtime codes: SESSION_BAD_REQUEST, RESPONSE_BAD_REQUEST, RESPONSE_STATE_MISMATCH, SESSION_ACCESS_DENIED, SCOPE_NOT_PERMITTED, SESSION_NOT_FOUND, REQUEST_DEADLINE, REQUEST_TOO_LARGE, SESSION_CAPACITY, RESULT_PENDING, RESULT_CONSUMED, SESSION_ALREADY_COMPLETED, SESSION_EXPIRED, EVIDENCE_UNAVAILABLE, EVIDENCE_STALE, EVIDENCE_REFRESH_FAILED, PERMISSION_VERSION_UNSUPPORTED. Protected refused results additionally preserve validated identity-core enum codes, or PRESENTATION_VERIFICATION_FAILED for unknown exceptions; no diagnostic text. Scalar scopes additionally use ISSUER_NOT_AUTHORIZED; protected refusals include DEFINITION_NOT_ACCEPTED."
               }
             },
             "required": [
@@ -677,32 +2488,15 @@
         ]
       },
       "CreateSession": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "profile": {
-            "type": "string",
-            "enum": [
-              "education_eligibility",
-              "education_sign_in"
-            ]
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/CreateEducationSession"
           },
-          "interaction_id": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 128
-          },
-          "purpose": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200
+          {
+            "$ref": "#/components/schemas/CreateScalarSession"
           }
-        },
-        "required": [
-          "profile",
-          "interaction_id",
-          "purpose"
-        ]
+        ],
+        "description": "Runtime mode selects exactly one request shape. A scalar-configured runtime requires configuration_id and cannot fall through to Education."
       },
       "Session": {
         "type": "object",
@@ -761,6 +2555,7 @@
               "pending",
               "verifying",
               "complete",
+              "linking",
               "consumed",
               "expired"
             ]
@@ -968,6 +2763,9 @@
             "$ref": "#/components/schemas/VerifiedResult"
           },
           {
+            "$ref": "#/components/schemas/ScalarVerifiedResult"
+          },
+          {
             "$ref": "#/components/schemas/RefusedResult"
           }
         ]
@@ -1028,6 +2826,1321 @@
             }
           }
         ]
+      },
+      "IssuerProtocolError": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Stable protocol code, including invalid_request, invalid_grant, invalid_token, invalid_proof, invalid_wallet_instance_attestation, issuer_authority_unavailable, request_too_large, request_deadline, temporarily_unavailable or server_error"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "VerifiedHolderOfferInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "configuration_id": {
+            "type": "string",
+            "description": "Exact independently configured definition/version/authorization reference"
+          },
+          "claims": {
+            "type": "object",
+            "maxProperties": 64,
+            "additionalProperties": {
+              "$ref": "#/components/schemas/StructuredValue"
+            },
+            "description": "Complete subject checked by the existing Rust definition API. Required full paths, implicit containers, whole values, bounds and reserved names are enforced without coercion; unknown, null or incomplete values fail. Total subject max 65536 compact UTF-8 bytes/depth 16/nodes 1024."
+          },
+          "valid_from": {
+            "type": "integer",
+            "description": "Unix seconds, no future start"
+          },
+          "valid_until": {
+            "type": "integer",
+            "description": "Immutable credential deadline within authenticated definition lifetime"
+          },
+          "offer_expires_at": {
+            "type": "integer",
+            "description": "Immutable Unix deadline: now < expiry <= now+600 and <= valid_until"
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "configuration_id",
+          "claims",
+          "valid_from",
+          "valid_until",
+          "offer_expires_at",
+          "interaction_id"
+        ],
+        "description": "Exactly these six fields. Interaction must match the protected completed local verification. Holder and issuing DID are derived by the runtime; no caller holder/issuer/result claims are accepted."
+      },
+      "IssuerOfferInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "configuration_id": {
+            "type": "string",
+            "description": "Exact independently configured definition/version/authorization reference"
+          },
+          "claims": {
+            "type": "object",
+            "maxProperties": 64,
+            "additionalProperties": {
+              "$ref": "#/components/schemas/StructuredValue"
+            },
+            "description": "Complete subject checked by the existing Rust definition API. Required full paths, implicit containers, whole values, bounds and reserved names are enforced without coercion; unknown, null or incomplete values fail. Total subject max 65536 compact UTF-8 bytes/depth 16/nodes 1024."
+          },
+          "valid_from": {
+            "type": "integer",
+            "description": "Unix seconds, no future start"
+          },
+          "valid_until": {
+            "type": "integer",
+            "description": "Immutable credential deadline within authenticated definition lifetime"
+          },
+          "offer_expires_at": {
+            "type": "integer",
+            "description": "Immutable Unix deadline: now < expiry <= now+600 and <= valid_until"
+          },
+          "recipient_jwk_thumbprint": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$",
+            "description": "Application-authorized intended holder RFC7638 SHA256 thumbprint; proof possession alone does not authorize recipient"
+          }
+        },
+        "required": [
+          "configuration_id",
+          "claims",
+          "valid_from",
+          "valid_until",
+          "offer_expires_at",
+          "recipient_jwk_thumbprint"
+        ]
+      },
+      "IssuerOfferCreated": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "credential_offer_uri": {
+            "type": "string",
+            "format": "uri",
+            "description": "Confidential retrievable bearer capability; no logging/referrers"
+          },
+          "expires_at": {
+            "type": "integer"
+          },
+          "pre_authorized_code": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$",
+            "description": "Confidential capability, stored only as a hash"
+          }
+        },
+        "required": [
+          "credential_offer_uri",
+          "expires_at",
+          "pre_authorized_code"
+        ]
+      },
+      "CredentialOffer": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "credential_issuer": {
+            "type": "string",
+            "format": "uri"
+          },
+          "credential_configuration_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "grants": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "pre-authorized_code": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_-]{43}$"
+                  }
+                },
+                "required": [
+                  "pre-authorized_code"
+                ]
+              }
+            },
+            "required": [
+              "urn:ietf:params:oauth:grant-type:pre-authorized_code"
+            ]
+          }
+        },
+        "required": [
+          "credential_issuer",
+          "credential_configuration_ids",
+          "grants"
+        ]
+      },
+      "IssuerTokenInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "grant_type": {
+            "const": "urn:ietf:params:oauth:grant-type:pre-authorized_code"
+          },
+          "pre-authorized_code": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          }
+        },
+        "required": [
+          "grant_type",
+          "pre-authorized_code"
+        ]
+      },
+      "IssuerTokenResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "token_type": {
+            "const": "Bearer"
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 300
+          }
+        },
+        "required": [
+          "access_token",
+          "token_type",
+          "expires_in"
+        ]
+      },
+      "IssuerNonce": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "c_nonce": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "c_nonce_expires_in": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 300
+          }
+        },
+        "required": [
+          "c_nonce",
+          "c_nonce_expires_in"
+        ]
+      },
+      "IssuerCredentialInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "credential_configuration_id": {
+            "type": "string"
+          },
+          "proofs": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "jwt": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 1,
+                "items": {
+                  "type": "string",
+                  "description": "openid4vci-proof+jwt ES256, aud configured issuer origin, actual nonce, bounded iat"
+                }
+              }
+            },
+            "required": [
+              "jwt"
+            ]
+          },
+          "holder_public_jwk": {
+            "type": "object",
+            "description": "Existing wallet wire public P-256 JWK; alternatively proof header jwk. If both exist their thumbprints must match. Private/unknown fields refused"
+          },
+          "wallet_instance_attestation": {
+            "type": "string",
+            "description": "Mandatory provider-signed wallet-instance-attestation+jwt, independent accredited provider pin, exact issuer audience and holder cnf"
+          }
+        },
+        "required": [
+          "credential_configuration_id",
+          "proofs",
+          "wallet_instance_attestation"
+        ]
+      },
+      "IssuerCredentialResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "credentials": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "credential": {
+                  "type": "string",
+                  "description": "Committed W3C vc+sd-jwt ES256 bytes; same original token/nonce/holder retry only, no new allocation"
+                }
+              },
+              "required": [
+                "credential"
+              ]
+            }
+          },
+          "x_credworks_renewal": {
+            "$ref": "#/components/schemas/IssuerRenewalReceipt"
+          }
+        },
+        "required": [
+          "credentials"
+        ]
+      },
+      "CreateEducationSession": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "profile": {
+            "type": "string",
+            "enum": [
+              "education_eligibility",
+              "education_sign_in"
+            ]
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "profile",
+          "interaction_id",
+          "purpose"
+        ]
+      },
+      "CreateScalarSession": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "profile": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,64}$",
+            "description": "Registered profile name for the explicitly selected configured scalar definition."
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "configuration_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,64}$",
+            "description": "Operator-configured immutable accepted definition. Does not authorize an issuer or caller-supplied claim paths."
+          }
+        },
+        "required": [
+          "profile",
+          "interaction_id",
+          "purpose",
+          "configuration_id"
+        ]
+      },
+      "ScalarClaims": {
+        "type": "object",
+        "minProperties": 1,
+        "maxProperties": 64,
+        "additionalProperties": {
+          "$ref": "#/components/schemas/StructuredValue"
+        },
+        "description": "Exact requested subject projection preserving nested hierarchy and types. Whole declared object/array values are copied intact only for an authorized exact path. Full paths distinguish identical leaf names. Core subject bound 65536 compact UTF-8 bytes, total depth 16 and 1024 nodes. Verified values are not an eligibility decision; existing scalar/Education shapes remain unchanged."
+      },
+      "ScalarEvidence": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "issuer_did": {
+            "type": "string"
+          },
+          "credential_type": {
+            "type": "string",
+            "maxLength": 128,
+            "not": {
+              "const": "UniversityEducationCredential"
+            }
+          },
+          "definition_id": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "Exact authenticated immutable definition identifier; sharing its name does not share issuer authority."
+          },
+          "definition_version": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._-]{1,64}$"
+          },
+          "profile": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,64}$"
+          },
+          "claim_paths": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 16
+            },
+            "minItems": 1,
+            "maxItems": 64,
+            "description": "Exact authenticated declared full paths. No dotted aliases, indices, wildcards or ancestor/descendant overlap."
+          },
+          "verifier_did": {
+            "type": "string"
+          },
+          "verifier_public_jwk_sha256_thumbprint": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "issuer_public_jwk_sha256_thumbprint": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "holder_public_jwk_sha256_thumbprint": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "verified_at": {
+            "type": "integer"
+          },
+          "expires_at": {
+            "type": "number",
+            "description": "Immutable minimum of original signed request expiry, issuer authority, scoped permission, credential validity, signed status and configured cache freshness. Current exact issuer grant/permission/status are checked again at consumption. Refresh cannot extend this deadline."
+          }
+        },
+        "required": [
+          "issuer_did",
+          "credential_type",
+          "definition_id",
+          "definition_version",
+          "profile",
+          "claim_paths",
+          "verifier_did",
+          "verifier_public_jwk_sha256_thumbprint",
+          "issuer_public_jwk_sha256_thumbprint",
+          "holder_public_jwk_sha256_thumbprint",
+          "verified_at",
+          "expires_at"
+        ]
+      },
+      "ScalarVerifiedResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "const": "verified"
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "claims": {
+            "$ref": "#/components/schemas/ScalarClaims"
+          },
+          "evidence": {
+            "$ref": "#/components/schemas/ScalarEvidence"
+          }
+        },
+        "required": [
+          "status",
+          "interaction_id",
+          "claims",
+          "evidence"
+        ]
+      },
+      "CredWorksScalarRequestExtension": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "CredWorks application extension in the signed OID4VP request; not standard OID4VP vocabulary and not a trust anchor. Resolve publication paths only against independently configured registry trust. Profile must equal the single DCQL credential id. Type and exact paths remain in DCQL.",
+        "properties": {
+          "credential_issuer_did": {
+            "type": "string"
+          },
+          "credential_issuer_key_id": {
+            "type": "string"
+          },
+          "definition_id": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "definition_version": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._-]{1,64}$"
+          },
+          "authorization_path": {
+            "type": "string",
+            "pattern": "^/issuer-authorizations/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.jwt$"
+          },
+          "permission_path": {
+            "type": "string",
+            "pattern": "^/scoped-verifier-permissions/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.jwt$"
+          },
+          "profile_name": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,64}$"
+          },
+          "credential_issuer_keys": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 64,
+            "description": "Unique exact issuer-owned IDs in ascending ordinal order; each pin is immutable and independently authenticated through exact signed issuer/definition verification-purpose authority. Distinct IDs may share a pin. Header kid is only a lookup hint.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "key_id",
+                "public_jwk_sha256_thumbprint"
+              ],
+              "properties": {
+                "key_id": {
+                  "type": "string",
+                  "description": "Exact credential_issuer_did plus # fragment matching [A-Za-z0-9._-]{1,128}."
+                },
+                "public_jwk_sha256_thumbprint": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{42}[AEIMQUYcgkosw048]$"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "credential_issuer_did",
+          "definition_id",
+          "definition_version",
+          "authorization_path",
+          "permission_path",
+          "profile_name"
+        ],
+        "oneOf": [
+          {
+            "required": [
+              "credential_issuer_key_id"
+            ],
+            "not": {
+              "required": [
+                "credential_issuer_keys"
+              ]
+            }
+          },
+          {
+            "required": [
+              "credential_issuer_keys"
+            ],
+            "not": {
+              "required": [
+                "credential_issuer_key_id"
+              ]
+            }
+          }
+        ]
+      },
+      "IssuerRevocationInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "state"
+        ],
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "revoked"
+            ]
+          }
+        }
+      },
+      "IssuerIssuanceStatus": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "issuance_id",
+          "credential_id",
+          "state",
+          "revoked_at",
+          "status_list_credential",
+          "status_list_index"
+        ],
+        "properties": {
+          "issuance_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{22}$"
+          },
+          "credential_id": {
+            "type": "string",
+            "format": "uri"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "active",
+              "revoked"
+            ]
+          },
+          "revoked_at": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "description": "Original transition Unix seconds. Null for active issuance or a legacy signed revocation whose time was never recorded."
+          },
+          "status_list_credential": {
+            "type": "string",
+            "format": "uri"
+          },
+          "status_list_index": {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          }
+        }
+      },
+      "StructuredValue": {
+        "description": "Supported typed JSON value. Rust enforces the authenticated definition, reserved keys, UTF-8 byte counts, safe numeric magnitude, whole-value completeness and total subject depth 16/nodes 1024/bytes 65536; this schema is documentation, not a second validator. Null is unsupported.",
+        "oneOf": [
+          {
+            "type": "string",
+            "maxLength": 1024
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "number",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          {
+            "type": "object",
+            "maxProperties": 64,
+            "patternProperties": {
+              "^[a-z][a-z0-9_]{0,63}$": {
+                "$ref": "#/components/schemas/StructuredValue"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "array",
+            "maxItems": 64,
+            "items": {
+              "$ref": "#/components/schemas/StructuredValue"
+            }
+          }
+        ]
+      },
+      "IssuerRenewalProof": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "proof_type": {
+            "type": "string",
+            "const": "jwt"
+          },
+          "jwt": {
+            "type": "string",
+            "description": "Existing core-verified holder proof, exact endpoint audience, fresh allocated nonce; max age 300 seconds and future skew 5 seconds."
+          }
+        },
+        "required": [
+          "proof_type",
+          "jwt"
+        ]
+      },
+      "IssuerRenewalInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "const": 1
+          },
+          "predecessor_issuance_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{22}$",
+            "description": "Exact existing committed offer/issuance ID in this issuer ledger. Holder and definition are derived from its authenticated signed credential; no caller-selected recipient."
+          },
+          "configuration_id": {
+            "type": "string",
+            "description": "Exact independently configured definition/version/authorization reference"
+          },
+          "claims": {
+            "type": "object",
+            "maxProperties": 64,
+            "additionalProperties": {
+              "$ref": "#/components/schemas/StructuredValue"
+            },
+            "description": "Complete subject checked by the existing Rust definition API. Required full paths, implicit containers, whole values, bounds and reserved names are enforced without coercion; unknown, null or incomplete values fail. Total subject max 65536 compact UTF-8 bytes/depth 16/nodes 1024."
+          },
+          "valid_from": {
+            "type": "integer",
+            "description": "Unix seconds, no future start"
+          },
+          "valid_until": {
+            "type": "integer",
+            "description": "Immutable credential deadline within authenticated definition lifetime"
+          },
+          "offer_expires_at": {
+            "type": "integer",
+            "description": "Immutable Unix deadline: now < expiry <= now+600 and <= valid_until"
+          }
+        },
+        "required": [
+          "version",
+          "predecessor_issuance_id",
+          "configuration_id",
+          "claims",
+          "valid_from",
+          "valid_until",
+          "offer_expires_at"
+        ]
+      },
+      "IssuerRenewalCreated": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "const": 1
+          },
+          "renewal_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{22}$"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "awaiting_holder",
+              "awaiting_receipt",
+              "retiring",
+              "completed",
+              "cancelled",
+              "expired"
+            ]
+          },
+          "renewal_request_uri": {
+            "type": "string",
+            "description": "Confidential same-origin request URL with read capability. Identical management retry returns this original operation, including its current phase.",
+            "format": "uri"
+          },
+          "expires_at": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "renewal_id",
+          "status",
+          "renewal_request_uri",
+          "expires_at"
+        ]
+      },
+      "IssuerRenewalRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "const": 1
+          },
+          "renewal_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{22}$"
+          },
+          "credential_issuer": {
+            "type": "string",
+            "description": "Configured issuer origin.",
+            "format": "uri"
+          },
+          "configuration_id": {
+            "type": "string"
+          },
+          "definition": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              },
+              "credential_type": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "version",
+              "credential_type"
+            ]
+          },
+          "predecessor": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "credential_id": {
+                "type": "string",
+                "format": "uri"
+              },
+              "status_list_credential": {
+                "type": "string",
+                "format": "uri"
+              },
+              "status_list_index": {
+                "type": "string",
+                "pattern": "^[0-9]+$"
+              },
+              "status_purpose": {
+                "type": "string",
+                "const": "revocation"
+              }
+            },
+            "required": [
+              "credential_id",
+              "status_list_credential",
+              "status_list_index",
+              "status_purpose"
+            ]
+          },
+          "claims": {
+            "type": "object",
+            "maxProperties": 64,
+            "additionalProperties": {
+              "$ref": "#/components/schemas/StructuredValue"
+            },
+            "description": "Complete subject checked by the existing Rust definition API. Required full paths, implicit containers, whole values, bounds and reserved names are enforced without coercion; unknown, null or incomplete values fail. Total subject max 65536 compact UTF-8 bytes/depth 16/nodes 1024."
+          },
+          "valid_from": {
+            "type": "integer"
+          },
+          "valid_until": {
+            "type": "integer"
+          },
+          "expires_at": {
+            "type": "integer"
+          },
+          "authorize_uri": {
+            "type": "string",
+            "format": "uri"
+          },
+          "cancel_uri": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "version",
+          "renewal_id",
+          "credential_issuer",
+          "configuration_id",
+          "definition",
+          "predecessor",
+          "claims",
+          "valid_from",
+          "valid_until",
+          "expires_at",
+          "authorize_uri",
+          "cancel_uri"
+        ]
+      },
+      "IssuerRenewalAuthorizeInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "const": 1
+          },
+          "capability": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "proof": {
+            "$ref": "#/components/schemas/IssuerRenewalProof"
+          }
+        },
+        "required": [
+          "version",
+          "capability",
+          "proof"
+        ]
+      },
+      "IssuerRenewalAuthorized": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "const": 1
+          },
+          "renewal_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{22}$"
+          },
+          "credential_offer_uri": {
+            "type": "string",
+            "format": "uri",
+            "description": "Confidential retrievable bearer capability; no logging/referrers"
+          },
+          "expires_at": {
+            "type": "integer"
+          },
+          "pre_authorized_code": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$",
+            "description": "Confidential capability, stored only as a hash"
+          }
+        },
+        "required": [
+          "version",
+          "renewal_id",
+          "credential_offer_uri",
+          "expires_at",
+          "pre_authorized_code"
+        ]
+      },
+      "IssuerRenewalOperationInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "const": 1
+          },
+          "proof": {
+            "$ref": "#/components/schemas/IssuerRenewalProof"
+          }
+        },
+        "required": [
+          "version",
+          "proof"
+        ]
+      },
+      "IssuerRenewalConfirmInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "const": 1
+          },
+          "event": {
+            "type": "string",
+            "const": "credential_accepted"
+          },
+          "proof": {
+            "$ref": "#/components/schemas/IssuerRenewalProof"
+          }
+        },
+        "required": [
+          "version",
+          "event",
+          "proof"
+        ]
+      },
+      "IssuerRenewalResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "const": 1
+          },
+          "renewal_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{22}$"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "awaiting_holder",
+              "awaiting_receipt",
+              "retiring",
+              "completed",
+              "cancelled",
+              "expired"
+            ]
+          },
+          "predecessor_credential_id": {
+            "type": "string",
+            "format": "uri"
+          },
+          "successor_credential_id": {
+            "type": "string",
+            "format": "uri"
+          },
+          "receipt_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "confirmed_at": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Persisted holder confirmation Unix seconds, or null."
+          },
+          "completed_at": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Persisted retirement completion Unix seconds, or null."
+          }
+        },
+        "required": [
+          "version",
+          "renewal_id",
+          "status",
+          "predecessor_credential_id",
+          "confirmed_at",
+          "completed_at"
+        ]
+      },
+      "IssuerRenewalReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "const": 1
+          },
+          "renewal_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{22}$"
+          },
+          "predecessor_credential_id": {
+            "type": "string",
+            "format": "uri"
+          },
+          "successor_credential_id": {
+            "type": "string",
+            "format": "uri"
+          },
+          "receipt_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "status": {
+            "type": "string",
+            "const": "pending_confirmation"
+          },
+          "confirm_uri": {
+            "type": "string",
+            "description": "Exact canonical same-origin receipt/successor endpoint; holder proof audience must equal this entire URI.",
+            "format": "uri"
+          },
+          "status_uri": {
+            "type": "string",
+            "format": "uri"
+          },
+          "cancel_uri": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "version",
+          "renewal_id",
+          "predecessor_credential_id",
+          "successor_credential_id",
+          "receipt_id",
+          "status",
+          "confirm_uri",
+          "status_uri",
+          "cancel_uri"
+        ],
+        "description": "Versioned application extension, not standard OID4VCI notification. Verify exact signed predecessor/successor identities and durably save successor plus pending confirmation before the holder signs credential_accepted. Receipt alone grants no authority."
+      },
+      "IssuerKeyStageInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expected_revision",
+          "project_id",
+          "issuer_registration_id",
+          "expected_registry_revision",
+          "key_fragment"
+        ],
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "project_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "issuer_registration_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "expected_registry_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "key_fragment": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._-]{1,128}$"
+          }
+        }
+      },
+      "IssuerKeySelectionInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expected_revision",
+          "key_id"
+        ],
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "key_id": {
+            "type": "string",
+            "description": "Exact immutable issuer DID plus a never-reused fragment."
+          }
+        }
+      },
+      "IssuerKeyChallenge": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "issuer_registration_id",
+          "expected_revision",
+          "key_id",
+          "proof_key_id",
+          "challenge_id",
+          "nonce",
+          "audience",
+          "expires_at"
+        ],
+        "properties": {
+          "operation": {
+            "const": "rotate"
+          },
+          "issuer_registration_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "key_id": {
+            "type": "string",
+            "description": "Exact immutable issuer DID plus a never-reused fragment."
+          },
+          "proof_key_id": {
+            "type": "string",
+            "description": "Exact immutable issuer DID plus a never-reused fragment."
+          },
+          "challenge_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "nonce": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "audience": {
+            "type": "string",
+            "format": "uri"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "IssuerKeyProofInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expected_revision",
+          "challenge"
+        ],
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "challenge": {
+            "$ref": "#/components/schemas/IssuerKeyChallenge"
+          }
+        }
+      },
+      "IssuerKeyState": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "revision",
+          "selected_key_id",
+          "credential_keys",
+          "pending"
+        ],
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "selected_key_id": {
+            "type": "string",
+            "description": "Exact immutable issuer DID plus a never-reused fragment."
+          },
+          "credential_keys": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 64,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "key_id",
+                "public_jwk",
+                "public_jwk_sha256_thumbprint",
+                "abandoned"
+              ],
+              "properties": {
+                "key_id": {
+                  "type": "string",
+                  "description": "Exact immutable issuer DID plus a never-reused fragment."
+                },
+                "public_jwk": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "description": "Immutable public P-256 JWK; null for an unpublished preparing or abandoned attempt."
+                },
+                "public_jwk_sha256_thumbprint": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "pattern": "^[A-Za-z0-9_-]{43}$"
+                },
+                "abandoned": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "pending": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "phase",
+                  "key_id",
+                  "expected_revision",
+                  "project_id",
+                  "issuer_registration_id",
+                  "expected_registry_revision",
+                  "key_fragment"
+                ],
+                "properties": {
+                  "phase": {
+                    "enum": [
+                      "preparing",
+                      "staged"
+                    ]
+                  },
+                  "key_id": {
+                    "type": "string",
+                    "description": "Exact immutable issuer DID plus a never-reused fragment."
+                  },
+                  "expected_revision": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  },
+                  "project_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  "issuer_registration_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  "expected_registry_revision": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  },
+                  "key_fragment": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9._-]{1,128}$"
+                  }
+                }
+              }
+            ]
+          }
+        }
       }
     }
   }

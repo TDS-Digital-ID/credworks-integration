@@ -1,0 +1,27 @@
+{
+  "databaseUrl": "postgres://credworks:REPLACE_WITH_SECRET@issuer-db:5432/partner_issuer",
+  "registryOrigin": "https://registry.example",
+  "registryDid": "did:web:registry.example",
+  "trustAnchorJwk": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "REPLACE_WITH_AUTHENTICATED_PUBLIC_X",
+    "y": "REPLACE_WITH_AUTHENTICATED_PUBLIC_Y"
+  },
+  "definitions": [
+    {
+      "configurationId": "membership-v1",
+      "authorizationId": "00000000-0000-0000-0000-000000000000",
+      "definitionId": "https://partner.example/definitions/membership",
+      "definitionVersion": "1",
+      "credentialType": "PartnerMembership"
+    }
+  ],
+  "walletProviderDid": "did:web:wallet-provider.example",
+  "walletProviderJwk": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "REPLACE_WITH_AUTHENTICATED_PUBLIC_X",
+    "y": "REPLACE_WITH_AUTHENTICATED_PUBLIC_Y"
+  }
+}

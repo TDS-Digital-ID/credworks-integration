@@ -1,12 +1,13 @@
-# CredWorks Education integration kit
+# CredWorks integration kit
 
-Experimental preview. Project-owned code is [Apache-2.0](LICENSE).
-Read [distribution status and limitations](DISTRIBUTION.md) before selecting an artifact.
-Before installing the separate wallet APK, read its [scanning privacy notice](ANDROID-PRIVACY.md).
+Project code is licensed under [Apache-2.0](LICENSE); third-party notices remain in force.
+Read the [distribution status and limits](DISTRIBUTION.md) before selecting an artifact.
 
-The [canonical Education integration guide](docs/education/overview.md) covers setup, profiles, API, operations and preparation limits.
+The [canonical partner integration guide](docs/partner/overview.md) covers generic setup, definitions, HTTP APIs and lifecycle operations on the revision-pinned #408 source. Start there for the configurable issuer/verifier kit. Both repositories remain private; physical and public release checks remain NOT RUN.
 
-This standalone kit exports completed Education source from
+The existing Education instructions below retain their original frozen source scope. The [canonical Education integration guide](docs/education/overview.md) covers setup, profiles, API, operations and preparation limits.
+
+This private kit exports completed Education source from
 `TDS-Digital-ID/university-vc-monorepo` at
 `14096ed41ee259e81414fcfa0c3b2ad622a5b426`. It supports Education sign-in and
 identifier-free eligibility. It does not distribute an issuer service, a wallet APK,
