@@ -2,6 +2,38 @@
 
 These commands are a runbook. #389 executes the complete clean operational/tunnel candidate; this page does not claim it has run. Use a fresh kit checkout, the toolchain in the [compatibility table](overview.md#compatibility-and-availability), PostgreSQL for a dedicated application database, OpenSSL, Caddy, and cloudflared for the optional named tunnel. Install CLI packages through your platform package manager. Container use also requires an initialized Docker runtime. OS trust, elevation or account prompts require the operator.
 
+## Published CredWorks sandbox configuration
+
+Use the [versioned sandbox configuration](../../config/credworks-sandbox-20261011.json) for the public CredWorks preview. It supplies public origins, issuer/provider keys, the independent registry root, signed status sources and the Education institution policy. It contains no project credentials or partner keys. Your own HTTPS origins, database, runtime secrets and persistent identities remain operator prerequisites.
+
+Acquire this file from a full commit of the public `TDS-Digital-ID/credworks-integration` repository authenticated through your trusted GitHub account or release handoff. Record the commit and verify the file's SHA-256 against the value below. Do not acquire your root key from the runtime registry and then use that key to authenticate the same registry. The checksum detects changes; trust in the publisher supplies the initial authority.
+
+```sh
+# Set the full public commit supplied by the authenticated handoff.
+REVISION=${PUBLIC_SOURCE_REVISION:?set the authenticated full public commit}
+curl --fail --silent --show-error --proto '=https' \
+  "https://raw.githubusercontent.com/TDS-Digital-ID/credworks-integration/$REVISION/config/credworks-sandbox-20261011.json" \
+  -o credworks-sandbox-20261011.json
+shasum -a 256 credworks-sandbox-20261011.json
+```
+
+Expected SHA-256: `554b1a092b30b888b243c47ee22f526fa573f51322ac9972549774288314c096`.
+
+The configuration records the operator's independent host inspection and matching Release A/B APK checksums. Both APKs compile the same registry public-key coordinates and service origins. Their compiled JWK has a legacy fixture `kid`; the wallet derives registry identity separately from its configured origin. The published registry key uses the actual live key ID. Issuer/provider keys were checked against the authenticated host and signed accreditation, not claimed as independently compiled APK pins.
+
+This is a dated configuration for the existing preview, not a permanent trust-update service. Before use, check that the selected release still names these origins and key coordinates. Follow signed evidence freshness checks normally. On changed keys, withdrawn authority, stale evidence or unavailable services, stop and obtain a reviewed replacement configuration from the authenticated publisher. Do not automatically adopt keys from a live DID response, replace an identity, or extend an evidence deadline. New origins or wallet pins require a new candidate and affected checks.
+
+Map the published values into the protected files below:
+
+| Consumer | Published values |
+|---|---|
+| `register.json` | `registryOrigin`, `registryDid`, `trustAnchorJwk`; use `education.issuerDid` as `educationIssuerDid` |
+| Verifier JSON | `education.issuerDid` as `issuerDid`, `education.issuerJwk` as `issuerJwk`, `registryOrigin`, `trustAnchorJwk`, all `education.statusSources`; keep `maxCacheAgeSeconds` at 300 |
+| App environment | `education.issuerDid` as `EDUCATION_TRUSTED_ISSUER`, `education.institution` as `EDUCATION_INSTITUTION`; derive `EDUCATION_VERIFIER_DID` from your own runtime's published DID |
+| `education-http.json` | `registryOrigin`, `registryDid`, `trustAnchorJwk`, `portalOrigin`, `providerOrigin`; map `government.issuerDid` and `education.issuerDid` to the corresponding issuer DID fields |
+
+Keep your own runtime/app origins, loopback management address, management token and disposable holder state in protected operator files. The public configuration does not grant partner authority. Registration and signed permissions below are still required.
+
 ## Build and protect state
 
 ```sh

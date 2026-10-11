@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "observedAt": "2026-10-11T09:11:19.607Z",
+  "registryOrigin": "https://trust.credworks.xyz",
+  "registryDid": "did:web:trust.credworks.xyz",
+  "trustAnchorJwk": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "9Es5dZoubbcjpvkCSZct_QjpU4Dx_KRw6s0dA-Xt8hQ",
+    "y": "vvr8zyI8oGXwoNtO6pP_BqIRb8qB96SpQ2qNkXoC3t4",
+    "kid": "did:web:trust.credworks.xyz#trust-anchor-1"
+  },
+  "portalOrigin": "https://issuer-portal.credworks.xyz",
+  "providerOrigin": "https://wallet-provider-unsw.credworks.xyz",
+  "providerDid": "did:web:wallet-provider-unsw.credworks.xyz",
+  "providerJwk": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "OHHy_xO-Zx43QNUZHf-ZrxlrETgrXhp_ydgDZo4zA7s",
+    "y": "WOcityPNKG4C5jWruWGifWMmHlmOSgQY4nYGls5a7WI",
+    "kid": "did:web:wallet-provider-unsw.credworks.xyz#wia-1"
+  },
+  "education": {
+    "issuerDid": "did:web:issuer-unsw.credworks.xyz",
+    "issuerJwk": {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "axfR8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpY",
+      "y": "T-NC4v4af5uO5-tKfA-eFivOM1drMV7Oy7ZAaDe_UfU",
+      "kid": "did:web:issuer-unsw.credworks.xyz#issuer-1"
+    },
+    "statusSources": [
+      {
+        "url": "https://status.credworks.xyz/status/student/revocation/1.jwt",
+        "purpose": "revocation",
+        "publicJwk": {
+          "kty": "EC",
+          "crv": "P-256",
+          "x": "axfR8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpY",
+          "y": "T-NC4v4af5uO5-tKfA-eFivOM1drMV7Oy7ZAaDe_UfU",
+          "kid": "did:web:issuer-unsw.credworks.xyz#issuer-1"
+        }
+      },
+      {
+        "url": "https://status.credworks.xyz/status/student/suspension/1.jwt",
+        "purpose": "suspension",
+        "publicJwk": {
+          "kty": "EC",
+          "crv": "P-256",
+          "x": "axfR8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpY",
+          "y": "T-NC4v4af5uO5-tKfA-eFivOM1drMV7Oy7ZAaDe_UfU",
+          "kid": "did:web:issuer-unsw.credworks.xyz#issuer-1"
+        }
+      }
+    ],
+    "institution": "unsw.edu.au"
+  },
+  "government": {
+    "issuerDid": "did:web:identity-gov.credworks.xyz",
+    "issuerJwk": {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "UVkLelFRQNLXhMhWCGaP3--Mgv0fW-UkIVVKDcPQM-0",
+      "y": "4MF9qJBKcn2K4b82v4p5Jg0BLwDU2AiI0dC7RP2hbaQ",
+      "kid": "did:web:identity-gov.credworks.xyz#issuer-1"
+    },
+    "statusSources": [
+      {
+        "url": "https://status.credworks.xyz/status/governmentIdentity/revocation/1.jwt",
+        "purpose": "revocation",
+        "publicJwk": {
+          "kty": "EC",
+          "crv": "P-256",
+          "x": "UVkLelFRQNLXhMhWCGaP3--Mgv0fW-UkIVVKDcPQM-0",
+          "y": "4MF9qJBKcn2K4b82v4p5Jg0BLwDU2AiI0dC7RP2hbaQ",
+          "kid": "did:web:identity-gov.credworks.xyz#issuer-1"
+        }
+      }
+    ]
+  },
+  "provenance": {
+    "centralSourceRevision": "dcdba3168cad39155b99c8211bea9caf119c1709",
+    "centralSchemaDigest": "20821decf375f12c873d72a8dc63e31b5e3e3317eb36c10ed6d92a45afa4e298",
+    "centralImageId": "sha256:5ba87bde84937572957b56992fe00366405ca18b218ec66a93281cf6403db782",
+    "method": "Operator authenticated the existing deployment through its previously pinned SSH host identity; public HTTPS identities were compared with the authenticated local service observations. The root cryptographic material was also compared with the independently recorded signed APK build inputs. Existing identity-core verified signed trust-list accreditation and status evidence at observedAt. This is an observation, not a future freshness guarantee.",
+    "institutionSource": "apps/issuer-portal/src/synthetic-education.ts at centralSourceRevision; agrees with the preserved Education operator policy",
+    "candidateArtifacts": [
+      {
+        "candidate": "education",
+        "sourceRevision": "9130db0e727490857bebeef64b74cec19ee9297e",
+        "apk": "9130db0-buildprod-release.apk",
+        "apkSha256": "5cd346c07c51cafa17eda3b2d28f41df0c960beeac1583a8beebe25784e4cee7",
+        "certificateSha256": "6f34aeeb67c9e2f4f9d7611e25241f9277513d6787e49f883e54987817f8bf07",
+        "inputSha256": {
+          "apps/wallet/lib/pinned_trust_anchor.dart": "c9fabdb89228e06be8aee072f6aac65b482408ac0a14b858a639aa9fce5cb55f",
+          "apps/wallet/lib/wallet_environment_hosts.g.dart": "8b71130239fd60a3f7e32005591337cea45bb1970e99c894de0d79537a505f6e"
+        }
+      },
+      {
+        "candidate": "generic",
+        "sourceRevision": "17c6d60b3196c40f6500adc391c6610ba5d52a89",
+        "apk": "17c6d60-buildprod-release.apk",
+        "apkSha256": "5d4e556e17b1b58443ccebd969e2e85d64296863ef4df18999fb14ae6b063fcc",
+        "certificateSha256": "6f34aeeb67c9e2f4f9d7611e25241f9277513d6787e49f883e54987817f8bf07",
+        "inputSha256": {
+          "apps/wallet/lib/pinned_trust_anchor.dart": "c9fabdb89228e06be8aee072f6aac65b482408ac0a14b858a639aa9fce5cb55f",
+          "apps/wallet/lib/wallet_environment_hosts.g.dart": "8b71130239fd60a3f7e32005591337cea45bb1970e99c894de0d79537a505f6e"
+        }
+      }
+    ]
+  },
+  "compatibility": {
+    "rootCryptographicMaterialMatchesBothCandidates": true,
+    "compiledRootKid": "did:web:trust.operator.example.invalid#trust-anchor-1",
+    "rootKidLabelMatches": false,
+    "rootKidExplanation": "The compiled source retains a legacy fixture kid label. Its kty/crv/x/y match the deployed root. The wallet derives the registry DID from its independently configured registry origin, not that fixture label. This configuration uses the deployed key identifier; no key was rotated.",
+    "providerAndIssuerKeysAreCompiledPins": false,
+    "providerAndIssuerKeyProvenance": "Authenticated operator deployment observations, matching public HTTPS DID documents and root-verified current accreditation; these individual keys are not APK-compiled pins.",
+    "scope": "Existing sandbox identities and endpoints only. No production identity assurance or physical acceptance is established by this configuration."
+  }
+}

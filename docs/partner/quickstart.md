@@ -23,6 +23,14 @@ docker build --build-arg SOURCE_REVISION="$REVISION" -f apps/partner-runtime/Doc
 docker image inspect "credworks-partner:git-$REVISION" --format '{{.Id}} {{index .Config.Labels "org.opencontainers.image.revision"}}'
 ```
 
+## Published CredWorks sandbox configuration
+
+Acquire and authenticate the [versioned public configuration](../../config/credworks-sandbox-20261011.json) using the [Education setup instructions](../education/quickstart.md#published-credworks-sandbox-configuration). Those instructions include its checksum, provenance, compatible APKs and rotation rules. This supplies the existing CredWorks registry and provider values without access to a private repository or operator configuration.
+
+Use `registryOrigin`, `registryDid` and `trustAnchorJwk` in registration, issuer, verifier and host-driver configuration. Map `providerDid` and `providerJwk` to the issuer's `walletProviderDid` and `walletProviderJwk`; the host driver uses `providerOrigin`, `providerDid` and `providerJwk` directly. Generic verifier status sources and issuer keys must come from your newly established partner issuer, not the Education issuer in this file. Your returned adoption/permission IDs, definitions, own HTTPS origins and protected runtime/database credentials remain distinct inputs established below.
+
+For a disposable host-only run, the [quick-tunnel procedure](../education/quickstart.md#disposable-quick-tunnel-candidate) also applies to two separate generic issuer/verifier gateways with the finite route lists below. Keep both processes and origins unchanged for the whole run. Preserve failed state; a replacement hostname needs a new explicit identity and registration. This does not establish phone acceptance.
+
 ## Bootstrap distinct identities
 
 Do this separately for issuer and verifier with distinct state, unlock secret, management token and origin. Inject protected secrets from operator storage. `PARTNER_UNLOCK_KEY` is exactly 32 random bytes in unpadded base64url; the management token is at least 32 bytes. Preserve both for replacement. Set the issuer/verifier public and management ports to different values if sharing a host.

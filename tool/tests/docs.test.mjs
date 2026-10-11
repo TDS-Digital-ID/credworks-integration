@@ -1,10 +1,11 @@
+import { createHash } from 'node:crypto';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { cpSync, mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-const linkedSources=['provenance/GENERIC-TRANSFORMS.md','provenance/GENERIC-ACCEPTANCE.md','apps/partner-runtime/examples','infra/partner','infra/partner-issuer','tool/generic-http.ts'];
+const linkedSources=['config/credworks-sandbox-20261011.json','provenance/GENERIC-TRANSFORMS.md','provenance/GENERIC-ACCEPTANCE.md','apps/partner-runtime/examples','infra/partner','infra/partner-issuer','tool/generic-http.ts'];
 const run=(root)=>execFileSync(process.execPath,['tool/check-docs.mjs','--root',root],{encoding:'utf8',stdio:['ignore','pipe','pipe']});
 test('canonical docs validate real OpenAPI contracts and refuse broken source links',()=>{
  const root=mkdtempSync(join(tmpdir(),'education-docs-'));
@@ -84,4 +85,33 @@ test('standalone entry points refuse missing local targets',()=>{
   writeFileSync(readme,readFileSync(readme,'utf8')+'\n[Missing runbook](../../docs/partner/scalar-issuer.md)\n');
   assert.throws(()=>run(root),e=>e.stderr.includes('DOCS_LINK_INVALID'));
  } finally { rmSync(root,{recursive:true,force:true}); }
+});
+
+test('published sandbox configuration is public-only and matches its documented checksum',()=>{
+ const bytes=readFileSync('config/credworks-sandbox-20261011.json');
+ const config=JSON.parse(bytes);
+ assert.deepEqual(Object.keys(config).sort(),['version','observedAt','registryOrigin','registryDid','trustAnchorJwk','portalOrigin','providerOrigin','providerDid','providerJwk','education','government','provenance','compatibility'].sort());
+ const key=jwk=>{
+  assert.deepEqual(Object.keys(jwk).sort(),['crv','kid','kty','x','y']);
+  assert.equal(jwk.kty,'EC'); assert.equal(jwk.crv,'P-256');
+  for(const coordinate of [jwk.x,jwk.y]) assert.match(coordinate,/^[A-Za-z0-9_-]{43}$/);
+ };
+ for(const jwk of [config.trustAnchorJwk,config.providerJwk]) key(jwk);
+ for(const name of ['registryOrigin','portalOrigin','providerOrigin']) {
+  const url=new URL(config[name]);
+  assert.equal(url.protocol,'https:'); assert.equal(url.origin,config[name]);
+ }
+ assert.equal(config.registryDid,'did:web:'+new URL(config.registryOrigin).host);
+ assert.equal(config.providerDid,'did:web:'+new URL(config.providerOrigin).host);
+ for(const role of ['education','government']) {
+  const issuer=config[role];
+  assert.deepEqual(Object.keys(issuer).sort(),(role==='education'?['institution','issuerDid','issuerJwk','statusSources']:['issuerDid','issuerJwk','statusSources']).sort());
+  key(issuer.issuerJwk); assert(issuer.issuerJwk.kid.startsWith(issuer.issuerDid+'#'));
+  assert.deepEqual(issuer.statusSources.map(s=>s.purpose).sort(),role==='education'?['revocation','suspension']:['revocation']);
+  for(const status of issuer.statusSources) {
+   assert.deepEqual(Object.keys(status).sort(),['publicJwk','purpose','url']); key(status.publicJwk);
+   const url=new URL(status.url); assert.equal(url.protocol,'https:'); assert(!url.username&&!url.password&&!url.search&&!url.hash);
+  }
+ }
+ assert(readFileSync('docs/education/quickstart.md','utf8').includes(createHash('sha256').update(bytes).digest('hex')));
 });
