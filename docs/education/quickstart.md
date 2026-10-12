@@ -1,6 +1,6 @@
 # Setup and registration
 
-These commands are a runbook. #389 executes the complete clean operational/tunnel candidate; this page does not claim it has run. Use a fresh kit checkout, the toolchain in the [compatibility table](overview.md#compatibility-and-availability), PostgreSQL for a dedicated application database, OpenSSL, Caddy, and cloudflared for the optional named tunnel. Install CLI packages through your platform package manager. Container use also requires an initialized Docker runtime. OS trust, elevation or account prompts require the operator.
+These commands are a runbook, not evidence that a particular deployment has passed acceptance. Use a fresh kit checkout, the toolchain in the [compatibility table](overview.md#compatibility-and-availability), PostgreSQL for a dedicated application database, OpenSSL, Caddy, and cloudflared for the optional named tunnel. Install CLI packages through your platform package manager. Container use also requires an initialized Docker runtime. OS trust, elevation or account prompts require the operator.
 
 ## Published CredWorks sandbox configuration
 
@@ -158,7 +158,7 @@ The explicit empty config prevents an existing `~/.cloudflared/config.yml` from 
 
 Use the Caddy route lists above with runtime site address `http://partner-candidate.local:8080` and app site address `http://app-candidate.local:8081`. Retain `bind 127.0.0.1` and all finite matchers. The host-header flags select those internal proxy sites only; signed public origins remain the actual HTTPS tunnel hostnames. Set PARTNER_ORIGIN and EDUCATION_APP_ORIGIN to those observed origins before bootstrap, and use the same origins in registration, app config and driver config. Do not invent a hostname or replace a signed ecosystem URL with it.
 
-Use a fresh disposable protected state directory and database. Keep the same tunnel processes/origins alive through registration and identity-only → verifier restart. If a tunnel origin changes or a step fails, preserve state and logs for diagnosis; never restart that identity under a replacement hostname. A new tunnel identity needs distinct explicit bootstrap/registration. #389 records observed tunnel routing and management refusal; these commands alone are not execution evidence. Public runtime reachability, mapped fixture ecosystem transport, mock WIA and physical authorization require separate evidence labels.
+Use a fresh disposable protected state directory and database. Keep the same tunnel processes/origins alive through registration and identity-only → verifier restart. If a tunnel origin changes or a step fails, preserve state and logs for diagnosis; never restart that identity under a replacement hostname. A new tunnel identity needs distinct explicit bootstrap/registration. Record observed tunnel routing and management refusal separately; these commands alone are not execution evidence. Public runtime reachability, mapped fixture ecosystem transport, mock WIA and physical authorization require separate evidence labels.
 
 ## Bootstrap, register, configure and restart
 

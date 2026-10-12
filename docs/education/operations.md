@@ -45,7 +45,7 @@ EDUCATION_APP_DATABASE_URL="$TEST_APP_DATABASE_URL" EDUCATION_APP_TEST_PORT=3882
 PARTNER_SESSION_HTTP_PORT=38810 PARTNER_EVIDENCE_HTTP_PORT=38812 pnpm test:fixtures
 ```
 
-Missing opt-in database/container variables skip their checks and are not acceptance evidence. The real runtime/session suites cover wrong signature/holder/audience/nonce/state, expiry, exact scope, replay/concurrent result consumption, stale/withdrawn authority and revoked evidence. The standalone browser HTTP suite checks secure cookies, missing browser authentication, CSRF and unsupported profiles. The acceptance driver separately checks another-browser completion and account continuity. Incorrect policy values and the complete operational negative matrix require the existing ecosystem/runtime/application acceptance suites in #389; this kit command alone does not establish those observations. To verify local ingress separation without credentials:
+Missing opt-in database/container variables skip their checks and are not acceptance evidence. The real runtime/session suites cover wrong signature/holder/audience/nonce/state, expiry, exact scope, replay/concurrent result consumption, stale/withdrawn authority and revoked evidence. The standalone browser HTTP suite checks secure cookies, missing browser authentication, CSRF and unsupported profiles. The acceptance driver separately checks another-browser completion and account continuity. Incorrect policy values and the complete operational negative matrix require the existing ecosystem/runtime/application acceptance suites; this kit command alone does not establish those observations. To verify local ingress separation without credentials:
 
 ```sh
 curl --fail https://partner.example.org/.well-known/did.json
@@ -53,7 +53,7 @@ curl -s -o /dev/null -w '%{http_code}\n' https://partner.example.org/management/
 # Expect 404 from default-deny ingress; never 200 or a management result.
 ```
 
-The [acceptance driver](quickstart.md#synthetic-onboarding-and-acceptance) exercises actual public HTTP synthetic issuance and presentation. These checks do not establish physical phone authorization or public tunnel availability. #389 records the full clean run and exact artifact combination separately.
+The [acceptance driver](quickstart.md#synthetic-onboarding-and-acceptance) exercises actual public HTTP synthetic issuance and presentation. These checks do not establish physical phone authorization or public tunnel availability. Record the full clean run and exact artifact combination separately.
 
 ## Install, update and recovery
 
@@ -72,4 +72,4 @@ Before replacement stop the runtime, back up the entire 0700 identity directory 
 
 Signing identity and application account mappings persist. Runtime sessions/results/evidence cache, browser sessions and interactions are ephemeral; restart logs browsers out and requires fresh ceremonies/evidence. No high availability or production custody assurance is claimed. The production addon excludes deterministic fixture installers; fixture-native output is separate test material.
 
-#389 supplies the exact Android candidate revision/checksum/package/certificate. Verify those before installation, use the documented buildprod artifact, and retain existing holder state. A debug certificate is not a protected release signature and cannot establish upgrade compatibility with a differently signed installed app. Do not uninstall to disguise an upgrade failure. Protected release signing, actual installation/update, genuine holder prompt, accessibility and public reachability remain NOT RUN under #338. Public iOS and broad external-wallet interoperability are unsupported.
+Verify the selected Android artifact’s source revision, checksum, package and signing certificate before installation, use the documented buildprod artifact, and retain existing holder state. A debug certificate is not a protected release signature and cannot establish upgrade compatibility with a differently signed installed app. Do not uninstall to disguise an upgrade failure. These HTTP checks do not establish release-signing provenance, physical installation/update, genuine holder authorization, accessibility or phone reachability. Public iOS and broad external-wallet interoperability are unsupported.

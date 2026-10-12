@@ -79,7 +79,7 @@ A DB snapshot alone cannot make a concurrently copied identity consistent. Keep 
 
 Restore into new empty DB/volume resources, preserve original archives and fence the original deployment. Refuse an existing destination rather than erasing it. Restore ownership/modes, the entire DB, config and matching unlock secrets. Private DB address may change; public origin/DID/pins cannot. Start the same immutable image first with `start`. Never run `bootstrap` or `bootstrap-issuer` on restored established state.
 
-For compatible upgrades take another stopped-writer backup, apply only bundled forward migrations through `db:migrate` or the container migration command in [setup](quickstart.md#compose-alternative), then launch the exact new image. Migration history is `partner_runtime_migrations.issuer_migrations`. #408 checked the specific prior kit image source 95a9da7a73d9fe2c2f1e414607ec76e8c586b316 to f632ec5caf8d917304501ad038b2aceef1e46bae, including whole-state/retained-key restoration. This is evidence for that pair, not arbitrary upgrades or downgrades.
+For compatible upgrades take another stopped-writer backup, apply only bundled forward migrations through `db:migrate` or the container migration command in [setup](quickstart.md#compose-alternative), then launch the exact new image. Migration history is `partner_runtime_migrations.issuer_migrations`. Earlier upgrade checks covered the specific prior kit image source 95a9da7a73d9fe2c2f1e414607ec76e8c586b316 to f632ec5caf8d917304501ad038b2aceef1e46bae, including whole-state/retained-key restoration. This is evidence for that pair, not arbitrary upgrades or downgrades.
 
 Compare public DID and protected key inventory against the captured generation. Fetch fresh signed evidence, start new sessions and check retained/current credentials, exact revoked instances, consumed authorization and pending/completed renewals before switching traffic. Positive caches/sessions/results are ephemeral. A healthy port is insufficient. Keep staged minting paused until normal signed activation authority permits it.
 
@@ -96,7 +96,7 @@ cargo +1.92.0 test --locked --package identity-core
 pnpm acceptance:generic /absolute/private/generic.json /absolute/private/input.json
 ```
 
-Use disposable test databases/isolated ports and the opt-in variables required by the existing suites. Missing opt-in container/database variables cause explicit skips, not acceptance. `pnpm check` is the full kit docs/type/boundary/fixture gate; acceptance against independently configured services is a separate command with no skip path. #410 owns the final two-definition lifecycle, status, receipt, key-history, negative/recovery and Android candidate inventory. A host software-holder check does not establish physical/public setup.
+Use disposable test databases/isolated ports and the opt-in variables required by the existing suites. Missing opt-in container/database variables cause explicit skips, not acceptance. `pnpm check` is the full kit docs/type/boundary/fixture gate; acceptance against independently configured services is a separate command with no skip path. Complete acceptance covers the two-definition lifecycle, status, receipt, key history, negative/recovery checks and the Android candidate inventory. A host software-holder check does not establish physical/public setup.
 
 | Stable refusal | Action |
 | --- | --- |
@@ -115,4 +115,4 @@ Use disposable test databases/isolated ports and the opt-in variables required b
 | TOKEN_DELIVERY_UNCERTAIN, PRIVATE_STATE_REFUSED | Retain protected host operation state; reconcile/cancel safely, never recreate established holder keys |
 | INVALID_SIGNATURE, BINDING_CHECK_FAILED, STATUS_CHECK_FAILED, REQUEST_SCOPE_NOT_PERMITTED | Refuse disclosure/access; inspect authenticated pins, exact scope and signed evidence |
 
-Read `.logs/partner-issuer.log` and `.logs/partner-verifier.log` or bounded container logs locally. Report only source/image pins and sanitized fixed codes. No framework, new cryptographic implementation or UI-driving suite is needed for these HTTP checks. Physical install/update, hardware authorization, consent and public release remain NOT RUN under #338/#348, and Release B publication follows Release A.
+Read `.logs/partner-issuer.log` and `.logs/partner-verifier.log` or bounded container logs locally. Report only source/image pins and sanitized fixed codes. No framework, new cryptographic implementation or UI-driving suite is needed for these HTTP checks. Physical install/update, hardware authorization and consent require separate device observations. Generic release publication follows Education release publication.
