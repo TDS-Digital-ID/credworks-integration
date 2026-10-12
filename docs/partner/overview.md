@@ -6,7 +6,7 @@ Read [setup and lifecycle](quickstart.md), [definitions and disclosure](definiti
 
 ## Revision and profile matrix
 
-The table records the earlier #408 preparation baseline. The public [Release B preview](https://github.com/TDS-Digital-ID/credworks-integration/releases/tag/release-b-preview-20261006) instead supplies image source dcef4b7721ad024ceb9d86133dc520ee66a92a13 and signed wallet source17c6d60b3196c40f6500adc391c6610ba5d52a89. Use the release manifest for exact checksums and image IDs; historical images below are not substitutes.
+The table records the earlier preparation baseline. The public [Release B preview](https://github.com/TDS-Digital-ID/credworks-integration/releases/tag/release-b-preview-20261006) instead supplies image source dcef4b7721ad024ceb9d86133dc520ee66a92a13 and signed wallet source17c6d60b3196c40f6500adc391c6610ba5d52a89. Use the release manifest for exact checksums and image IDs; historical images below are not substitutes.
 
 A source label identifies the commit used to build an image. A later integration or documentation commit does not relabel that image.
 
@@ -25,10 +25,10 @@ A source label identifies the commit used to build an image. A later integration
 | Application extensions | credworks_scalar request authority, metadata issuer authorization, receipt-confirmed renewal version 1 |
 | Status / trust | Signed Bitstring Status List revocation; issuer-scoped signed definitions and verifier permissions; retained credential-key membership |
 | Education baseline | Original monorepo export 14096ed41ee259e81414fcfa0c3b2ad622a5b426; preserve its candidate/artifact pins and application contract |
-| #408 evidence | 130 runtime checks, 25 Node checks, 8 boundary checks, core/conformance 99 checks; software-holder HTTP checks; no physical observations |
-| Final generic candidate / Android | #410 records its exact source, APK checksum, signer and endpoint combination; this page does not claim that candidate run |
+| Preparation evidence | 130 runtime checks, 25 Node checks, 8 boundary checks, core/conformance 99 checks; software-holder HTTP checks; no physical observations |
+| Final generic candidate / Android | Consult the selected release manifest for its exact source, APK checksum, signer and endpoint combination |
 
-The source export manifest and [packaging transforms](../../provenance/GENERIC-TRANSFORMS.md) describe original files and deliberate packaging changes. [Earlier generic acceptance evidence](../../provenance/GENERIC-ACCEPTANCE.md) distinguishes intermediate producer pins from later consumer checks. Final #408 closure records the production source/image pins above and its successful third standalone gate and exact-head CI. These historical image pins describe preparation, not the currently published image archive. Other CPU architectures require their own build and inspection.
+The source export manifest and [packaging transforms](../../provenance/GENERIC-TRANSFORMS.md) describe original files and deliberate packaging changes. [Earlier generic acceptance evidence](../../provenance/GENERIC-ACCEPTANCE.md) distinguishes intermediate producer pins from later consumer checks. These historical image pins describe preparation, not the currently published image archive. Other CPU architectures require their own build and inspection.
 
 ## Availability and release limits
 
