@@ -62,6 +62,14 @@ Review the separate Education offer and authorize adding it. Expect "Credential 
 
 ## 3. Check cancellation
 
+Immediately before creating the phone request, refresh signed verifier evidence from the kit directory with the same setup state:
+
+```sh
+./setup doctor --state "$HOME/.local/share/credworks-team"
+```
+
+Continue only after `SETUP_READY`. This checks the running services and refreshes signed trust, permission and status evidence through protected management. Evidence can expire while you complete receipt or enrolment on the phone.
+
 Return to your team's app in the same phone browser. Tap "Check eligibility only", then "Open CredWorks wallet on Android".
 
 Confirm the recipient is your team's registered verifier origin, the purpose is eligibility without an account, and only enrolment and institution are requested. Select the new synthetic Education credential. Student ID must be withheld.
@@ -72,11 +80,19 @@ If the request expires before Android's dialog appears, record expiry, not cance
 
 ## 4. Complete eligibility
 
-Repeat the review with a fresh request. Share only enrolment and institution and successfully authorize Android. After "Details delivered", promptly return to the same app browser and tap "Check completion".
+Refresh again immediately before creating the successful attempt:
+
+```sh
+./setup doctor --state "$HOME/.local/share/credworks-team"
+```
+
+After `SETUP_READY`, repeat the review with a fresh request. Share only enrolment and institution and successfully authorize Android. After "Details delivered", promptly return to the same app browser and tap "Check completion".
 
 Expect "Eligibility confirmed". This is the app backend's authenticated, policy-checked result. Wallet delivery alone is not success. Eligibility does not sign you in or create an app account.
 
 If you see `RESULT_PENDING`, check again before expiry. If it expires, or the app restarts, start a fresh request in the app. Do not repeat credential issuance to recover an expired eligibility request.
+
+A request or app interaction can return HTTP 503 when signed evidence is stale. If the app reports `RUNTIME_UNAVAILABLE` after a delay, run `doctor` again and, once it succeeds, create a fresh eligibility request using the same held Education credential. Protected diagnostics may identify `EVIDENCE_STALE`; do not expose management endpoints or tokens to inspect it. A failed refresh is a refusal, not approval. Refresh does not extend an old request or result deadline, reset a credential or replace your identity.
 
 ## Recover an expired issuance attempt
 
