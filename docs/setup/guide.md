@@ -185,11 +185,13 @@ It uses a separate issuer hostname, identity and database while preserving this 
 | Environment | Observed checks | Limit |
 | --- | --- | --- |
 | macOS ARM64 | Public HTTPS setup, registration, software eligibility and sign-in; full stop/start preserved identity, credentials and account | Software holder with labelled mock platform attestation |
-| Ubuntu ARM64 virtual machine | Exact archive import and protected preparation/rerun with containerd and classic Docker image stores | Full public HTTPS flow not run on this host |
+| Ubuntu 26.04 ARM64 virtual machine | Supplied public-only source and images; Education setup, eligibility, sign-in and restart; custom receipt, member-only verification, restart and exact revocation refusal | Existing prepared VM; recovered after operator DNS cache actions and same-state retries; public release download not tested |
 | AMD64 containers | Image build and container checks under emulation | Native Linux AMD64 host not verified |
 | Windows/WSL2 | NOT RUN; no Windows machine available | Instructions are provided without a verified support claim |
 | Pixel 7, Android 17, arm64-v8a | New Government receipt, Education enrolment and receipt, Android cancellation, then successful disclosure and app-confirmed eligibility | One phone with the exact wallet candidate already installed; installation and other devices not tested; iPhone is coming soon |
 
 On 13 October 2026, the macOS ARM64 custom flow also passed over public HTTPS: issuance, selected-field verification of only the boolean `member`, full stop/start with the same identity and receipt, then exact revocation and refusal of the revoked credential. The first verifier resume failed with a transport error; one retry with the same saved state passed. The cause of that transient failure was not isolated.
+
+The Ubuntu run preserved its initial DNS and issuer identity-check failures. It completed after two operator DNS cache refreshes and documented same-state recovery, without changing keys, origins or trust settings. Its revocation check refused the saved credential before presentation; forced delivery of a revoked credential was not tested.
 
 The Android run first encountered stale signed evidence and expired requests. Those attempts did not pass. Refreshing with `doctor` before each fresh request allowed the cancellation and successful eligibility checks to complete, with the same held credential and unchanged deadlines. These are sandbox observations, not production assurance.

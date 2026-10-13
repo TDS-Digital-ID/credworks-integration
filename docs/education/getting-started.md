@@ -26,8 +26,8 @@ backups. CredWorks runs the sandbox issuers and trust registry. Domain registrat
 may cost money; Cloudflare's tunnel service does not provide a free domain.
 
 Start in the kit's root directory. Keep your private setup state outside Git.
-You do not need Node.js or Rust installed for this path. macOS ARM64 has verified
-public Education software checks. Other platform and Android limits are listed in
+You do not need Node.js or Rust installed for this path. Public Education software
+checks passed on macOS ARM64 and an Ubuntu ARM64 virtual machine. Platform and Android limits are listed in
 [the setup evidence](../setup/guide.md#platform-evidence).
 
 ## 1. Run your team services

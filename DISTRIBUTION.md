@@ -29,9 +29,11 @@ unchanged source revision and exact image/archive identities. A newer documentat
 commit does not change an image's source label.
 
 Local software-holder checks use labelled mock platform attestation. Public Education
-setup, eligibility, sign-in and restart checks passed on macOS ARM64. Ubuntu ARM64 VM
-evidence covers image import and preparation only. Native Linux AMD64, Windows/WSL2
-and this new Android guide remain unverified. See [platform evidence](docs/setup/guide.md#platform-evidence).
+setup, eligibility, sign-in, custom lifecycle and restart checks passed on macOS ARM64
+and in an Ubuntu ARM64 VM using supplied public-only artifacts. The VM run required
+operator DNS cache refreshes and documented same-state recovery. The Android guide passed receipt,
+authorization cancellation and app-confirmed eligibility on one Pixel 7 with Android 17.
+Native Linux AMD64 and Windows/WSL2 remain unverified. See [platform evidence](docs/setup/guide.md#platform-evidence).
 Older release results are not evidence that the new instructions work everywhere.
 
 Before a new release, attach the matching finite source, images, signed APK when

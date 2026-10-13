@@ -149,5 +149,8 @@ font notices retain their own terms. Public preview availability and remaining a
 are recorded separately in the release evidence. Public Education software checks passed
 on macOS ARM64, as did custom issuance, selected-field verification, restart and exact
 revocation. The Android guide passed receipt, cancellation and app-confirmed eligibility
-on one Pixel 7 running Android 17. Native Linux AMD64 and Windows/WSL2 remain unverified;
+on one Pixel 7 running Android 17. An independent Ubuntu ARM64 VM run also passed
+Education and custom software flows using supplied public-only artifacts, with
+documented recovery and operator DNS cache refreshes.
+Native Linux AMD64 and Windows/WSL2 remain unverified;
 see [platform evidence](docs/setup/guide.md#platform-evidence).

@@ -15,7 +15,7 @@ of your endpoint and key; it does not establish institutional authority.
 | --- | --- |
 | Kit source | Public [Education preview](https://github.com/TDS-Digital-ID/credworks-integration/releases/tag/release-a-preview-20261006); use its pinned source archive |
 | Native toolchain | Node 22.22.0, pnpm 10.34.4, Rust 1.92.0, locked dependencies |
-| Host | New container setup passed public HTTPS Education and custom software flows on macOS ARM64; native Linux AMD64 and Windows/WSL2 remain unverified |
+| Host | Public HTTPS Education and custom software flows passed on macOS ARM64 and in an Ubuntu ARM64 VM; see [platform evidence](../setup/guide.md#platform-evidence) for recovery and scope limits. Native Linux AMD64 and Windows/WSL2 remain unverified |
 | Verifier | Education definition urn:credworks:education version 1 only |
 | Credential | W3C VC Data Model 2.0 SD-JWT+KB, vc+sd-jwt, ES256/P-256 |
 | Presentation | OID4VP 1.0 Final, exact scalar DCQL, decentralized_identifier, direct_post, vp_token |

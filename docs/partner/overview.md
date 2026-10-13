@@ -42,7 +42,8 @@ independent-wallet interoperability or a second-device matrix.
 
 The new guided onboarding candidate includes independently authenticated sandbox
 configuration. Its public HTTPS Education and custom software flows passed on macOS
-ARM64; see [platform evidence](../setup/guide.md#platform-evidence) for scope and limits.
+ARM64. Both flows also passed in an Ubuntu ARM64 VM using supplied public-only artifacts;
+see [platform evidence](../setup/guide.md#platform-evidence) for scope and limits.
 Its new commands and container archives are awaiting publication. Teams still operate their own HTTPS services,
 databases and protected identities. [Getting started](../education/getting-started.md)
 explains the first development milestone; software-holder checks do not establish
