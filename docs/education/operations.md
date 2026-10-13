@@ -73,3 +73,39 @@ Before replacement stop the runtime, back up the entire 0700 identity directory 
 Signing identity and application account mappings persist. Runtime sessions/results/evidence cache, browser sessions and interactions are ephemeral; restart logs browsers out and requires fresh ceremonies/evidence. No high availability or production custody assurance is claimed. The production addon excludes deterministic fixture installers; fixture-native output is separate test material.
 
 Verify the selected Android artifact’s source revision, checksum, package and signing certificate before installation, use the documented buildprod artifact, and retain existing holder state. A debug certificate is not a protected release signature and cannot establish upgrade compatibility with a differently signed installed app. Do not uninstall to disguise an upgrade failure. These HTTP checks do not establish release-signing provenance, physical installation/update, genuine holder authorization, accessibility or phone reachability. Public iOS and broad external-wallet interoperability are unsupported.
+
+
+## Registration recovery
+
+Run `pnpm register` again with the same configuration and progress-file paths after
+fixing connectivity or signed-permission availability. Keep the runtime state,
+keys, public origins and independently obtained trust pins unchanged. The command
+checks authenticated project and registration state before reusing completed work.
+It does not repeat a known-completed ownership proof or replace project credentials.
+If a completion response is lost, it reads the original challenge-derived
+registration ID through authenticated management HTTP and checks its saved
+origin, key and revision before continuing.
+A known expired challenge is renewed through the authenticated ownership flow.
+
+The progress file contains the project management credential. Keep it outside Git
+in a directory owned by you with mode 0700; configuration and progress files must
+be regular files with mode 0600. Back them up through a protected channel. Never
+paste their contents into logs, chat or issue reports. Only
+`VERIFIER_REGISTERED_PROTECTED_OUTPUT_WRITTEN` indicates successful registration;
+a file left after failure can contain incomplete progress.
+
+| Command outcome | Next action |
+| --- | --- |
+| Connectivity or permission failure | Fix the reported service or pins at their authoritative source, then rerun the same command. Do not adopt a newly discovered registry key as a trust pin. |
+| `REGISTRATION_BUSY` | Another command may still be running. Stop here. After confirming the original process has exited, remove **only** the adjacent empty `registration-result.json.lock` directory with `rmdir`, then retry. Never remove an active command's lock. |
+| `REGISTRATION_STATE_REFUSED` | Restore the original configuration/runtime identity and private file permissions. Legacy output or damaged state needs operator-assisted recovery; it is not silently overwritten. |
+| `REGISTRATION_STORAGE_REFUSED` | Fix ownership/permissions or storage availability. Preserve the progress file and any adjacent `.pending` file for protected recovery. |
+| `REGISTRATION_PROJECT_OUTCOME_UNKNOWN` | Stop. Creation may have succeeded before its credential was saved. Preserve both files and ask the registry operator to reconcile the original attempt. The API stores only a credential hash and cannot return a lost once-issued credential. Creating a new project requires a separate explicit remediation decision. |
+| `REGISTRATION_CHALLENGE_OUTCOME_UNKNOWN` | Stop. Preserve the project credential and ask the registry operator to reconcile the outstanding challenge. Do not repeat a possibly completed operation by editing progress markers yourself. |
+| `REGISTRATION_COMPLETION_OUTCOME_UNKNOWN` | Preserve state and rerun the same command to read the original registration through authenticated project management HTTP. If the original registration still cannot be verified, stop and ask the registry operator to reconcile the saved challenge. A missing or unavailable read is not permission to repeat completion. Public DID or permission discovery alone cannot establish ownership of that registration. |
+
+A hard interruption can leave an adjacent `.pending` file containing newer progress.
+Do not delete it to make retry succeed or choose a journal version based only on its
+contents. Resolve it with the operator using authenticated remote state; if that
+state cannot establish the outcome, keep the run stopped. The command does not
+rotate credentials, reset identities or withdraw registrations during recovery.

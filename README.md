@@ -3,15 +3,32 @@
 Project code is licensed under [Apache-2.0](LICENSE); third-party notices remain in force.
 Read the [distribution status and limits](DISTRIBUTION.md) before selecting an artifact.
 
-The [canonical partner integration guide](docs/partner/overview.md) covers generic setup, definitions, HTTP APIs and lifecycle operations on the revision-pinned #408 source. Start there for the configurable issuer/verifier kit. Experimental releases are available in [the public distribution repository](https://github.com/TDS-Digital-ID/credworks-integration/releases). The producer repositories remain private. Complete public-only setup and physical acceptance remain incomplete; see the canonical guides for the current limits.
+Start with [Getting started](docs/education/getting-started.md) to check student
+eligibility using the supplied app. Run [guided setup](docs/setup/guide.md) with
+Docker; no host Node.js or Rust compiler is required for that path.
 
-The existing Education instructions below retain their original frozen source scope. The [canonical Education integration guide](docs/education/overview.md) covers setup, profiles, API, operations and preparation limits.
+These instructions target the [student onboarding preview](https://github.com/TDS-Digital-ID/credworks-integration/releases/tag/student-onboarding-preview-20261013).
+If that release is unavailable, publication has not happened yet. Earlier experimental downloads do not contain these setup commands and images.
+The later physical preview records retained-scope checks on one Pixel; it does not
+qualify this new setup. The producer repositories remain private.
 
-This private kit exports completed Education source from
-`TDS-Digital-ID/university-vc-monorepo` at
-`14096ed41ee259e81414fcfa0c3b2ad622a5b426`. It supports Education sign-in and
-identifier-free eligibility. It does not distribute an issuer service, a wallet APK,
-private ecosystem services, or Git history. Generic issuance is outside this source pin.
+Use [Education concepts](docs/education/overview.md) or
+[partner integration](docs/partner/overview.md) for background and advanced flows.
+The native source instructions below retain their original frozen-source scope.
+
+Follow [Sign in a student](docs/guides/student-sign-in.md) and
+[Connect your backend](docs/guides/connect-your-backend.md) after eligibility works.
+For your own credential types, use [Issue a custom credential](docs/guides/issue-a-credential.md).
+The kit includes the Education app and partner issuer/verifier runtime. It connects
+to shared sandbox ecosystem services; it does not distribute their private source.
+Wallet APKs are separate release artifacts.
+
+## Advanced: build from source
+
+The files in `provenance/` retain the original export records and later packaging
+history. Current container source revisions and checksums are recorded in
+[the setup candidate](config/setup-candidate.json). An original export pin does not
+describe every subsequent change in this checkout.
 
 Use Node 22.22.0, pnpm 10.34.4 and Rust 1.92.0. The files in `provenance/` record the
 allowlist, original hashes and packaging transforms. Frozen builds require only public
@@ -61,7 +78,9 @@ pnpm register /absolute/private/register.json /absolute/private/registration-res
 
 This creates a project, fetches a challenge, signs it through protected runtime HTTP,
 completes ownership, and verifies both signed Education permissions. It writes project
-management credentials only to a newly created mode-0600 output, never stdout.
+management credentials immediately to a mode-0600 progress file, never stdout.
+Keep that file in a private directory (mode 0700). Retry the same command and paths
+after a recoverable failure; completed work is reused. See [registration recovery](docs/education/operations.md#registration-recovery) for interrupted or ambiguous outcomes.
 
 Populate `apps/partner-runtime/examples/verifier.json` into an operator-owned public
 configuration file with the pinned issuer/key, independent registry origin/anchor and
@@ -104,7 +123,7 @@ not hardware attestation or physical wallet acceptance.
 
 This driver alone is not a claim of clean self-service setup: bootstrap, HTTPS routing,
 registration, configuration/restart and application/database provisioning are required
-operational steps. The complete candidate/setup sibling will execute the full sequence.
+operational steps. Use the guided container path above for the complete setup sequence.
 
 ## Revision-labelled containers
 
@@ -127,6 +146,7 @@ image IDs and layer checks separately from source provenance.
 
 The producer repositories remain private. Project-owned code is Apache-2.0; third-party
 font notices retain their own terms. Public preview availability and remaining acceptance
-are recorded separately under #338. This child
-prepares source/build delivery, not a complete release candidate. Public deployment and
-physical Android acceptance are **NOT RUN**.
+are recorded separately in the release evidence. Public Education software checks passed
+on macOS ARM64. The new Android guide, native Linux AMD64 and Windows/WSL2 remain
+unverified; see [platform evidence](docs/setup/guide.md#platform-evidence). Earlier preview
+phone evidence is separate.

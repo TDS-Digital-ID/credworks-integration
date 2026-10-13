@@ -1,0 +1,255 @@
+#!/usr/bin/env bash
+set -euo pipefail
+umask 077
+KIT=$(cd "$(dirname "$0")" && pwd -P)
+ACTION=${1:-help}
+if [[ "$ACTION" == help || "$ACTION" == --help ]]; then
+  cat <<'HELP'
+CredWorks team setup
+
+Supply your own domain and Cloudflare account. Domain registration may cost money.
+Install Docker with Compose and cloudflared. Complete `cloudflared tunnel login`
+in your browser first. This tool never purchases a domain or opens a login prompt.
+
+  ./setup prepare --state /absolute/private/team --runtime-origin https://verify.your-domain --app-origin https://app.your-domain
+  ./setup prepare --state /absolute/private/issuer --role issuer --runtime-origin https://issuer.your-domain
+  ./setup issue   --state /absolute/private/issuer
+  ./setup prepare --role verifier --state /absolute/private/verifier --runtime-origin https://check.your-domain --issuer-state /absolute/private/issuer
+  ./setup verify  --state /absolute/private/verifier
+  ./setup revoke-example --state /absolute/private/issuer
+  ./setup resume  --state /absolute/private/team
+  ./setup eligibility --state /absolute/private/team
+  ./setup android-offer --state /absolute/private/team [--attempt 2]
+  ./setup android-open --state /absolute/private/team --stage government
+  ./setup sign-in --state /absolute/private/team
+  ./setup doctor  --state /absolute/private/team
+  ./setup stop    --state /absolute/private/team
+  ./setup start   --state /absolute/private/team
+
+prepare writes protected configuration. resume creates the named tunnel and DNS
+routes, starts containers and registers your verifier. Review your origins first.
+start resumes the same installation. stop preserves its keys and database.
+Candidate images must already be loaded; see docs/setup/guide.md.
+HELP
+  exit 0
+fi
+shift
+case "$ACTION" in prepare|resume|start|stop|doctor|eligibility|sign-in|android-offer|android-open|issue|verify|revoke-example) ;; *) echo SETUP_COMMAND_REFUSED >&2; exit 1;; esac
+STATE=''
+STAGE=''
+ATTEMPT=''
+ARGS=("$@")
+EXTRA_MOUNTS=()
+ISSUER_STATE=''
+ISSUER_LOCK=''
+while (($#)); do
+  [[ $# -ge 2 ]] || { echo SETUP_ARGUMENTS_REFUSED >&2; exit 1; }
+  [[ "$ACTION" == prepare || "$1" == --state || ( "$ACTION" == android-offer && "$1" == --attempt ) || ( "$ACTION" == android-open && "$1" == --stage ) ]] || { echo SETUP_ARGUMENTS_REFUSED >&2; exit 1; }
+  case "$1" in
+    --state) STATE=$2 ;;
+    --stage) [[ "$ACTION" == android-open ]] || { echo SETUP_ARGUMENTS_REFUSED >&2; exit 1; }; STAGE=$2 ;;
+    --attempt) [[ "$ACTION" == android-offer ]] || { echo SETUP_ARGUMENTS_REFUSED >&2; exit 1; }; ATTEMPT=$2 ;;
+    --issuer-state) ISSUER_STATE=$2 ;;
+    --ecosystem) EXTRA_MOUNTS+=(-v "$2:$2:ro") ;;
+    --role|--runtime-origin|--app-origin|--ecosystem-sha256|--runtime-port|--app-port) ;;
+    *) echo SETUP_ARGUMENTS_REFUSED >&2; exit 1 ;;
+  esac
+  shift 2
+done
+# Compose gives ambient variables priority over --env-file. Only saved team inputs apply.
+while IFS= read -r name; do
+  case "$name" in PARTNER_*|EDUCATION_*) unset "$name";; esac
+done < <(compgen -e)
+[[ "$STATE" == /* && "$STATE" != *$'\n'* && "$STATE" != *:* && "$STATE" != *\'* ]] || { echo 'SETUP_STORAGE_REFUSED: Use an absolute private path without colons, quotes or newlines.' >&2; exit 1; }
+[[ ! -L "$STATE" ]] || { echo SETUP_STORAGE_REFUSED >&2; exit 1; }
+if [[ "$ACTION" == prepare ]]; then mkdir -p -m 700 "$STATE"; fi
+[[ -d "$STATE" && -O "$STATE" ]] || { echo SETUP_STORAGE_REFUSED >&2; exit 1; }
+# Atomic directory ownership prevents overlapping setup and container operations.
+mkdir "$STATE/.lock" 2>/dev/null || { echo 'SETUP_BUSY: Confirm the other setup has stopped before removing only .lock.' >&2; exit 1; }
+TEMP=$(mktemp -d)
+trap 'rm -rf "$TEMP"; [[ -z "$ISSUER_LOCK" ]] || rmdir "$ISSUER_LOCK"; rmdir "$STATE/.lock"' EXIT
+CONTEXT=SETUP_FAILED
+bounded() {
+  local status=0 child watcher
+  "$@" <&0 >"$TEMP/output" 2>"$TEMP/diagnostics" & child=$!
+  (trap 'kill "$timer" 2>/dev/null || true; exit 0' TERM; sleep 90 & timer=$!; wait "$timer"; kill -TERM "$child" 2>/dev/null || true; sleep 3; kill -KILL "$child" 2>/dev/null || true) >/dev/null 2>&1 & watcher=$!
+  wait "$child" || status=$?
+  kill "$watcher" 2>/dev/null || true
+  wait "$watcher" 2>/dev/null || true
+  if ((status != 0)); then
+    # External command output can contain capabilities. Only stable error codes leave here.
+    grep -hE '^[A-Z][A-Z0-9_]+$' "$TEMP/output" "$TEMP/diagnostics" >&2 || true
+    echo "$CONTEXT" >&2
+    return "$status"
+  fi
+}
+command -v docker >/dev/null || { echo 'SETUP_DOCKER_REQUIRED: Install Docker and Compose, then complete its OS prompts.' >&2; exit 1; }
+CONTEXT='SETUP_DOCKER_UNAVAILABLE: Start Docker or resolve its local permissions. Do not run setup with sudo.'
+bounded docker info --format '{{.OSType}} {{.Architecture}}'
+read -r OS ARCH <"$TEMP/output"
+[[ "$OS" == linux ]] || { echo SETUP_PLATFORM_REFUSED >&2; exit 1; }
+case "$ARCH" in aarch64|arm64) ARCH=arm64;; x86_64|amd64) ARCH=amd64;; *) echo SETUP_PLATFORM_REFUSED >&2; exit 1;; esac
+bounded docker compose version
+CONTEXT='SETUP_IMAGE_UNAVAILABLE: Load the checksum-verified candidate archive for your architecture. No source compilation is needed.'
+select_image() {
+  local ref actual
+  while IFS= read -r ref; do
+    [[ "$ref" =~ ^sha256:[a-f0-9]{64}$ ]] || { echo SETUP_IMAGE_REFUSED >&2; return 1; }
+    if bounded docker image inspect --format '{{.Id}}' "$ref" >/dev/null 2>&1; then
+      read -r actual <"$TEMP/output"
+      [[ "$actual" == "$ref" ]] || { echo SETUP_IMAGE_REFUSED >&2; return 1; }
+      echo "$ref"; return 0
+    fi
+  done < <(awk -v arch="$ARCH" -v role="$1" '$0 ~ "\"" arch "\"" {chosen=1;next} chosen && /}/ {exit} chosen && $0 ~ "\"" role "(Imported|Config)?\"" {gsub(/[",]/, "", $2); print $2}' "$KIT/config/setup-candidate.json")
+  echo "$CONTEXT" >&2; return 1
+}
+IMAGE=$(select_image partner)
+NETWORK=none
+helper() {
+  CONTEXT='SETUP_FAILED: Preserve the state directory. Run doctor after resolving the reported prerequisite.'
+  bounded docker run --rm --read-only --user "$(id -u):$(id -g)" --network "$NETWORK" --cap-drop ALL --security-opt no-new-privileges --tmpfs /tmp:rw,noexec,nosuid,size=16m \
+    -v "$KIT:/partner/operator-kit:ro" -v "$STATE:$STATE" -v "$TEMP:$TEMP:ro" ${EXTRA_MOUNTS[@]+"${EXTRA_MOUNTS[@]}"} \
+    --entrypoint node "$IMAGE" --import tsx /partner/operator-kit/tool/setup.mjs "$@" || return $?
+  cat "$TEMP/output"
+}
+issuer_mount() {
+  [[ "$ISSUER_STATE" == /* && "$ISSUER_STATE" != *$'\n'* && "$ISSUER_STATE" != *:* && "$ISSUER_STATE" != *\'* && "$ISSUER_STATE" != "$STATE" && ! -L "$ISSUER_STATE" ]] || { echo SETUP_STORAGE_REFUSED >&2; return 1; }
+  [[ -d "$ISSUER_STATE" && -O "$ISSUER_STATE" ]] || { echo SETUP_STORAGE_REFUSED >&2; return 1; }
+  mkdir "$ISSUER_STATE/.lock" 2>/dev/null || { echo 'SETUP_BUSY: Wait for the issuer or another verifier operation to finish, then retry.' >&2; return 1; }
+  ISSUER_LOCK="$ISSUER_STATE/.lock"
+  EXTRA_MOUNTS+=(-v "$ISSUER_STATE:$ISSUER_STATE")
+}
+if [[ "$ACTION" == prepare ]]; then
+  [[ -z "$ISSUER_STATE" ]] || issuer_mount
+  if [[ -f "$STATE/state.json" ]]; then
+    APP_IMAGE=$(helper get --state "$STATE" --field appImage)
+    IMAGE=$(helper get --state "$STATE" --field partnerImage)
+  else
+    APP_IMAGE=$(select_image application)
+  fi
+  bounded docker image inspect "$IMAGE" "$APP_IMAGE"
+  cp "$TEMP/output" "$TEMP/images.json"
+  helper prepare "${ARGS[@]}" --architecture "$ARCH" --kit-root "$KIT" --partner-image "$IMAGE" --app-image "$APP_IMAGE" --image-inspection "$TEMP/images.json"
+  echo 'Next: review the origins, then run ./setup resume --state with this same directory.'
+  exit 0
+fi
+PROJECT=$(helper get --state "$STATE" --field project)
+ROLE=$(helper get --state "$STATE" --field role)
+if [[ "$ROLE" == verifier ]]; then
+  ISSUER_STATE=$(helper get --state "$STATE" --field issuerState)
+  issuer_mount
+fi
+APP_IMAGE=$(helper get --state "$STATE" --field appImage)
+IMAGE=$(helper get --state "$STATE" --field partnerImage)
+CONTEXT='SETUP_IMAGE_UNAVAILABLE: Load both exact candidate images before continuing.'
+bounded docker image inspect "$IMAGE" "$APP_IMAGE"
+cp "$TEMP/output" "$STATE/image-inspection.json"
+helper inspect-images --state "$STATE" --input "$STATE/image-inspection.json"
+if [[ "$ACTION" == android-open ]]; then
+  helper android-activation --state "$STATE" --stage "$STAGE" > "$TEMP/activation"
+  CONTEXT='ANDROID_OPEN_FAILED: Resolve the device prerequisite; keep the wallet and saved attempt intact.'
+  bounded "$KIT/tool/android-open" "$TEMP/activation"
+  cat "$TEMP/output"
+  exit 0
+fi
+COMPOSE_FILE="$KIT/infra/education-sign-in/compose.yml"
+DATABASE=database
+SERVICES=(partner application tunnel)
+DEPENDENTS=(application tunnel)
+HOST_FIELDS=(runtimeHost appHost)
+if [[ "$ROLE" == issuer ]]; then
+  COMPOSE_FILE="$KIT/infra/partner-issuer/compose.yml"
+  DATABASE=issuer-db
+  SERVICES=(partner tunnel)
+  DEPENDENTS=(tunnel)
+  HOST_FIELDS=(runtimeHost)
+fi
+if [[ "$ROLE" == verifier ]]; then
+  COMPOSE_FILE="$KIT/infra/partner/compose.yml"
+  DATABASE=''
+  SERVICES=(partner tunnel)
+  DEPENDENTS=(tunnel)
+  HOST_FIELDS=(runtimeHost)
+fi
+COMPOSE=(docker compose --env-file "$STATE/team.env" -p "$PROJECT" -f "$COMPOSE_FILE")
+[[ "$ROLE" != issuer ]] || COMPOSE+=(-f "$STATE/issuer-compose.json")
+[[ ! -f "$STATE/tunnel-compose.json" ]] || COMPOSE+=(-f "$STATE/tunnel-compose.json")
+COMPOSE+=(--profile local-db)
+if [[ "$ACTION" == stop ]]; then
+  CONTEXT='SETUP_STOP_FAILED: Preserve volumes and retry when Docker responds.'
+  bounded "${COMPOSE[@]}" stop
+  echo 'SETUP_STOPPED: Keys, registration and database are retained.'
+  exit 0
+fi
+if [[ "$ACTION" != doctor && "$ACTION" != eligibility && "$ACTION" != android-offer && "$ACTION" != sign-in && "$ACTION" != issue && "$ACTION" != verify && "$ACTION" != revoke-example ]]; then
+  command -v cloudflared >/dev/null || { echo 'SETUP_CLOUDFLARED_REQUIRED: Install cloudflared, run cloudflared tunnel login, then resume.' >&2; exit 1; }
+  NAME=$(helper get --state "$STATE" --field tunnelName)
+  CONTEXT='SETUP_CLOUDFLARE_AUTHORIZATION_REQUIRED: Run cloudflared tunnel login yourself, finish browser authorization for your domain, then resume. No credentials belong in chat.'
+  bounded cloudflared tunnel list --output json --name "$NAME"
+  cp "$TEMP/output" "$STATE/tunnel-list.json"
+  TUNNEL=$(helper tunnel-reconcile --state "$STATE" --list "$STATE/tunnel-list.json")
+  if [[ "$TUNNEL" == CREATE ]]; then
+    CONTEXT='SETUP_TUNNEL_OUTCOME_UNKNOWN: Resume to reconcile the saved tunnel name. Never delete state or create a replacement.'
+    bounded cloudflared tunnel create --credentials-file "$STATE/tunnel-credentials.json" --output json "$NAME"
+    bounded cloudflared tunnel list --output json --name "$NAME"
+    cp "$TEMP/output" "$STATE/tunnel-list.json"
+    TUNNEL=$(helper tunnel-reconcile --state "$STATE" --list "$STATE/tunnel-list.json")
+  fi
+  CONTEXT='SETUP_DNS_REFUSED: The selected hostname may already exist or belong to another zone. Inspect DNS in Cloudflare; do not overwrite a record to continue.'
+  for field in "${HOST_FIELDS[@]}"; do
+    HOST=$(helper get --state "$STATE" --field "$field")
+    bounded env -u TUNNEL_FORCE_PROVISIONING_DNS cloudflared tunnel route dns --overwrite-dns=false "$TUNNEL" "$HOST"
+  done
+  CONTEXT='SETUP_TUNNEL_CONFIGURATION_REFUSED: Preserve the generated ingress and inspect the selected candidate.'
+  bounded cloudflared tunnel --config "$STATE/tunnel.yml" ingress validate
+  COMPOSE=(docker compose --env-file "$STATE/team.env" -p "$PROJECT" -f "$COMPOSE_FILE")
+  [[ "$ROLE" != issuer ]] || COMPOSE+=(-f "$STATE/issuer-compose.json")
+  COMPOSE+=(-f "$STATE/tunnel-compose.json" --profile local-db)
+  PHASE=$(helper get --state "$STATE" --field phase)
+  if [[ "$PHASE" == prepared ]]; then
+    helper mark --state "$STATE" --phase bootstrap-started
+    CONTEXT='SETUP_BOOTSTRAP_INTERRUPTED: Preserve the identity volume and unlock key. Resume will inspect the existing identity before doing anything else.'
+    bounded "${COMPOSE[@]}" run --rm --no-deps partner bootstrap
+  fi
+  CONTEXT='SETUP_START_FAILED: Check Docker, available host ports and database connectivity. Preserve the state and volumes.'
+  [[ -z "$DATABASE" ]] || bounded "${COMPOSE[@]}" up -d --wait "$DATABASE"
+  bounded "${COMPOSE[@]}" up -d "${SERVICES[@]}"
+fi
+CONTEXT='SETUP_RUNTIME_UNAVAILABLE: Start the saved containers. An interrupted bootstrap needs its original complete key state; never bootstrap again or remove its volume.'
+bounded "${COMPOSE[@]}" ps -q partner
+CID=$(cat "$TEMP/output")
+[[ "$CID" =~ ^[a-f0-9]{12,64}$ ]] || { echo "$CONTEXT" >&2; exit 1; }
+NETWORK="container:$CID"
+if [[ "$ACTION" == issue || "$ACTION" == verify || "$ACTION" == revoke-example ]]; then helper "$ACTION" --state "$STATE"; exit 0; fi
+helper check-local --state "$STATE"
+helper check-public --state "$STATE"
+if [[ "$ACTION" != doctor && "$ACTION" != eligibility && "$ACTION" != android-offer && "$ACTION" != sign-in && "$ACTION" != issue && "$ACTION" != verify && "$ACTION" != revoke-example ]]; then
+  helper register --state "$STATE"
+  helper configure --state "$STATE"
+  if [[ "$ROLE" == issuer ]]; then
+    CONTEXT='SETUP_ISSUER_STORAGE_FAILED: Preserve the protected config and database; resolve container volume permissions before retrying.'
+    bounded docker run --rm -i --read-only --user 10001:10001 --network none --cap-drop ALL --security-opt no-new-privileges \
+      -v "${PROJECT}_issuer_config:/state" --entrypoint node "$IMAGE" -e 'const fs=require("node:fs");fs.writeFileSync("/state/issuer.json",fs.readFileSync(0),{mode:0o600});fs.chmodSync("/state/issuer.json",0o600)' < "$STATE/issuer.json"
+    bounded "${COMPOSE[@]}" run --rm --no-deps --entrypoint node partner --import tsx src/issuer-migrate.ts
+    ISSUER_BOOTSTRAP=$(helper get --state "$STATE" --field issuerBootstrap)
+    if [[ -z "$ISSUER_BOOTSTRAP" ]]; then
+      helper mark --state "$STATE" --phase issuer-bootstrap-started
+      CONTEXT='SETUP_ISSUER_BOOTSTRAP_INTERRUPTED: Preserve the dedicated database and identity. Resume inspects the existing runtime; never erase or repeat bootstrap blindly.'
+      bounded "${COMPOSE[@]}" run --rm --no-deps partner bootstrap-issuer
+    fi
+  fi
+  CONTEXT='SETUP_RESTART_FAILED: Preserve the state and retry start; configuration and registration are retained.'
+  bounded "${COMPOSE[@]}" stop "${DEPENDENTS[@]}"
+  bounded "${COMPOSE[@]}" up -d --force-recreate "${SERVICES[@]}"
+  bounded "${COMPOSE[@]}" ps -q partner
+  NETWORK="container:$(cat "$TEMP/output")"
+fi
+helper ready --state "$STATE"
+if [[ "$ACTION" == eligibility || "$ACTION" == sign-in ]]; then
+  helper "$ACTION" --state "$STATE"
+fi
+if [[ "$ACTION" == android-offer ]]; then
+  PHONE_ARGS=()
+  [[ -z "$ATTEMPT" ]] || PHONE_ARGS+=(--attempt "$ATTEMPT")
+  helper android-offer --state "$STATE" ${PHONE_ARGS[@]+"${PHONE_ARGS[@]}"}
+fi

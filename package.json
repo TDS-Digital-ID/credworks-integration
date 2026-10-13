@@ -6,7 +6,7 @@
   "scripts": {
     "build": "pnpm --filter @unsw-vc/identity-core-node build && pnpm --filter @unsw-vc/issuer-protocol build && pnpm --filter @unsw-vc/partner-runtime build && pnpm --filter @unsw-vc/education-sign-in build",
     "lint": "pnpm -r lint",
-    "test:boundary": "node --import tsx --test tests/*.test.mjs",
+    "test:boundary": "node --import tsx --test tests/*.test.mjs apps/education-sign-in/tests/*.test.mjs",
     "acceptance": "node --import tsx tool/education-http.ts",
     "test:fixtures": "node tool/test-fixture-addon.mjs",
     "check": "pnpm docs:check && pnpm lint && pnpm exec tsc -p tool/tsconfig.json && pnpm test:boundary && pnpm test:fixtures",

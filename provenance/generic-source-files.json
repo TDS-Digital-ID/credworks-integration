@@ -550,6 +550,43 @@
       "path": "vectors/conformance/student-uc3.json",
       "source_sha256": "5593b0cf8e73352dad8ad3ccc7c37a27ab1de19cfdad930c8cc3616041d93c12",
       "export_sha256": "5593b0cf8e73352dad8ad3ccc7c37a27ab1de19cfdad930c8cc3616041d93c12"
+    },
+    {
+      "path": "apps/education-sign-in/src/cli.ts",
+      "source_revision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
+      "source_path": "apps/education-sign-in/src/cli.ts",
+      "source_sha256": "6ba7ffdc6656d0fd79fba283bc38cb2121a2ee68a712979ba5d86518192d092a",
+      "export_sha256": "6ba7ffdc6656d0fd79fba283bc38cb2121a2ee68a712979ba5d86518192d092a"
+    },
+    {
+      "path": "apps/education-sign-in/tests/cli.test.mjs",
+      "source_revision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
+      "source_path": "apps/education-sign-in/tests/cli.test.mjs",
+      "source_sha256": "bf7f3aa61a11f8707fd778befd64ea574f1e164138af19a32a7a760e5d8cb263",
+      "export_sha256": "bf7f3aa61a11f8707fd778befd64ea574f1e164138af19a32a7a760e5d8cb263"
+    },
+    {
+      "path": "apps/education-sign-in/tests/container.test.mjs",
+      "source_revision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
+      "source_path": "apps/education-sign-in/tests/container.test.mjs",
+      "source_sha256": "c2b5deb8a6ef3d2843a2a49053a1d4eb4046cbef3b2684c957a7af5c0e8f2915",
+      "export_sha256": "c2b5deb8a6ef3d2843a2a49053a1d4eb4046cbef3b2684c957a7af5c0e8f2915"
+    },
+    {
+      "path": "docs/setup/containers.md",
+      "source_revision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
+      "source_path": "docs/partner/container-startup.md",
+      "source_sha256": "e5fed73754d789818ed5e484a71f4f50aca56c1a2ca1cb6e297af45e5d0facdf",
+      "export_sha256": "1bee7017892e81ebc0ce9da9a7249bea617e0e1a9345d84415614f19150dfd72",
+      "transformation": "Kit-owned documentation transformation: relocated outside the finite partner reference index, link to the guided setup entry point, and explain the public-only configuration child mount while retaining private operator secrets. Original producer source revision, path and hash are preserved.",
+      "previous_export_sha256": "e5fed73754d789818ed5e484a71f4f50aca56c1a2ca1cb6e297af45e5d0facdf"
+    },
+    {
+      "path": "apps/education-sign-in/README.md",
+      "source_revision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
+      "source_sha256": "67b16817ea15c5ff482d2ed5e6214af67ff6955c772d71651ffcb5a26723d444",
+      "export_sha256": "0cebf430283c4f74eb28346e3046552d72f4e6684f985b5375aa36cba11b795f",
+      "transformation": "Preserve existing Apache-2.0 distribution wording and point the container guide to docs/setup/containers.md."
     }
   ],
   "omitted_generated_files": [

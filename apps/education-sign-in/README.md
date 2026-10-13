@@ -10,6 +10,8 @@ Eligibility is separate. It requests only `credentialSubject.enrolled` and
 also requests `credentialSubject.student_id`. Services receiving the same stable ID
 can correlate visits. Use eligibility when account continuity is unnecessary.
 
+For container startup without native compilation, follow [Run the Education containers](../../docs/setup/containers.md).
+
 ## Prerequisites and configuration
 
 First follow the [partner runtime setup](../partner-runtime/README.md): create a project,
@@ -50,7 +52,7 @@ just education-sign-in
 The CLI binds the container interface. Expose it only through correctly configured HTTPS
 ingress. `just education-sign-in` tees claim-free readiness/failure output to
 `.logs/education-sign-in.log`. It never logs browser cookies, credentials, claims, activation
-URIs, result capabilities or raw runtime diagnostics. Readiness errors are fixed codes.
+URIs, result capabilities or raw runtime diagnostics. Readiness errors use fixed codes and safe variable names; configured values are never printed.
 
 ## Browser and result contract
 

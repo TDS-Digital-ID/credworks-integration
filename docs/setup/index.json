@@ -1,0 +1,16 @@
+[
+  {
+    "slug": "setup",
+    "title": "Set up your team services",
+    "order": 1,
+    "source": "guide.md",
+    "group": "Run your services"
+  },
+  {
+    "slug": "containers",
+    "title": "Run the Education containers",
+    "order": 2,
+    "source": "containers.md",
+    "group": "Run your services"
+  }
+]

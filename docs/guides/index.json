@@ -1,0 +1,37 @@
+[
+  {
+    "slug": "android-wallet",
+    "title": "Try the Android wallet",
+    "order": 0,
+    "source": "android-wallet.md",
+    "group": "Guides"
+  },
+  {
+    "slug": "student-sign-in",
+    "title": "Sign in a student",
+    "order": 1,
+    "source": "student-sign-in.md",
+    "group": "Guides"
+  },
+  {
+    "slug": "connect-your-backend",
+    "title": "Connect your backend",
+    "order": 2,
+    "source": "connect-your-backend.md",
+    "group": "Guides"
+  },
+  {
+    "slug": "issue-a-credential",
+    "title": "Issue a custom credential",
+    "order": 3,
+    "source": "issue-a-credential.md",
+    "group": "Guides"
+  },
+  {
+    "slug": "verify-a-credential",
+    "title": "Verify selected fields",
+    "order": 4,
+    "source": "verify-a-credential.md",
+    "group": "Guides"
+  }
+]

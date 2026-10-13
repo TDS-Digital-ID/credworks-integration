@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+fail() { echo "$1" >&2; exit 1; }
+[[ $# == 1 && -f "$1" && ! -L "$1" ]] || fail ANDROID_ACTIVATION_REFUSED
+IFS= read -r URI < "$1" || fail ANDROID_ACTIVATION_REFUSED
+[[ ${#URI} -le 4096 && "$URI" != *[!a-zA-Z0-9:/?\&=%.~_-]* ]] || fail ANDROID_ACTIVATION_REFUSED
+case "$URI" in openid-credential-offer://\?credential_offer_uri=*|openid4vp://authorize\?*) ;; *) fail ANDROID_ACTIVATION_REFUSED;; esac
+command -v adb >/dev/null || fail ANDROID_PLATFORM_TOOLS_REQUIRED
+DEVICES=$(adb devices 2>/dev/null) || fail ANDROID_DEVICE_UNAVAILABLE
+COUNT=$(printf '%s\n' "$DEVICES" | awk 'NF && $1 != "List" {n++} END {print n+0}')
+[[ "$COUNT" != 0 ]] || fail ANDROID_DEVICE_REQUIRED
+[[ "$COUNT" == 1 ]] || fail ANDROID_ONE_DEVICE_REQUIRED
+STATUS=$(printf '%s\n' "$DEVICES" | awk 'NF && $1 != "List" {print $2}')
+[[ "$STATUS" != unauthorized ]] || fail ANDROID_USB_AUTHORIZATION_REQUIRED
+[[ "$STATUS" == device ]] || fail ANDROID_DEVICE_UNAVAILABLE
+# adb joins shell arguments remotely. The validated URI excludes apostrophes;
+# literal single quotes keep its ampersands and other metacharacters inert there.
+OUTPUT=$(adb shell am start --user current -a android.intent.action.VIEW -p au.edu.unsw.vc.unsw_wallet -d "'$URI'" 2>&1) || fail ANDROID_OPEN_FAILED
+[[ "$OUTPUT" != *Error* && "$OUTPUT" != *Exception* ]] || fail ANDROID_OPEN_FAILED
+echo ANDROID_ACTIVATION_OPENED

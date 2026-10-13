@@ -34,12 +34,21 @@ The source export manifest and [packaging transforms](../../provenance/GENERIC-T
 
 The public source and preview artifacts are in TDS-Digital-ID/credworks-integration. Both producer repositories remain private. Source builds require public package registries, not private-monorepo access or private build secrets. Project-owned code is Apache-2.0; third-party terms remain unchanged. Read the release manifest, required notices and corresponding-source attachments before using the image/APK downloads.
 
-Release A was published before B. Publication and release signing are complete for these previews; full acceptance is not. Remaining phone checks are operator-deferred. Startup intermittency remains unresolved, and the frozen generic APK lacks the later expired-receipt diagnostic correction. Existing physical failures and successes remain recorded; no clean-device or complete hardware acceptance is claimed.
+Release A was published before B. The [later physical preview](https://github.com/TDS-Digital-ID/credworks-integration/releases/tag/release-b-physical-preview-20261012)
+updates the generic wallet and records the retained POC checks on one Pixel,
+including receipt, selective disclosure, revocation and renewal recovery. It uses
+labelled mock platform attestation. It does not establish vendor attestation,
+independent-wallet interoperability or a second-device matrix.
 
-A complete public-only setup remains incomplete because the examples contain placeholder ecosystem configuration. Operators still need independently authenticated registry/provider roots, actual issuer/status endpoints and keys, and the accepted Education institution value. No public sandbox bootstrap manifest currently supplies these. Operator-owned HTTPS, databases and protected persistent identities are also required. Host software-holder checks use mock platform attestation and do not establish hardware custody.
+The new guided onboarding candidate includes independently authenticated sandbox
+configuration. Its new commands and container archives are awaiting publication and
+separate public-setup qualification. Teams still operate their own HTTPS services,
+databases and protected identities. [Getting started](../education/getting-started.md)
+explains the first development milestone; software-holder checks do not establish
+hardware custody.
 
 Unsupported options include dc+sd-jwt, other suites, Presentation Exchange, arbitrary DCQL controls, array-element disclosure, overlapping hidden ancestor/child paths, proximity transports, public iOS distribution and broad unrelated-wallet interoperability. There is one issuer identity per deployment. The kit makes no production key-custody, high-availability or institutional accreditation claim.
 
 ## One documentation source
 
-These five indexed pages are canonical. CredWorks imports reviewed committed files and both existing OpenAPI contracts into an offline snapshot with an immutable full kit revision and per-file SHA256 hashes. Site builds read that snapshot without fetching repositories. Source edits come here first, then the site imports the reviewed distribution revision. Report sanitized failures through the [public issue tracker](https://github.com/TDS-Digital-ID/credworks-integration/issues), with source/image revisions and fixed refusal codes. Never include credentials, keys or bearer tokens.
+These indexed pages are canonical. CredWorks imports reviewed committed files and both existing OpenAPI contracts into an offline snapshot with an immutable full kit revision and per-file SHA256 hashes. Site builds read that snapshot without fetching repositories. Source edits come here first, then the site imports the reviewed distribution revision. Report sanitized failures through the [public issue tracker](https://github.com/TDS-Digital-ID/credworks-integration/issues), with source/image revisions and fixed refusal codes. Never include credentials, keys or bearer tokens.

@@ -5,7 +5,7 @@ import { execFileSync } from 'node:child_process';
 import { cpSync, mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-const linkedSources=['config/credworks-sandbox-20261011.json','provenance/GENERIC-TRANSFORMS.md','provenance/GENERIC-ACCEPTANCE.md','apps/partner-runtime/examples','infra/partner','infra/partner-issuer','tool/generic-http.ts'];
+const linkedSources=['docs/guides','README.md','LICENSE','DISTRIBUTION.md','apps/partner-runtime/README.md','apps/education-sign-in/src/public/fonts.md','apps/education-sign-in/README.md','infra/education-sign-in','docs/setup','config/setup-candidate.json','config/credworks-sandbox-20261011.json','provenance/GENERIC-TRANSFORMS.md','provenance/GENERIC-ACCEPTANCE.md','apps/partner-runtime/examples','infra/partner','infra/partner-issuer','tool/generic-http.ts'];
 const run=(root)=>execFileSync(process.execPath,['tool/check-docs.mjs','--root',root],{encoding:'utf8',stdio:['ignore','pipe','pipe']});
 test('canonical docs validate real OpenAPI contracts and refuse broken source links',()=>{
  const root=mkdtempSync(join(tmpdir(),'education-docs-'));

@@ -1,27 +1,38 @@
 [
   {
+    "slug": "getting-started",
+    "title": "Getting started",
+    "order": 0,
+    "group": "Getting started"
+  },
+  {
     "slug": "overview",
     "title": "Education integration",
-    "order": 1
+    "order": 1,
+    "group": "Concepts"
   },
   {
     "slug": "quickstart",
     "title": "Setup and registration",
-    "order": 2
+    "order": 2,
+    "group": "Run your services"
   },
   {
     "slug": "profiles",
     "title": "Profiles and application policy",
-    "order": 3
+    "order": 3,
+    "group": "Concepts"
   },
   {
     "slug": "api",
     "title": "HTTP API",
-    "order": 4
+    "order": 4,
+    "group": "API reference"
   },
   {
     "slug": "operations",
     "title": "Operations and limits",
-    "order": 5
+    "order": 5,
+    "group": "Run your services"
   }
 ]

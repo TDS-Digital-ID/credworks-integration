@@ -1,5 +1,9 @@
 # Setup and registration
 
+New here? Start with [Getting started](getting-started.md) and the container-based
+[team setup](../setup/guide.md). This page retains the advanced native setup and
+registration contract for existing integrations.
+
 These commands are a runbook, not evidence that a particular deployment has passed acceptance. Use a fresh kit checkout, the toolchain in the [compatibility table](overview.md#compatibility-and-availability), PostgreSQL for a dedicated application database, OpenSSL, Caddy, and cloudflared for the optional named tunnel. Install CLI packages through your platform package manager. Container use also requires an initialized Docker runtime. OS trust, elevation or account prompts require the operator.
 
 ## Published CredWorks sandbox configuration
@@ -189,9 +193,11 @@ chmod 600 /absolute/protected/register.json
 pnpm register /absolute/protected/register.json /absolute/protected/registration-result.json
 ```
 
-Registration output is written only after every step succeeds. If a later step fails, or the output path already exists, the once-issued project credential may not be recoverable from the tool. Keep the output path new, investigate registry project state before retrying, and do not treat a blind retry as recovery.
+Keep both files private (mode 0600) and the output directory mode 0700. The output is a progress file: it stores the project credential as soon as received. After a connectivity or permission failure, rerun the **same command with the same files**. The tool reuses the saved project and completed registration, checks authenticated registry state, and renews an expired known challenge. It never bootstraps a new runtime identity.
 
-The tool creates a project, fetches the public DID, obtains a registry challenge, signs it through protected runtime HTTP, completes endpoint/key ownership and verifies both signed Education grants with the independent registry DID/anchor. Output is newly created mode 0600 and contains the separate project management credential. Registration establishes endpoint/key control, never credential issuer authority or permission to add Education claims.
+Expected result: `VERIFIER_REGISTERED_PROTECTED_OUTPUT_WRITTEN`. This means both signed Education permissions were verified. A partial progress file alone does not mean registration succeeded. If the command reports an unknown outcome or a lock, follow [registration recovery](operations.md#registration-recovery); do not delete the file and start again.
+
+The tool creates a project, fetches the public DID, obtains a registry challenge, signs it through protected runtime HTTP, completes endpoint/key ownership and verifies both signed Education grants with the independent registry DID/anchor. The progress file is mode 0600 and contains the separate project management credential; protect it like a password. Registration establishes endpoint/key control, never credential issuer authority or permission to add Education claims.
 
 Create a public verifier JSON using the following shape and independently provisioned keys/status URLs. It must not contain secrets:
 

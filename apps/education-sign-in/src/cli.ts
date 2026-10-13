@@ -1,4 +1,13 @@
 import { startApplication } from "./server.js";
+const missing = [
+  "EDUCATION_APP_ORIGIN",
+  "EDUCATION_RUNTIME_MANAGEMENT",
+  "PARTNER_MANAGEMENT_TOKEN",
+  "EDUCATION_TRUSTED_ISSUER",
+  "EDUCATION_VERIFIER_DID",
+  "EDUCATION_INSTITUTION",
+  "EDUCATION_APP_DATABASE_URL",
+].filter((name) => !process.env[name]);
 try {
   const required = (name: string) => {
     const value = process.env[name];
@@ -25,6 +34,10 @@ try {
       void app.close().then(() => process.exit(0));
     });
 } catch {
-  console.error("education_application_unavailable");
+  console.error(
+    missing.length
+      ? `education_application_configuration_missing: ${missing.join(", ")}`
+      : "education_application_unavailable: check configuration, database connectivity and listener availability",
+  );
   process.exitCode = 1;
 }

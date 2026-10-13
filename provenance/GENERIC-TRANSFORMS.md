@@ -58,3 +58,18 @@ Root LICENSE, NOTICE and DISTRIBUTION.md are new distribution documents. Current
 status prose and portable example links are updated separately from historical source pins.
 Third-party attribution/licence texts are preserved. Physical results are not upgraded to
 PASS, and public distribution remains pending its own concrete artifacts and checks.
+
+## Container onboarding source refresh, 2026-10-13
+
+The Education startup diagnostic and its CLI/Compose checks are copied exactly from
+monorepo `61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb`. New manifest entries carry
+that per-file source revision; the original generic and Education exports remain
+historical records. The container guide moves to `docs/setup/containers.md`, outside
+the finite partner reference index. The app README keeps its existing distribution
+licence wording and links to that portable guide path. Root boundary checks now run
+the exported CLI check; Compose checks run only with explicit candidate image inputs.
+
+Existing runtime/core bytes, dependency locks and historical release archives are
+unchanged. New image candidates retain their own producer source labels and inspection
+evidence. Preparing this source export does not publish those images or establish
+native Linux or Windows/WSL2 support.

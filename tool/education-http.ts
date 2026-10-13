@@ -1,7 +1,7 @@
 /** Public-HTTP sandbox acceptance; all key operations stay inside the Rust addon. */
 import * as core from "@unsw-vc/identity-core-node";
 import assert from "node:assert/strict";
-import { mkdirSync, readFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, readFileSync, writeFileSync, renameSync, openSync, closeSync, fsyncSync } from "node:fs";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { httpClient } from "./http-client.mjs";
@@ -27,7 +27,7 @@ const paths = (profile: string) => [
     ? [["credentialSubject", "student_id"]]
     : []),
 ];
-export async function runEducation(config: Config, fetch = httpClient()) {
+export async function runEducation(config: Config, fetch = httpClient(), ownerInput?: any) {
   const allowed = new Set([
     config.registryOrigin,
     config.portalOrigin,
@@ -88,20 +88,40 @@ export async function runEducation(config: Config, fetch = httpClient()) {
     return response.json();
   };
   mkdirSync(config.stateDir, { recursive: true, mode: 0o700 });
-  const holderKeyId = "holder:kit:" + core.randomUrlSafe(16);
+  const savedPath = join(config.stateDir, "holder.json");
+  const binding = { ...config, stateDir: undefined };
+  let saved: any;
+  const save = () => {
+    const pending = savedPath + ".pending";
+    const fd = openSync(pending, "wx", 0o600);
+    try { writeFileSync(fd, JSON.stringify(saved)); fsyncSync(fd); } finally { closeSync(fd); }
+    renameSync(pending, savedPath);
+    const dir = openSync(config.stateDir, "r");
+    try { fsyncSync(dir); } finally { closeSync(dir); }
+  };
+  if (ownerInput) {
+    const directory = lstatSync(config.stateDir);
+    if (!directory.isDirectory() || directory.uid !== process.getuid?.() || directory.mode & 0o077 || existsSync(savedPath + ".pending")) throw Error("EDUCATION_HOLDER_STATE_REFUSED");
+    if (existsSync(savedPath)) {
+      const file = lstatSync(savedPath);
+      if (!file.isFile() || file.uid !== process.getuid?.() || file.mode & 0o177) throw Error("EDUCATION_HOLDER_STATE_REFUSED");
+      saved = JSON.parse(readFileSync(savedPath, "utf8"));
+      assert.deepEqual(saved.binding, JSON.parse(JSON.stringify(binding)));
+      if (!saved.education) throw Error("EDUCATION_ONBOARDING_INTERRUPTED");
+    } else {
+      saved = { binding, holderKeyId: "holder:kit:" + core.randomUrlSafe(16), unlockKey: core.randomUrlSafe(32) };
+      save();
+    }
+  }
+  const holderKeyId = saved?.holderKeyId ?? "holder:kit:" + core.randomUrlSafe(16);
   const holder = core.persistentSigningKey({
-    path: join(config.stateDir, randomUUID() + ".key"),
-    unlockKey: core.randomUrlSafe(32),
+    path: join(config.stateDir, saved ? "holder.key" : randomUUID() + ".key"),
+    unlockKey: saved?.unlockKey ?? core.randomUrlSafe(32),
     keyId: holderKeyId,
-    create: true,
+    create: !saved?.education,
   });
-  const owner = await json(
-    config.registryOrigin + "/api/projects",
-    "POST",
-    {},
-    {},
-    201,
-  );
+  const owner = ownerInput ?? await json(config.registryOrigin + "/api/projects", "POST", {}, {}, 201);
+  if (saved?.education) return { education: saved.education as string, holderKeyId, holder, owner, call, json, text, postForm };
   const auth = { authorization: "Bearer " + owner.management_credential };
   const person = await json(
     config.portalOrigin +
@@ -206,6 +226,7 @@ export async function runEducation(config: Config, fetch = httpClient()) {
     continued.education_offer_uri,
     config.educationIssuerDid,
   );
+  if (saved) { saved.education = education; save(); }
   return { education, holderKeyId, holder, owner, call, json, text, postForm };
 }
 
@@ -320,6 +341,7 @@ export async function presentEnrolment(
 export async function registeredCeremonies(
   config: Config,
   flow: Awaited<ReturnType<typeof runEducation>>,
+  profiles = ["education_sign_in", "education_sign_in", "education_eligibility"],
 ) {
   const { call, text, postForm, education, holderKeyId } = flow;
   const documentUrl = config.runtimeOrigin + "/.well-known/did.json";
@@ -368,11 +390,8 @@ export async function registeredCeremonies(
   assert.equal((await a.request("/api/session")).status, 200);
   assert.equal((await b.request("/api/session")).status, 200);
   let accountId: string | undefined;
-  for (const profile of [
-    "education_sign_in",
-    "education_sign_in",
-    "education_eligibility",
-  ]) {
+  for (const profile of profiles) {
+    if (!["education_eligibility", "education_sign_in"].includes(profile)) throw Error("REQUEST_SCOPE_NOT_PERMITTED");
     const created = await a.request("/api/interactions", "POST", { profile });
     assert.equal(created.status, 201);
     const interaction = created.value;
@@ -470,6 +489,16 @@ export async function registeredCeremonies(
       assert.equal(replay.status, 409);
       assert.equal(replay.value.error.code, "INTERACTION_CONSUMED");
     }
+  }
+  if (profiles.length === 1 && profiles[0] === "education_eligibility") {
+    assert.equal((await a.request("/api/session")).value.status, "anonymous");
+    return { status: "eligible", account: "none", shared: ["enrolled", "institution_id"], attestation: "software holder; self-asserted mock_platform_attestation; NOT physical" };
+  }
+  if (profiles.length === 2 && profiles.every(profile => profile === "education_sign_in")) {
+    const session = await a.request("/api/session");
+    assert.equal(session.value.status, "signed_in");
+    assert.equal(session.value.account_id, accountId);
+    return { status: "signed_in", account_id: accountId, account_continuity: "verified", shared: ["enrolled", "institution_id", "student_id"], attestation: "software holder; self-asserted mock_platform_attestation; NOT physical" };
   }
   return {
     status: "passed",

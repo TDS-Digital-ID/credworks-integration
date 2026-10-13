@@ -66,3 +66,9 @@ outside this source pin.
 - Generated native index.cjs/index.js/index.d.ts wrappers from the source archive
   are classified as omitted_generated_files, not committed export files. The
   locked napi build regenerates them into ignored production/test output.
+
+- The kit-owned verifier registration command now persists a protected progress
+  journal before subsequent network operations and resumes authenticated project
+  and registration state. Its CLI/HTTPS interruption tests use fault-injected
+  boundary servers and real Rust-signed permissions; they are not production or
+  physical acceptance. No exported runtime, Rust source or source hashes change.

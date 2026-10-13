@@ -7,7 +7,7 @@ const read = path => readFileSync(resolve(root, path), 'utf8');
 const heading = text => text.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-');
 const partnerPages = ['overview', 'quickstart', 'definitions', 'api', 'operations'];
 const slugs = new Set();
-for (const section of ['education', 'partner']) {
+for (const section of ['education', 'partner', 'guides', 'setup']) {
   const directory = resolve(root, 'docs/'+section);
   let index;
   try { index = JSON.parse(read('docs/'+section+'/index.json')); } catch { throw Error('DOCS_INDEX_INVALID'); }
@@ -18,9 +18,10 @@ for (const section of ['education', 'partner']) {
     assert.deepEqual(index.map(p => p.slug), partnerPages.map(p => 'partner-'+p), 'DOCS_INDEX_INVALID');
     assert.deepEqual(index.map(p => p.source), partnerPages.map(p => p+'.md'), 'DOCS_INDEX_INVALID');
   }
-  const filename = page => section === 'partner' ? page.source : page.slug+'.md';
+  const filename = page => page.source ?? page.slug+'.md';
   assert.deepEqual(readdirSync(directory).filter(p => p.endsWith('.md')).sort(), index.map(filename).sort(), 'DOCS_INDEX_INVALID');
   for (const page of index) {
+    assert(['Getting started','Guides','Concepts','API reference','Run your services'].includes(page.group), 'DOCS_GROUP_INVALID');
     assert.match(page.slug, /^[a-z][a-z-]*$/, 'DOCS_INDEX_INVALID');
     assert(!slugs.has(page.slug), 'DOCS_INDEX_INVALID'); slugs.add(page.slug);
     const source = read('docs/'+section+'/'+filename(page));
