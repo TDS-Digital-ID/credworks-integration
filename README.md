@@ -147,6 +147,7 @@ image IDs and layer checks separately from source provenance.
 The producer repositories remain private. Project-owned code is Apache-2.0; third-party
 font notices retain their own terms. Public preview availability and remaining acceptance
 are recorded separately in the release evidence. Public Education software checks passed
-on macOS ARM64. The new Android guide, native Linux AMD64 and Windows/WSL2 remain
-unverified; see [platform evidence](docs/setup/guide.md#platform-evidence). Earlier preview
-phone evidence is separate.
+on macOS ARM64, as did custom issuance, selected-field verification, restart and exact
+revocation. The Android guide passed receipt, cancellation and app-confirmed eligibility
+on one Pixel 7 running Android 17. Native Linux AMD64 and Windows/WSL2 remain unverified;
+see [platform evidence](docs/setup/guide.md#platform-evidence).

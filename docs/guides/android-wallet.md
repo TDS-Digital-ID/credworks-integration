@@ -2,7 +2,7 @@
 
 Complete [Getting started](../education/getting-started.md) first. Now use a real Android phone to review an eligibility request and authorize sharing. Your app must confirm eligibility after the wallet delivers the details. This is separate from the software-holder check.
 
-The new onboarding guide has not yet been verified on a phone. Earlier wallet preview results do not qualify this path.
+On 13 October 2026, this flow passed on one Pixel 7 running Android 17, with the [wallet candidate below](#wallet-candidate) already installed. The check covered separate Government and Education receipts, enrolment, real Android authorization cancellation, then successful disclosure and app-confirmed eligibility. It did not test installation or other phones.
 
 You need an Android 11 or newer phone, a screen lock, working internet and the [inspected wallet candidate](#wallet-candidate). iPhone: Coming soon.
 

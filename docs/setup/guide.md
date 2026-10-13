@@ -188,6 +188,8 @@ It uses a separate issuer hostname, identity and database while preserving this 
 | Ubuntu ARM64 virtual machine | Exact archive import and protected preparation/rerun with containerd and classic Docker image stores | Full public HTTPS flow not run on this host |
 | AMD64 containers | Image build and container checks under emulation | Native Linux AMD64 host not verified |
 | Windows/WSL2 | NOT RUN; no Windows machine available | Instructions are provided without a verified support claim |
-| Android | New onboarding guide NOT RUN on a phone | Prior preview phone results do not qualify this flow; iPhone is coming soon |
+| Pixel 7, Android 17, arm64-v8a | New Government receipt, Education enrolment and receipt, Android cancellation, then successful disclosure and app-confirmed eligibility | One phone with the exact wallet candidate already installed; installation and other devices not tested; iPhone is coming soon |
 
-Custom issuance and selected-field verification have local HTTP acceptance evidence. Public-host qualification is recorded separately in the release notes. These are sandbox observations, not production assurance.
+On 13 October 2026, the macOS ARM64 custom flow also passed over public HTTPS: issuance, selected-field verification of only the boolean `member`, full stop/start with the same identity and receipt, then exact revocation and refusal of the revoked credential. The first verifier resume failed with a transport error; one retry with the same saved state passed. The cause of that transient failure was not isolated.
+
+The Android run first encountered stale signed evidence and expired requests. Those attempts did not pass. Refreshing with `doctor` before each fresh request allowed the cancellation and successful eligibility checks to complete, with the same held credential and unchanged deadlines. These are sandbox observations, not production assurance.
