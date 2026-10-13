@@ -73,3 +73,11 @@ Existing runtime/core bytes, dependency locks and historical release archives ar
 unchanged. New image candidates retain their own producer source labels and inspection
 evidence. Preparing this source export does not publish those images or establish
 native Linux or Windows/WSL2 support.
+
+## Versioned onboarding preview documentation
+
+The container guide now links to the versioned image download and checksum steps,
+with a stop condition when the release is unavailable. Its manifest entry records
+the new exported SHA256 and the preceding guided-setup export hash. The original
+producer source revision, path and source hash remain unchanged. This documentation
+change does not rebuild or relabel the historical image archives.

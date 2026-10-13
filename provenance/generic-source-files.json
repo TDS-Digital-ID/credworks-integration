@@ -577,9 +577,9 @@
       "source_revision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
       "source_path": "docs/partner/container-startup.md",
       "source_sha256": "e5fed73754d789818ed5e484a71f4f50aca56c1a2ca1cb6e297af45e5d0facdf",
-      "export_sha256": "1bee7017892e81ebc0ce9da9a7249bea617e0e1a9345d84415614f19150dfd72",
-      "transformation": "Kit-owned documentation transformation: relocated outside the finite partner reference index, link to the guided setup entry point, and explain the public-only configuration child mount while retaining private operator secrets. Original producer source revision, path and hash are preserved.",
-      "previous_export_sha256": "e5fed73754d789818ed5e484a71f4f50aca56c1a2ca1cb6e297af45e5d0facdf"
+      "export_sha256": "f8bbbc9809b65c2e9297e4788a1de181c327777f0017496c7257c991c57791ef",
+      "transformation": "Kit-owned documentation transformation: relocated outside the finite partner reference index, link to the guided setup entry point, and explain the public-only configuration child mount while retaining private operator secrets. Original producer source revision, path and hash are preserved. Versioned onboarding preview follow-up: replace the unpublished-image sentence with a link to the exact release download/checksum steps and explicitly refuse substituting another image when that release is unavailable.",
+      "previous_export_sha256": "1bee7017892e81ebc0ce9da9a7249bea617e0e1a9345d84415614f19150dfd72"
     },
     {
       "path": "apps/education-sign-in/README.md",
