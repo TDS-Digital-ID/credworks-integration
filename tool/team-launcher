@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+STARTER=$(cd "$(dirname "$0")" && pwd -P)
+case "${1:-up}" in
+  help|--help)
+    cat <<'HELP'
+CredWorks team setup
+
+Start Docker, then run ./setup and confirm your team and addresses.
+Keep this folder private and use one active team computer.
+
+  ./setup            Start or resume your team installation
+  ./setup stop       Stop services and keep your accounts and keys
+  ./setup start      Start the saved services
+  ./setup doctor     Check the saved installation
+  ./setup sign-in    Check student sign-in
+
+Instructions: https://credworks.xyz/developers/getting-started
+HELP
+    exit 0 ;;
+  up)
+    (($# == 0)) || shift
+    exec "$STARTER/.credworks/setup" up --tunnel-bundle "$STARTER/team.json" "$@" ;;
+  *) exec "$STARTER/.credworks/setup" "$@" ;;
+esac

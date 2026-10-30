@@ -128,9 +128,10 @@ operator workstation, from a clean kit checkout with Node.js:
 node tool/package-team.mjs /absolute/private/banana.json /absolute/private/banana-starter.tar.gz
 ```
 
-The output is private, refuses overwriting, and includes only committed kit files,
-`team.json` and `START-HERE.txt`. Untracked local files, other bundles and account
-certificates are excluded. Deliver it through the agreed private channel and confirm
+The output is private and refuses overwriting. It contains a `setup` launcher,
+`team.json`, `START-HERE.txt` and a `.credworks` folder with the required committed
+runtime helpers and licence. Developer source, tests, build files, other bundles
+and account certificates are excluded. Deliver it through the agreed private channel and confirm
 the team and exact app/verifier addresses separately. The team extracts it, starts
 Docker and runs `./setup`. They confirm the assignment before registration.
 

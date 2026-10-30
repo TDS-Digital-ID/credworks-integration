@@ -68,7 +68,10 @@ account uniqueness and cookie rotation from the starter. Test wrong-browser
 completion, pending/replayed results, expiry during database work, policy refusal,
 and account continuity after restart. Never return claims or log capabilities.
 
-The client is Node.js source supplied in the kit. Other backend languages use the
+The [client source](../../apps/education-sign-in/src/client.ts) and reference server
+are in the [public integration repository](https://github.com/TDS-Digital-ID/credworks-integration).
+Get that developer source when adapting your backend; the private starter contains
+the files needed to run the supplied containers. Other backend languages use the
 same [HTTP contract](../education/api.md) and must preserve these checks. A software
 holder result does not qualify a new backend's refusal paths or physical consent.
 

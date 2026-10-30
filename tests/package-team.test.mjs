@@ -1,15 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 
-test('private starter contains only committed kit files and its validated team, and refuses overwrite or dirty source', () => {
+test('private starter ships only executable setup helpers and its own team, excluding developer and operator files', () => {
   const root = mkdtempSync(join(tmpdir(), 'package-team-')), kit = join(root, 'kit'), bundlePath = join(root, 'bundle.json'), output = join(root, 'starter.tar.gz');
   try {
     mkdirSync(kit);
-    for (const file of ['setup', 'config', 'tool', '.gitignore']) cpSync(file, join(kit, file), { recursive: true });
+    for (const file of ['setup', 'config', 'tool', 'infra', 'LICENSE', '.gitignore']) cpSync(file, join(kit, file), { recursive: true });
+    mkdirSync(join(kit, 'tests'));
+    writeFileSync(join(kit, 'tests/developer-only.test.mjs'), 'must not ship');
+    writeFileSync(join(kit, 'README.md'), 'developer source instructions must not ship');
     const git = (...args) => execFileSync('git', ['-C', kit, ...args], { stdio: ['ignore','pipe','pipe'] });
     git('init'); git('add', '.'); git('-c','user.name=Test','-c','user.email=test@example.invalid','commit','-m','reviewed kit');
     writeFileSync(join(kit, 'operator-secret'), 'must not ship');
@@ -25,6 +28,22 @@ test('private starter contains only committed kit files and its validated team, 
     assert.deepEqual(JSON.parse(readFileSync(join(root, 'credworks-team/team.json'))), bundle);
     assert.equal(statSync(join(root, 'credworks-team/team.json')).mode & 0o777, 0o600);
     assert(!existsSync(join(root, 'credworks-team/operator-secret')));
+    assert.deepEqual(readdirSync(join(root, 'credworks-team')).sort(), ['.credworks', 'START-HERE.txt', 'setup', 'team.json']);
+    const support = join(root, 'credworks-team/.credworks');
+    assert(!existsSync(join(support, 'tests')));
+    assert(!existsSync(join(support, 'README.md')));
+    assert(!existsSync(join(support, 'tool/package-team.mjs')));
+    assert(!existsSync(join(support, 'tool/tests')));
+    assert(!existsSync(join(support, 'node_modules')));
+    assert(existsSync(join(support, 'infra/education-sign-in/compose.yml')));
+    assert(existsSync(join(support, 'infra/partner/compose.yml')));
+    assert(existsSync(join(support, 'tool/register-verifier.ts')));
+    const help = spawnSync(join(root, 'credworks-team/setup'), ['--help'], { encoding: 'utf8' });
+    assert.equal(help.status, 0, help.stderr);
+    assert.match(help.stdout, /https:\/\/credworks.xyz\/developers\/getting-started/);
+    const input = spawnSync(process.execPath, [realpathSync(join(support, 'tool/setup.mjs')), 'course-input', '--state', join(root, 'unused-state'), '--input', join(root, 'credworks-team/team.json')], { encoding: 'utf8' });
+    assert.equal(input.status, 0, input.stderr);
+    assert.equal(input.stdout, `${bundle.group}\n${bundle.runtimeOrigin}\n${bundle.appOrigin}\n`);
     assert.match(readFileSync(join(root, 'credworks-team/START-HERE.txt'), 'utf8'), /run \.\/setup/);
     const before = readFileSync(output);
     assert.equal(run(output).status, 1);
