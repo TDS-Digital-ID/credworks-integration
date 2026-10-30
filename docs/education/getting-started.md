@@ -13,8 +13,9 @@ WSL2 Linux terminal.
 ## 2. Get your team starter
 
 Download and extract the private package supplied by your operator. It contains
-`setup`, `team.json` and `START-HERE.txt`. Keep the folder at a stable location and
-keep the package private. The team file contains a tunnel credential.
+`setup`, `team.json` and `START-HERE.txt`, plus a `.credworks` support folder.
+Keep the whole folder at a stable location and keep the package private.
+The team file contains a tunnel credential.
 
 ## 3. Run setup
 

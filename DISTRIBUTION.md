@@ -7,8 +7,9 @@ Both producer repositories remain private.
 
 ## Team starter
 
-Course teams receive a private starter containing the kit, their own tunnel
-assignment and `START-HERE.txt`. Extract it, start Docker and run `./setup`.
+Course teams receive a private starter containing the setup launcher, required
+runtime helpers, their own tunnel assignment and `START-HERE.txt`.
+Extract it, start Docker and run `./setup`.
 The [getting-started guide](docs/education/getting-started.md) covers confirmation,
 eligibility and the team's app. The package contains a tunnel credential and must
 be delivered only to its assigned team through a private channel.
