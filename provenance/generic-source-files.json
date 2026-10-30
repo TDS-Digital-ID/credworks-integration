@@ -19,8 +19,8 @@
       "path": "apps/education-sign-in/README.md",
       "source_revision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
       "source_sha256": "67b16817ea15c5ff482d2ed5e6214af67ff6955c772d71651ffcb5a26723d444",
-      "export_sha256": "c53023c8af2e889093c8dcdffcd7dac6ee2ff116e9fa0575aa353626b8064bec",
-      "transformation": "standalone README links and result retry documentation",
+      "export_sha256": "1824c2c9a901a67072c1fa3c09c2418b479445f865ab2af2f9bbe5e34596a215",
+      "transformation": "standalone README links and result retry documentation; current team setup documentation and artifact selection",
       "previous_export_sha256": "17c545e1c1f83819e093aaa88b56f24f23d9319a8d07398cd911b9ca6c0bb264"
     },
     {

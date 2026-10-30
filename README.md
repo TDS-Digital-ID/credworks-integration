@@ -8,13 +8,11 @@ run `./setup` in the extracted folder. Confirm the team and addresses. Setup sta
 the example, checks eligibility and opens the app. [Getting started](docs/education/getting-started.md)
 is the complete team walkthrough.
 
-The current helper requires the reviewed kit supplied by your operator. Older public
-previews retain their original instructions. [Own-domain setup](docs/setup/guide.md)
-is available for integrations without a course starter.
+[Own-domain setup](docs/setup/guide.md) is available for integrations without a course starter.
 
 Use [Education concepts](docs/education/overview.md) or
 [partner integration](docs/partner/overview.md) for background and advanced flows.
-The native source instructions below retain their original frozen-source scope.
+The native source instructions below are for developers building the kit themselves.
 
 Follow [Sign in a student](docs/guides/student-sign-in.md) and
 [Connect your backend](docs/guides/connect-your-backend.md) after eligibility works.
@@ -25,15 +23,12 @@ Wallet APKs are separate release artifacts.
 
 ## Advanced: build from source
 
-The files in `provenance/` retain the original export records and later packaging
-history. Current container source revisions and checksums are recorded in
-[the setup candidate](config/setup-candidate.json). An original export pin does not
-describe every subsequent change in this checkout.
+Container source revisions, image identities and checksums are recorded in
+[the setup manifest](config/setup-candidate.json). The `provenance/` directory records
+source inputs and packaging transforms.
 
-Use Node 22.22.0, pnpm 10.34.4 and Rust 1.92.0. The files in `provenance/` record the
-allowlist, original hashes and packaging transforms. Frozen builds require only public
-package registries; no monorepo mount, private credentials or private service source is
-required.
+Use Node 22.22.0, pnpm 10.34.4 and Rust 1.92.0. Builds require public package
+registries; no monorepo mount, private credentials or private service source is required.
 
 ```sh
 pnpm install --frozen-lockfile
@@ -127,7 +122,7 @@ operational steps. Use the guided container path above for the complete setup se
 
 ## Revision-labelled containers
 
-Build from a checksum-verified source archive or clean committed checkout. Set `SOURCE_REVISION` to the full source revision recorded in its release manifest; a Git checkout may use its clean HEAD. This labels a new build, not the preserved historical image:
+Build from a checksum-verified source archive or clean committed checkout. Set `SOURCE_REVISION` to the full source revision recorded in its release manifest; a Git checkout may use its clean HEAD. The label identifies the source used for that build:
 
 ```sh
 REVISION=${SOURCE_REVISION:?set the full source revision from the release manifest}
@@ -145,12 +140,7 @@ fixture-aware scanner before final COPY. Final artifact evidence records observe
 image IDs and layer checks separately from source provenance.
 
 The producer repositories remain private. Project-owned code is Apache-2.0; third-party
-font notices retain their own terms. Public preview availability and remaining acceptance
-are recorded separately in the release evidence. Public Education software checks passed
-on macOS ARM64, as did custom issuance, selected-field verification, restart and exact
-revocation. The Android guide passed receipt, cancellation and app-confirmed eligibility
-on one Pixel 7 running Android 17. An independent Ubuntu ARM64 VM run also passed
-Education and custom software flows using supplied public-only artifacts, with
-documented recovery and operator DNS cache refreshes.
-Native Linux AMD64 and Windows/WSL2 remain unverified;
+font notices retain their own terms. The runtime and app packages have been checked
+on ARM64 in a Docker Linux VM and on AMD64 under emulation, including lost-response
+recovery. Host setup, browser and device checks have separate limits;
 see [platform evidence](docs/setup/operations.md#platform-evidence).

@@ -112,7 +112,7 @@ Keep PASS, FAIL or NOT RUN for receipt, cancellation, successful authorization a
 
 ## Wallet candidate
 
-Use the wallet inside [the generic physical preview](https://github.com/TDS-Digital-ID/credworks-integration/releases/tag/release-b-physical-preview-20261012). It also supports Education. Verify the extracted APK before installation; historical acceptance of that wallet does not validate your new team deployment.
+Use the signed APK in [the wallet download](https://github.com/TDS-Digital-ID/credworks-integration/releases/tag/release-b-physical-preview-20261012). It supports Education and custom credentials. Verify the extracted APK before installation and complete the phone flow against your team's services.
 
 | Item | Expected value |
 | --- | --- |

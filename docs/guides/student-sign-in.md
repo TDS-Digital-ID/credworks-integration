@@ -2,7 +2,7 @@
 
 Use sign-in when your app needs to recognise a returning student. It requests enrolment, institution and student ID. Your backend checks the verified result, then finds an application account using the authenticated issuer and student ID together.
 
-[Getting started](../education/getting-started.md) checks eligibility without creating an account or sharing student ID. Complete that lesson first, using the same protected state directory and synthetic credential. Use the same versioned onboarding preview as that lesson.
+[Getting started](../education/getting-started.md) checks eligibility without creating an account or sharing student ID. Complete that lesson first, using the same protected state directory and synthetic credential. Use the same team starter as that lesson.
 
 ## 1. Run the sign-in example
 

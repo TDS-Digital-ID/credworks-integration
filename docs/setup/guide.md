@@ -5,9 +5,7 @@ per team. Setup preserves your keys and registration across retries.
 
 ## Before you start
 
-Use the reviewed kit supplied by your operator. These instructions require the
-updated setup helper; earlier public previews keep their original instructions.
-Install [Docker with Compose](https://docs.docker.com/get-started/get-docker/) and
+Use the private starter supplied by your operator. Install [Docker with Compose](https://docs.docker.com/get-started/get-docker/) and
 finish its first-run prompts. On Windows, use a Docker-enabled WSL2 Linux terminal.
 Keep the kit at a stable path and private state outside Git.
 
@@ -52,10 +50,6 @@ Expect `SETUP_READY`, then an `eligible` result. Open your app's HTTPS address w
 a certificate warning. Own-domain setup creates a named tunnel and unused DNS routes.
 Management stays private. This software-holder check uses synthetic data and mock
 attestation; it does not prove phone consent.
-
-## Upgrade an existing installation
-
-Use the [runtime and client upgrade](operations.md#upgrade-the-runtime-and-client). It preserves the existing identity and accounts.
 
 ## Stop, resume and diagnose
 

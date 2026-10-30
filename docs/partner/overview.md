@@ -2,54 +2,31 @@
 
 This kit packages independently operated issuer and verifier services, neutral examples and HTTP tools on the shared Rust identity-core. Partners own signing identities, issuance records, status and application decisions. Registration proves endpoint and key control. It does not establish institutional authority or authorize Education claims.
 
-Read [setup and lifecycle](quickstart.md), [definitions and disclosure](definitions.md), [HTTP API](api.md) and [operations and limits](operations.md). The existing [Education integration](../education/overview.md), [Education setup](../education/quickstart.md), [Education profiles](../education/profiles.md), [Education API](../education/api.md) and [Education operations](../education/operations.md) retain their Release A scope and frozen candidate references.
+Read [setup and lifecycle](quickstart.md), [definitions and disclosure](definitions.md), [HTTP API](api.md) and [operations and limits](operations.md). For student eligibility and sign-in, use the [Education integration](../education/overview.md) and [Getting started](../education/getting-started.md).
 
 ## Revision and profile matrix
 
-The table records the earlier preparation baseline. The public [Release B preview](https://github.com/TDS-Digital-ID/credworks-integration/releases/tag/release-b-preview-20261006) instead supplies image source dcef4b7721ad024ceb9d86133dc520ee66a92a13 and signed wallet source17c6d60b3196c40f6500adc391c6610ba5d52a89. Use the release manifest for exact checksums and image IDs; historical images below are not substitutes.
+Use the [setup manifest](../../config/setup-candidate.json) for exact container archives, image identities, architectures and checksums. Setup downloads and checks the matching images. A source label identifies the commit used to build an image; documentation has its own source revision.
 
-A source label identifies the commit used to build an image. A later integration or documentation commit does not relabel that image.
-
-| Component | Prepared and checked combination |
+| Component | Supported configuration |
 | --- | --- |
-| Monorepo source export | 5f00a507a892200cf1fd3b857dc875d556f16c17 |
-| Generic kit production source / OCI revision | f632ec5caf8d917304501ad038b2aceef1e46bae |
-| Kit integration base for these docs | 226a59da91e75807cf3ede9621888abcb13b4577 |
-| Local runtime image | vc408-partner:git-f632ec5caf8d917304501ad038b2aceef1e46bae, linux/arm64, ID sha256:be7e6e82bfb3de4659d63832c85e2f8a0f7db2a82d8c7c4ad31a5a9266804f8a |
-| Local Education app image | vc408-education:git-f632ec5caf8d917304501ad038b2aceef1e46bae, linux/arm64, ID sha256:2f1f52036a8df7626037ca8e9a133f278b2adce7d8a032680a6f735d18b070f3 |
-| Toolchain | Node 22.22.0, pnpm 10.34.4, Rust 1.92.0, frozen pnpm and locked Cargo dependencies |
+| Runtime and Education app source | 4be274ebc92a8653f56f83661d035150d1497770 |
+| Container architectures | linux/arm64 and linux/amd64 |
+| Toolchain | Node 22.22.0, pnpm 10.34.4, Rust 1.92.0, locked pnpm and Cargo dependencies |
 | Credential / binding | W3C VC Data Model 2.0 SD-JWT, vc+sd-jwt, ES256/P-256, holder binding, did:web |
 | Issuance | OID4VCI 1.0 Final pre-authorized-code, jwt holder proof, configured provider-signed WIA; recipient key thumbprint required |
 | Presentation | OID4VP 1.0 Final, decentralized_identifier, direct_post, one DCQL credential query with exact registered paths |
 | Generic shapes | string, boolean, safe finite number/integer, nested object properties, complete object/array values |
 | Application extensions | credworks_scalar request authority, metadata issuer authorization, receipt-confirmed renewal version 1 |
 | Status / trust | Signed Bitstring Status List revocation; issuer-scoped signed definitions and verifier permissions; retained credential-key membership |
-| Education baseline | Original monorepo export 14096ed41ee259e81414fcfa0c3b2ad622a5b426; preserve its candidate/artifact pins and application contract |
-| Preparation evidence | 130 runtime checks, 25 Node checks, 8 boundary checks, core/conformance 99 checks; software-holder HTTP checks; no physical observations |
-| Final generic candidate / Android | Consult the selected release manifest for its exact source, APK checksum, signer and endpoint combination |
-
-The source export manifest and [packaging transforms](../../provenance/GENERIC-TRANSFORMS.md) describe original files and deliberate packaging changes. [Earlier generic acceptance evidence](../../provenance/GENERIC-ACCEPTANCE.md) distinguishes intermediate producer pins from later consumer checks. These historical image pins describe preparation, not the currently published image archive. Other CPU architectures require their own build and inspection.
-
-The [result delivery update](../setup/operations.md#upgrade-the-runtime-and-client) uses image source `4be274ebc92a8653f56f83661d035150d1497770` for both Education and generic verification. It changes result retrieval and the Education client, without changing credential formats or the wallet. Older image pins above remain historical.
+| Result delivery | Authenticated retries within the original retention and evidence limits; current authorization and status checked on every verified delivery |
+| Android | Separate signed [wallet download and consent flow](../guides/android-wallet.md) |
 
 ## Availability and release limits
 
-The public source and preview artifacts are in TDS-Digital-ID/credworks-integration. Both producer repositories remain private. Source builds require public package registries, not private-monorepo access or private build secrets. Project-owned code is Apache-2.0; third-party terms remain unchanged. Read the release manifest, required notices and corresponding-source attachments before using the image/APK downloads.
+Public source and artifacts are in [TDS-Digital-ID/credworks-integration](https://github.com/TDS-Digital-ID/credworks-integration). Both producer repositories remain private. Source builds require public package registries. Project-owned code is Apache-2.0; third-party terms remain unchanged. Read the artifact manifests, notices and corresponding-source attachments when downloading images or the APK.
 
-Release A was published before B. The [later physical preview](https://github.com/TDS-Digital-ID/credworks-integration/releases/tag/release-b-physical-preview-20261012)
-updates the generic wallet and records the retained POC checks on one Pixel,
-including receipt, selective disclosure, revocation and renewal recovery. It uses
-labelled mock platform attestation. It does not establish vendor attestation,
-independent-wallet interoperability or a second-device matrix.
-
-The new guided onboarding candidate includes independently authenticated sandbox
-configuration. Its public HTTPS Education and custom software flows passed on macOS
-ARM64. Both flows also passed in an Ubuntu ARM64 VM using supplied public-only artifacts;
-see [platform evidence](../setup/operations.md#platform-evidence) for scope and limits.
-Its new commands and container archives are awaiting publication. Teams still operate their own HTTPS services,
-databases and protected identities. [Getting started](../education/getting-started.md)
-explains the first development milestone; software-holder checks do not establish
-hardware custody.
+Teams operate their own HTTPS services, databases and protected identities. The private starter contains the team's tunnel assignment and independently authenticated sandbox configuration. [Getting started](../education/getting-started.md) explains setup and the first development milestone. See [platform evidence](../setup/operations.md#platform-evidence) for the checked environments and their limits. Software-holder checks use labelled mock platform attestation and do not establish hardware custody.
 
 Unsupported options include dc+sd-jwt, other suites, Presentation Exchange, arbitrary DCQL controls, array-element disclosure, overlapping hidden ancestor/child paths, proximity transports, public iOS distribution and broad unrelated-wallet interoperability. There is one issuer identity per deployment. The kit makes no production key-custody, high-availability or institutional accreditation claim.
 

@@ -23,9 +23,9 @@ shasum -a 256 credworks-sandbox-20261011.json
 
 Expected SHA-256: `554b1a092b30b888b243c47ee22f526fa573f51322ac9972549774288314c096`.
 
-The configuration records the operator's independent host inspection and matching Release A/B APK checksums. Both APKs compile the same registry public-key coordinates and service origins. Their compiled JWK has a legacy fixture `kid`; the wallet derives registry identity separately from its configured origin. The published registry key uses the actual live key ID. Issuer/provider keys were checked against the authenticated host and signed accreditation, not claimed as independently compiled APK pins.
+The configuration records the operator's independent host inspection and wallet-build checksums. The pinned registry public-key coordinates and service origins match those wallet builds. The wallet derives registry identity from its configured origin; the published configuration uses the live registry key ID. Issuer/provider keys were checked against the authenticated host and signed accreditation.
 
-This is a dated configuration for the existing preview, not a permanent trust-update service. Before use, check that the selected release still names these origins and key coordinates. Follow signed evidence freshness checks normally. On changed keys, withdrawn authority, stale evidence or unavailable services, stop and obtain a reviewed replacement configuration from the authenticated publisher. Do not automatically adopt keys from a live DID response, replace an identity, or extend an evidence deadline. New origins or wallet pins require a new candidate and affected checks.
+The configuration records a specific authenticated observation. It is not a permanent trust-update service. Before use, check that the selected release still names these origins and key coordinates. Follow signed evidence freshness checks normally. On changed keys, withdrawn authority, stale evidence or unavailable services, stop and obtain a reviewed replacement configuration from the authenticated publisher. Do not automatically adopt keys from a live DID response, replace an identity, or extend an evidence deadline. New origins or wallet pins require a new candidate and affected checks.
 
 Map the published values into the protected files below:
 
