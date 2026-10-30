@@ -25,5 +25,8 @@
     "src",
     "drizzle"
   ],
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "exports": {
+    "./client": "./src/client.ts"
+  }
 }

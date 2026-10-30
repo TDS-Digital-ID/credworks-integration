@@ -11,13 +11,15 @@
     "test:fixtures": "node tool/test-fixture-addon.mjs",
     "check": "pnpm docs:check && pnpm lint && pnpm exec tsc -p tool/tsconfig.json && pnpm test:boundary && pnpm test:fixtures",
     "register": "node --import tsx tool/register-verifier.ts",
-    "docs:check": "node tool/check-docs.mjs --root . && node --test tool/tests/docs.test.mjs",
+    "docs:check": "node tool/check-docs.mjs --root . && node --test tool/tests/docs.test.mjs tool/tests/api-examples.test.mjs",
     "acceptance:generic": "node --import tsx tool/generic-check.ts"
   },
   "devDependencies": {
-    "typescript": "5.9.3",
     "@types/node": "24.10.0",
-    "tsx": "^4.23.0"
+    "ajv": "8.17.1",
+    "ajv-formats": "3.0.1",
+    "tsx": "^4.23.0",
+    "typescript": "5.9.3"
   },
   "dependencies": {
     "@unsw-vc/identity-core-node": "workspace:*"

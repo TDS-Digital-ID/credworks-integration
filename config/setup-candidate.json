@@ -1,37 +1,38 @@
 {
   "version": 1,
-  "sourceRevision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
+  "archiveBaseUrl": "https://github.com/TDS-Digital-ID/credworks-integration/releases/download/result-retry-update-20261030",
+  "sourceRevision": "4be274ebc92a8653f56f83661d035150d1497770",
   "ecosystemFile": "credworks-sandbox-20261011.json",
   "ecosystemSha256": "554b1a092b30b888b243c47ee22f526fa573f51322ac9972549774288314c096",
   "platforms": {
     "arm64": {
-      "application": "sha256:166562c1c9b5ba192f20c17d100ed06ae1336644c934046afc0f860a8723f7a9",
-      "partner": "sha256:8cac256d1810d7140e336e8276ca0dc314a2d5f741172e8081dbbc6bc50cdd6f",
-      "applicationImported": "sha256:68bb7faf4b72fbc94cf28f2df4e7584fbf33d5726ba251019b1729b7c5f1d594",
-      "applicationConfig": "sha256:2d4b0316d327168ff34ebc552e8330a609421f011c5e409673a5714e0d23025a",
-      "partnerImported": "sha256:9fd6aabe535529c5e7a94c02bbb28d837a3d8d9fc2266d05e2cff65e5b0a39d2",
-      "partnerConfig": "sha256:a014a44ef6b901987428a2999be45569aa117b632db4d2dd03b3d18b3fadd497"
+      "application": "sha256:5f64f1cf12e9539c412861c06259798f95cbb019b748276d6b1db182df7a1de3",
+      "partner": "sha256:f809acea70889c2e15afc657872debdf93631618b8f71b561f893dc2862e4709",
+      "applicationConfig": "sha256:be9879b92cbfec96f46205f841388e7bb2818ce70c7a557cc3a274afc2293f13",
+      "partnerConfig": "sha256:ae5a54f813d9b94b1f623e9419c9532e9df04ad1276befd9b7bfffd36157f2c9",
+      "applicationImported": "sha256:98f1679d972d2a83b4e2559816eb9e6d7a87577bc3862160c289048b1a7e98f1",
+      "partnerImported": "sha256:b7c91e7312145f08bda04d47f589db03ff2646b846c3bc8ca57d5d01b5aa440b"
     },
     "amd64": {
-      "application": "sha256:14b0a2339cf7170db526c6379a2de1c85c353b2794ca4ebcda759ad096ba9a14",
-      "partner": "sha256:a650793dca9cea54b649fc65376991f10800682e14406706a566a5c28b00fc71",
-      "applicationImported": "sha256:3f807d35e38352f39f882bb7e528df97ae8db3d076ec454f5d5206cf441324e0",
-      "applicationConfig": "sha256:05df33c7150fe49b1847cf5e5fb6090735d46793e210d1d51c4bfc9bc2fb6873",
-      "partnerImported": "sha256:dc74c604881be36ce3dc2f351e5a88838fb17781c360f94ddc3bf4050087dd1b",
-      "partnerConfig": "sha256:e7ed3ca1922590a02b62704a35462db359c9eb2cdc72d1cc4887169e72e5027c"
+      "application": "sha256:ae6144799d53946b6abafb0fff9ac0e97c5f1cb12feb8a00a362f907f7355215",
+      "partner": "sha256:92b4d7939252cd009e4d1a3141f95e54bc3182f92574231e33c15a5ef045405e",
+      "applicationConfig": "sha256:ff1d233fa8dab7b0b33b952cfb22c8de031db8c946725791618c880e5d9c3f22",
+      "partnerConfig": "sha256:310208d5a324156a603197051c429fd2728f68c37de948d5c6bee5202118b179",
+      "applicationImported": "sha256:ebd81cabb59164315c8ec4a642e7d988966a61dd89f6f60a0d830592ecd69637",
+      "partnerImported": "sha256:865c096f7ea0c9f1a8ed3fac178b714f305d9e384059b633e4791e3197ac194e"
     }
   },
   "archives": [
     {
-      "name": "education-containers-61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb-arm64.tar",
-      "sha256": "5c3580ce25a70713cff1b877be8f0d52cee547aff3503a52f1403daeaffa5d1e",
-      "size": 99429376,
+      "name": "education-containers-4be274ebc92a8653f56f83661d035150d1497770-arm64.tar",
+      "sha256": "b8078120b90a10bbc633b81fcd670c56ec787fc0483f2e5cc118b478d36922f0",
+      "size": 99444224,
       "architecture": "arm64"
     },
     {
-      "name": "education-containers-61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb-amd64.tar",
-      "sha256": "8a9436793b76dcdf80dba17d0951e157387c87e2225b44d5856b0aba9afea157",
-      "size": 100521472,
+      "name": "education-containers-4be274ebc92a8653f56f83661d035150d1497770-amd64.tar",
+      "sha256": "251d67689353517c7ae5bb26d199d977de2a887b96ad6411852bd28a825c7496",
+      "size": 100532224,
       "architecture": "amd64"
     }
   ]

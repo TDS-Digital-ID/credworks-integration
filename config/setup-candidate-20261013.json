@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "archiveBaseUrl": "https://github.com/TDS-Digital-ID/credworks-integration/releases/download/student-onboarding-preview-20261013",
+  "sourceRevision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
+  "ecosystemFile": "credworks-sandbox-20261011.json",
+  "ecosystemSha256": "554b1a092b30b888b243c47ee22f526fa573f51322ac9972549774288314c096",
+  "platforms": {
+    "arm64": {
+      "application": "sha256:166562c1c9b5ba192f20c17d100ed06ae1336644c934046afc0f860a8723f7a9",
+      "partner": "sha256:8cac256d1810d7140e336e8276ca0dc314a2d5f741172e8081dbbc6bc50cdd6f",
+      "applicationImported": "sha256:68bb7faf4b72fbc94cf28f2df4e7584fbf33d5726ba251019b1729b7c5f1d594",
+      "applicationConfig": "sha256:2d4b0316d327168ff34ebc552e8330a609421f011c5e409673a5714e0d23025a",
+      "partnerImported": "sha256:9fd6aabe535529c5e7a94c02bbb28d837a3d8d9fc2266d05e2cff65e5b0a39d2",
+      "partnerConfig": "sha256:a014a44ef6b901987428a2999be45569aa117b632db4d2dd03b3d18b3fadd497"
+    },
+    "amd64": {
+      "application": "sha256:14b0a2339cf7170db526c6379a2de1c85c353b2794ca4ebcda759ad096ba9a14",
+      "partner": "sha256:a650793dca9cea54b649fc65376991f10800682e14406706a566a5c28b00fc71",
+      "applicationImported": "sha256:3f807d35e38352f39f882bb7e528df97ae8db3d076ec454f5d5206cf441324e0",
+      "applicationConfig": "sha256:05df33c7150fe49b1847cf5e5fb6090735d46793e210d1d51c4bfc9bc2fb6873",
+      "partnerImported": "sha256:dc74c604881be36ce3dc2f351e5a88838fb17781c360f94ddc3bf4050087dd1b",
+      "partnerConfig": "sha256:e7ed3ca1922590a02b62704a35462db359c9eb2cdc72d1cc4887169e72e5027c"
+    }
+  },
+  "archives": [
+    {
+      "name": "education-containers-61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb-arm64.tar",
+      "sha256": "5c3580ce25a70713cff1b877be8f0d52cee547aff3503a52f1403daeaffa5d1e",
+      "size": 99429376,
+      "architecture": "arm64"
+    },
+    {
+      "name": "education-containers-61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb-amd64.tar",
+      "sha256": "8a9436793b76dcdf80dba17d0951e157387c87e2225b44d5856b0aba9afea157",
+      "size": 100521472,
+      "architecture": "amd64"
+    }
+  ]
+}

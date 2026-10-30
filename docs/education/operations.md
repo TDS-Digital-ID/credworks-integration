@@ -5,7 +5,7 @@
 | Role | Destination | Material / purpose |
 | --- | --- | --- |
 | Runtime public | Own registered HTTPS origin | DID, signed request, wallet direct_post; public ceremony capabilities |
-| Runtime management | Exact http://127.0.0.1:3081 | Runtime bearer; ownership proof, sessions, one-time results, evidence refresh |
+| Runtime management | Exact http://127.0.0.1:3081 | Runtime bearer; ownership proof, sessions, retryable results, evidence refresh |
 | Registry | Independently provisioned HTTPS origin/DID/key | Project-scoped bearer for writes; signed trust and scoped permissions |
 | Education issuer / portal | Metadata-named issuer and authorization-server origins | Synthetic offers, Government enrolment, Education receipt |
 | Wallet provider | Provisioned HTTPS origin | Provider-signed mock WIA for sandbox issuance |

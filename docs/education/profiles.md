@@ -12,13 +12,13 @@ No name, date of birth, programme, photo or holder identifier is requested. Arbi
 ## Delivery, verification and access
 
 1. Public `{"status":"accepted"}` acknowledges admitted delivery only. It carries no verification verdict, claims or login decision.
-2. Protected one-time result retrieval returns verified typed claims and evidence, or a claim-free refusal. The initiating application keeps the management bearer and correlation capability server-side. Public state and request capabilities cannot retrieve results.
+2. Protected retryable result retrieval returns verified typed claims and evidence, or a claim-free refusal. The initiating application keeps the management bearer and correlation capability server-side. Public state and request capabilities cannot retrieve results.
 3. The application checks policy explicitly. The reference app requires the configured issuer/verifier, exact type/definition/version/profile/paths, original interaction, fresh evidence, `enrolled === true` and the exact configured institution. A verified `enrolled=false` is valid cryptography and refuses access.
 
 Sign-in additionally requires a bounded nonblank student ID. The app maps the exact authenticated `(issuer, student_id)` pair to a random application UUID. The UUID does not remove the stable student ID correlation risk at the receiving service: two services given that identifier can correlate visits. Eligibility returns `eligible`, creates no account and does not sign in. Use it whenever continuity is unnecessary. Synthetic student IDs are stable and never reassigned.
 
 ## Browser correlation
 
-The browser app creates a 30-minute Secure/HttpOnly/SameSite=Strict `__Host-education` cookie. JSON POSTs require exact Origin and synchronizer `X-CSRF-Token`. Runtime session ID, interaction ID and correlation capability remain server-side. Another browser cannot complete the interaction; one admitted completion claims it before upstream I/O. Uncertain delivery fails closed. Replay and concurrent consumption cannot create a second login. Successful sign-in rotates cookie/CSRF and retires pending interactions; refusal preserves an existing login.
+The browser app creates a 30-minute Secure/HttpOnly/SameSite=Strict `__Host-education` cookie. JSON POSTs require exact Origin and synchronizer `X-CSRF-Token`. Runtime session ID, interaction ID and correlation capability remain server-side. Another browser cannot complete the interaction; one admitted completion claims it before upstream I/O. A lost runtime result response permits a retry before application effects start and within the original deadlines. Replay and concurrent consumption cannot create a second login. Successful sign-in rotates cookie/CSRF and retires pending interactions; refusal preserves an existing login.
 
 The app rechecks browser, result-retention and immutable evidence deadlines after network/account I/O. Refresh cannot extend old results. See [API examples](api.md) and [operations](operations.md).

@@ -81,3 +81,29 @@ with a stop condition when the release is unavailable. Its manifest entry record
 the new exported SHA256 and the preceding guided-setup export hash. The original
 producer source revision, path and source hash remain unchanged. This documentation
 change does not rebuild or relabel the historical image archives.
+
+## Shared client and one-command course starter, 2026-10-29
+
+The app README describes the kit's shared backend client. Its export hash now records
+that documentation change; the previous export hash and original producer revision
+and source hash remain recorded. The course setup helper and private starter packaging
+reuse the pinned images. No historical archive is rebuilt or relabelled.
+
+## Retryable result delivery, 2026-10-30
+
+Runtime sessions, the Education client and browser diagnostic, their regression tests,
+and both OpenAPI documents were refreshed from monorepo
+`4be274ebc92a8653f56f83661d035150d1497770`. Each refreshed manifest entry records
+its exact source revision, source hash and export hash. The session HTTP fixture uses
+the reserved kit port; production code is copied exactly. The packaged issuer test
+now expects repeated ordinary reads to return the same result.
+
+The helper accepts the previous and current pinned image sets. Explicit `./setup upgrade`
+checks the new images, keeps a protected backup and resumes interrupted configuration
+writes without changing keys, origins, registration, project names or database volumes.
+The previous candidate is retained for existing installations. The current candidate
+records newly built image archives, never relabelled historical ones.
+
+The lockfile export record now includes the schema-validation dependencies already
+introduced by the preceding API documentation update. No dependency versions changed
+in this runtime fix. Rust core and issuer-protocol source are unchanged.

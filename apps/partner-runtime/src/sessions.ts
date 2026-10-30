@@ -325,9 +325,9 @@ export class Sessions {
     const session = this.protectedSession(id, capability);
     if (session.phase === "linking")
       throw new VerificationError("RESULT_LINKED", 409);
-    if (session.phase === "consumed")
+    if (session.phase === "consumed" && !session.result)
       throw new VerificationError("RESULT_CONSUMED", 409);
-    if (session.phase !== "complete")
+    if (session.phase !== "complete" && session.phase !== "consumed")
       throw new VerificationError(
         this.now() >= session.expiresAt ? "SESSION_EXPIRED" : "RESULT_PENDING",
         this.now() >= session.expiresAt ? 410 : 409,
@@ -353,8 +353,11 @@ export class Sessions {
       }
     }
     session.phase = "consumed";
-    session.result = undefined;
-    session.credentialStatus = undefined;
+    // Retain ordinary delivery for retries until the original retireAt. Each
+    // verified retry rechecks current authority/status and the original deadline.
+    // Once refused, erase the claims and never restore a positive result.
+    session.result = result;
+    if (result?.status !== "verified") session.credentialStatus = undefined;
     return result;
   }
   validateBinding(binding: HolderBinding) {

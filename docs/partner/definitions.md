@@ -61,6 +61,6 @@ Issuer configuration contains `databaseUrl`, `registryOrigin`, `registryDid`, `t
 
 Verifier configuration retains `issuerDid`, `issuerJwk`, `registryOrigin`, `trustAnchorJwk`, `statusSources` and `maxCacheAgeSeconds`. Its generic `scalar` object selects `registryDid`, `issuerKeyId` and `definitions`. Each definition selects `configurationId`, `authorizationId`, `definitionId`, `definitionVersion`, `credentialType` and `profiles`; profiles select `name` and `permissionId`. See [scalar verifier input](../../apps/partner-runtime/examples/scalar-verifier.json). Authenticated registry publications supply labels and exact paths, never the session caller.
 
-After credential-key rotation, follow [retained-key configuration](operations.md#retained-key-rotation). A session captures its accepted membership; fetching a newer grant cannot silently add a key to that request. Apply partner policy only to protected, correlated one-time results. Preserve issuer, definition/version and full paths alongside typed claims.
+After credential-key rotation, follow [retained-key configuration](operations.md#retained-key-rotation). A session captures its accepted membership; fetching a newer grant cannot silently add a key to that request. Apply partner policy only to protected, correlated results. Preserve issuer, definition/version and full paths alongside typed claims.
 
 Continue with [setup](quickstart.md#registration-and-authority), [API contracts](api.md) or the separate [Education profiles](../education/profiles.md).

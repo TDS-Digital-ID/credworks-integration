@@ -63,4 +63,4 @@ A wallet's delivery message does not sign anyone in. The app must consume the pr
 | `INTERACTION_NOT_FOUND` or `INTERACTION_CONSUMED` | Use the initiating browser. If it restarted or already completed, start a fresh request. |
 | `ENROLMENT_REQUIRED` or `INSTITUTION_NOT_ALLOWED` | The verified credential does not meet your app's policy. Refuse sign-in; do not rewrite its values. |
 
-For setup or interrupted synthetic receipt, use [Getting started recovery](../education/getting-started.md#3-recover-from-an-interrupted-request). Continue with [Connect your backend](connect-your-backend.md) to adapt the working app, or use the [HTTP reference](../education/api.md) for request schemas and limits.
+For setup or interrupted synthetic receipt, use [Getting started recovery](../education/getting-started.md#if-setup-stops). Continue with [Connect your backend](connect-your-backend.md) to adapt the working app, or use the [HTTP reference](../education/api.md) for request schemas and limits.
