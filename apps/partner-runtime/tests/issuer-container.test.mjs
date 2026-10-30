@@ -811,14 +811,14 @@ test(
       assert.deepEqual(result.body.claims, { enabled: true });
       assert.equal(result.body.evidence.issuer_did, identity.did);
       assert.equal(result.body.evidence.verifier_did, verifierIdentity.did);
-      assert.equal(
+      assert.deepEqual(
         management(
           `/management/sessions/${session.body.session_id}/result`,
           {},
           verifier,
           session.body.correlation_capability,
-        ).status,
-        409,
+        ),
+        result,
       );
       assert.equal(
         (await fetch(verifierUrl + "/management/sessions", { method: "POST" }))

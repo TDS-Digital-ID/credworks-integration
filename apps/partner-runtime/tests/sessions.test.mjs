@@ -3,8 +3,10 @@ import { test } from "node:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { createServer } from "node:http";
 import * as core from "@unsw-vc/identity-core-node";
 import { openIdentity, startRuntime } from "../src/runtime.ts";
+import { educationClient } from "../../education-sign-in/src/client.ts";
 
 async function fixture({
   trustTTL = 300,
@@ -21,8 +23,8 @@ async function fixture({
     stateDir: join(root, "identity"),
     unlockKey: core.randomUrlSafe(32),
     managementToken: core.randomUrlSafe(32),
-    publicPort: Number(process.env.PARTNER_SESSION_HTTP_PORT ?? 29200),
-    managementPort: Number(process.env.PARTNER_SESSION_HTTP_PORT ?? 29200) + 1,
+    publicPort: Number(process.env.PARTNER_SESSION_HTTP_PORT ?? 29270),
+    managementPort: Number(process.env.PARTNER_SESSION_HTTP_PORT ?? 29270) + 1,
   };
   const identity = openIdentity(config, true);
   let clock = Math.floor(Date.now() / 1000);
@@ -325,7 +327,69 @@ async function respond(f, request, token, state = request.state) {
     }),
   });
 }
-test("real holder presentation yields one protected typed result and concurrent completion is claimed once", async () => {
+test("a lost result response can be retried through the client without repeating application effects", async () => {
+  const f = await fixture();
+  let discard = true, deliveries = 0, applications = 0;
+  // Drop the connection only after the real runtime has processed the result.
+  const proxy = createServer(async (incoming, outgoing) => {
+    const chunks = [];
+    for await (const chunk of incoming) chunks.push(chunk);
+    const response = await fetch(f.runtime.management + incoming.url, {
+      method: "POST",
+      headers: {
+        authorization: incoming.headers.authorization,
+        "content-type": "application/json",
+        ...(incoming.headers["x-session-capability"]
+          ? { "x-session-capability": incoming.headers["x-session-capability"] }
+          : {}),
+      },
+      body: Buffer.concat(chunks),
+    });
+    const body = await response.text();
+    if (incoming.url.endsWith("/result")) {
+      deliveries++;
+      if (discard) {
+        discard = false;
+        outgoing.destroy();
+        return;
+      }
+    }
+    outgoing.writeHead(response.status, { "content-type": "application/json" });
+    outgoing.end(body);
+  });
+  await new Promise(resolve => proxy.listen(0, "127.0.0.1", resolve));
+  try {
+    const client = educationClient({
+      runtimeManagement: `http://127.0.0.1:${proxy.address().port}`,
+      runtimeToken: f.config.managementToken,
+      issuer: f.issuerDid, verifierDid: f.identity.did, institution: "unsw.edu.au",
+    }, f.clock);
+    const verification = await client.create("education_sign_in", () => {});
+    const jwt = await (await fetch(f.runtime.public + new URL(verification.request_uri).pathname)).text();
+    const request = core.verifyOid4vpRequestObject({
+      compactJws: jwt,
+      resolverResponses: {
+        [core.didWebToHttpsUrl(f.identity.did)]: JSON.stringify(core.buildDidWebDocument(f.identity.did, [f.identity.publicJwk])),
+      },
+      nowUnixSeconds: f.clock(),
+    }).payload;
+    const token = presentation(f, request, "education_sign_in");
+    assert.equal((await respond(f, request, token)).status, 200);
+    const apply = claims => { applications++; return claims.student_id; };
+    await assert.rejects(client.consume(verification, apply), { code: "RUNTIME_UNAVAILABLE" });
+    assert.equal(deliveries, 1);
+    assert.equal(applications, 0);
+    assert.equal(await client.consume(verification, apply), "synthetic-362");
+    await assert.rejects(client.consume(verification, apply), { code: "INTERACTION_CONSUMED" });
+    assert.equal(deliveries, 2);
+    assert.equal(applications, 1);
+    assert.equal((await respond(f, request, token)).status, 409);
+  } finally {
+    await new Promise(resolve => proxy.close(resolve));
+    await f.close();
+  }
+});
+test("protected result reads are repeatable while concurrent presentation completion is claimed once", async () => {
   const f = await fixture();
   try {
     const { session, request } = await create(f, "education_sign_in");
@@ -356,16 +420,18 @@ test("real holder presentation yields one protected typed result and concurrent 
       institution_id: "unsw.edu.au",
       student_id: "synthetic-362",
     });
-    assert.equal(
-      (
-        await f.app(
-          `/management/sessions/${session.session_id}/result`,
-          {},
-          session.correlation_capability,
-        )
-      ).status,
-      409,
-    );
+    const path = `/management/sessions/${session.session_id}/result`;
+    const retry = await f.app(path, {}, session.correlation_capability);
+    assert.equal(retry.status, 200);
+    assert.deepEqual(await retry.json(), verified);
+    const other = await create(f);
+    for (const capability of [undefined, request.state, other.session.correlation_capability]) {
+      assert.equal((await f.app(path, {}, capability)).status, 401);
+    }
+    assert.equal((await f.app(path, {}, session.correlation_capability, "wrong-token")).status, 401);
+    const status = await (await f.app(`/management/sessions/${session.session_id}`, undefined, session.correlation_capability)).json();
+    assert.equal(status.status, "consumed");
+    assert.equal(status.claims, undefined);
   } finally {
     await f.close();
   }
@@ -579,7 +645,7 @@ test("cache refresh changes scoped authority for existing sessions and rejects u
     await f.close();
   }
 });
-test("management input is bounded and result consumption is atomic across concurrent callers", async () => {
+test("management input is bounded and concurrent result reads return the same result", async () => {
   const f = await fixture();
   try {
     const malformed = await f.app("/management/sessions", {
@@ -614,7 +680,8 @@ test("management input is bounded and result consumption is atomic across concur
         session.correlation_capability,
       ),
     ]);
-    assert.deepEqual(results.map((r) => r.status).sort(), [200, 409]);
+    assert.deepEqual(results.map((r) => r.status), [200, 200]);
+    assert.deepEqual(await results[0].json(), await results[1].json());
   } finally {
     await f.close();
   }
@@ -838,7 +905,7 @@ test("refresh cannot extend a completed result's original evidence deadline", as
         ),
       ),
     );
-    assert.deepEqual(outcomes.map((r) => r.status).sort(), [200, 409]);
+    assert.deepEqual(outcomes.map((r) => r.status), [200, 200]);
     const result = await outcomes.find((r) => r.status === 200).json();
     assert.deepEqual(result, {
       status: "refused",
@@ -901,16 +968,9 @@ test("completed result delivery refuses a withdrawn exact permission", async () 
       interaction_id: session.interaction_id,
       error: { code: "SCOPE_NOT_PERMITTED" },
     });
-    assert.equal(
-      (
-        await f.app(
-          `/management/sessions/${session.session_id}/result`,
-          {},
-          session.correlation_capability,
-        )
-      ).status,
-      409,
-    );
+    const retry = await f.app(`/management/sessions/${session.session_id}/result`, {}, session.correlation_capability);
+    assert.equal(retry.status, 200);
+    assert.equal((await retry.json()).error.code, "SCOPE_NOT_PERMITTED");
   } finally {
     await f.close();
   }
@@ -999,6 +1059,51 @@ test("authenticated fractional credential expiry caps completed result delivery"
     await f.close();
   }
 });
+
+for (const change of ["expiry", "permission", "revocation"]) {
+  test(`result retry rechecks ${change} and never restores invalidated claims`, async () => {
+    const f = await fixture();
+    try {
+      const { session, request } = await create(f);
+      assert.equal((await respond(f, request, presentation(f, request))).status, 200);
+      const read = () => f.app(`/management/sessions/${session.session_id}/result`, {}, session.correlation_capability);
+      const first = await (await read()).json();
+      assert.equal(first.status, "verified");
+      const original = new Map(f.evidence);
+      let code;
+      if (change === "expiry") {
+        f.advance(30);
+        code = "EVIDENCE_STALE";
+      } else if (change === "permission") {
+        const payload = core.verifyCompactJwsJson({ compactJws: f.evidence.get(f.permissionsUrl), publicJwk: f.config.verifier.trustAnchorJwk }).payload;
+        const keyId = "did:web:registry362.example#trust-anchor-1";
+        f.evidence.set(f.permissionsUrl, core.signScopedVerifierPermissions({
+          payload: { ...payload, permissions: [] },
+          header: { alg: "ES256", typ: "scoped-verifier-permissions+jwt", kid: keyId }, keyId,
+        }));
+        code = "SCOPE_NOT_PERMITTED";
+      } else {
+        const keyId = f.issuerDid + "#status-1";
+        const payload = core.verifyCompactJwsJson({ compactJws: f.evidence.get(f.statusUrl), publicJwk: f.config.verifier.statusSources[0].publicJwk }).payload;
+        payload.credentialSubject.encodedList = core.encodeBitstringStatusList(131072, [7]);
+        f.evidence.set(f.statusUrl, core.signBitstringStatusListCredential({
+          payload, header: { alg: "ES256", typ: "statuslist+jwt", kid: keyId }, keyId,
+        }));
+        code = "STATUS_CHECK_FAILED";
+      }
+      assert.equal((await f.app("/management/evidence/refresh", {})).status, 200);
+      const expected = { status: "refused", interaction_id: session.interaction_id, error: { code } };
+      for (let i = 0; i < 2; i++) {
+        const retry = await read();
+        assert.equal(retry.status, 200);
+        assert.deepEqual(await retry.json(), expected);
+      }
+      for (const [url, jwt] of original) f.evidence.set(url, jwt);
+      assert.equal((await f.app("/management/evidence/refresh", {})).status, 200);
+      assert.deepEqual(await (await read()).json(), expected);
+    } finally { await f.close(); }
+  });
+}
 
 test("pending request retrieval enforces current permission without changing its original deadline", async () => {
   const f = await fixture({ maxAge: 10 });

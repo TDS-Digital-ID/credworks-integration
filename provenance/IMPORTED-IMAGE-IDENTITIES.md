@@ -1,6 +1,6 @@
 # Imported container identities
 
-The container archives and their source revision are unchanged. The existing build
+Each candidate records its own immutable archives and source revision. The result-retry update adds new archives; earlier archives remain unchanged. The existing build
 engine identifies each image by its builder OCI index. Loading the archive into a
 clean containerd image store identifies it by the included platform manifest;
 a classic Docker store identifies it by the image configuration digest.
@@ -10,7 +10,7 @@ The `Imported` entries are platform manifest digests and the `Config` entries ar
 configuration digests derived from the same checksum-verified archives. The archive
 `index.json` points to each manifest, and that manifest points to its configuration.
 Each referenced JSON blob was SHA256 checked. Architecture, source label and runtime
-user match the original candidate. No images were rebuilt or archives repacked.
+user match the original candidate. The import variants describe the same archive bytes, not another build.
 
 Setup tries only those exact immutable identities for the selected architecture.
 It records the available identity in new protected state and inspects architecture,

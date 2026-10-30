@@ -3,6 +3,7 @@ import { existsSync, lstatSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
 import { httpClient } from './http-client.mjs';
+import { credentialInput } from './setup-credential.mjs';
 import { openGeneric, type GenericConfig } from './generic-http.js';
 
 const check = (value: unknown, code: string) => { if (!value) throw Error(code); };
@@ -17,15 +18,8 @@ export async function configureIssuer(root: string, state: any, atomic: (path: s
   const e = state.ecosystem;
   check(e.providerDid === core.didWebFromHost(new URL(e.providerOrigin).host), 'SETUP_TRUST_INPUT_REFUSED');
   core.publicJwkSha256Thumbprint(e.providerJwk);
-  const definition = {
-    id: state.binding.runtimeOrigin + '/definitions/club-membership', version: '1',
-    credential_type: 'SyntheticClubMembership', label: 'Synthetic club membership', max_validity_seconds: 3600,
-    claims: [
-      { name: 'member', label: 'Member', value_type: 'boolean', required: true },
-      { name: 'club', label: 'Club', value_type: 'string', required: true },
-    ],
-    profiles: [{ name: 'membership', claim_paths: [['credentialSubject', 'member']] }],
-  };
+  const { definition } = credentialInput(state);
+  const configurationId = state.binding.credential ? 'custom-credential' : 'club-membership';
   core.validateScalarDefinition(definition as core.ScalarCredentialDefinition);
   const path = join(root, 'custom-definition.json');
   const progress = existsSync(path) ? read(path) : { definition };
@@ -48,13 +42,13 @@ export async function configureIssuer(root: string, state: any, atomic: (path: s
   check(authorization.status === 200, 'SETUP_SIGNED_EVIDENCE_UNAVAILABLE');
   const publication = core.verifyCompactJwsJson({ compactJws: authorization.text, publicJwk: e.trustAnchorJwk }).payload as any;
   check(publication.issuer === e.registryDid && publication.id === progress.adopted.authorization_url, 'SETUP_SIGNED_EVIDENCE_REFUSED');
-  const authority = core.verifyIssuerAuthorization({ compactJws: authorization.text, trustAnchorJwk: e.trustAnchorJwk, request: { credential_issuer_did: owner.issuerDid, credential_issuer_key_id: owner.keyId, credential_issuer_public_jwk: owner.issuerPublicJwk, definition_id: definition.id, definition_version: '1', credential_type: definition.credential_type, registry_did: e.registryDid, purpose: 'issuance' }, nowUnixSeconds: Math.floor(Date.now() / 1000) });
+  const authority = core.verifyIssuerAuthorization({ compactJws: authorization.text, trustAnchorJwk: e.trustAnchorJwk, request: { credential_issuer_did: owner.issuerDid, credential_issuer_key_id: owner.keyId, credential_issuer_public_jwk: owner.issuerPublicJwk, definition_id: definition.id, definition_version: definition.version, credential_type: definition.credential_type, registry_did: e.registryDid, purpose: 'issuance' }, nowUnixSeconds: Math.floor(Date.now() / 1000) });
   check(isDeepStrictEqual(authority.definition, definition), 'SETUP_DEFINITION_REFUSED');
   atomic(join(root, 'issuer.json'), JSON.stringify({
     databaseUrl: `postgres://credworks:${state.databasePassword}@issuer-db:5432/partner_issuer`,
     registryOrigin: e.registryOrigin, registryDid: e.registryDid, trustAnchorJwk: e.trustAnchorJwk,
     walletProviderDid: e.providerDid, walletProviderJwk: e.providerJwk,
-    definitions: [{ configurationId: 'club-membership', authorizationId: progress.adopted.adoption_id, definitionId: definition.id, definitionVersion: '1', credentialType: definition.credential_type }],
+    definitions: [{ configurationId, authorizationId: progress.adopted.adoption_id, definitionId: definition.id, definitionVersion: definition.version, credentialType: definition.credential_type }],
   }, null, 2) + '\n');
 }
 export async function issuerReady(root: string, state: any) {
@@ -62,19 +56,21 @@ export async function issuerReady(root: string, state: any) {
   const response = await httpClient()(state.binding.runtimeOrigin + '/.well-known/openid-credential-issuer');
   check(response.status === 200, 'SETUP_ISSUER_UNAVAILABLE');
   const metadata = response.json();
-  const supported = metadata.credential_configurations_supported?.['club-membership'];
+  const configurationId = state.binding.credential ? 'custom-credential' : 'club-membership';
+  const supported = metadata.credential_configurations_supported?.[configurationId];
   check(metadata.credential_issuer === state.binding.runtimeOrigin && supported?.credentialDefinition?.id === progress.definition.id && supported.credworks_issuer_authorization?.path === '/issuer-authorizations/' + progress.adopted.adoption_id + '.jwt', 'SETUP_ISSUER_CONFIGURATION_REFUSED');
 }
 export function exampleConfig(root: string, state: any): GenericConfig {
   const progress = read(join(root, 'custom-definition.json'));
   const owner = read(join(root, 'registration-result.json'));
   const e = state.ecosystem;
+  const profile = progress.definition.profiles[0];
   return { registryOrigin: e.registryOrigin, registryDid: e.registryDid, trustAnchorJwk: e.trustAnchorJwk, providerOrigin: e.providerOrigin, providerDid: e.providerDid, providerJwk: e.providerJwk,
     issuerOrigin: state.binding.runtimeOrigin, issuerManagementOrigin: 'http://127.0.0.1:3081', issuerManagementToken: state.managementToken,
     // The existing driver requires verifier fields; issuance never requests their permissions or routes.
     verifierOrigin: state.binding.runtimeOrigin, verifierManagementOrigin: 'http://127.0.0.1:3081', verifierManagementToken: state.managementToken,
-    stateDir: join(root, 'software-holder'), configurationId: 'club-membership', definitionId: progress.definition.id, definitionVersion: '1', credentialType: progress.definition.credential_type,
-    profileName: 'membership', claimPaths: [['credentialSubject', 'member']], authorizationPath: '/issuer-authorizations/' + progress.adopted.adoption_id + '.jwt', permissionPath: '/scoped-verifier-permissions/' + progress.adopted.adoption_id + '.jwt', statusKeyId: owner.keyId, statusPublicJwk: owner.issuerPublicJwk,
+    stateDir: join(root, 'software-holder'), configurationId: state.binding.credential ? 'custom-credential' : 'club-membership', definitionId: progress.definition.id, definitionVersion: progress.definition.version, credentialType: progress.definition.credential_type,
+    profileName: profile.name, claimPaths: profile.claim_paths, authorizationPath: '/issuer-authorizations/' + progress.adopted.adoption_id + '.jwt', permissionPath: '/scoped-verifier-permissions/' + progress.adopted.adoption_id + '.jwt', statusKeyId: owner.keyId, statusPublicJwk: owner.issuerPublicJwk,
   };
 }
 export async function revokeExample(root: string, state: any) {
@@ -90,12 +86,13 @@ export async function revokeExample(root: string, state: any) {
 }
 export async function issueExample(root: string, state: any) {
   await issuerReady(root, state);
+  const input = credentialInput(state);
   const flow = openGeneric(exampleConfig(root, state));
   let attempt: any;
   try { attempt = flow.load('example'); } catch (error: any) { if (error.code !== 'ENOENT') throw error; }
   if (!attempt) {
     const now = Math.floor(Date.now() / 1000);
-    attempt = { phase: 'creating-offer', input: { claims: { member: true, club: 'Example Robotics Club' }, valid_from: now, valid_until: now + 3600, offer_expires_at: now + 600 } };
+    attempt = { phase: 'creating-offer', input: { claims: input.claims, valid_from: now, valid_until: now + input.definition.max_validity_seconds, offer_expires_at: now + 600 } };
     flow.save('example', attempt);
     attempt.offer = await flow.createOffer(attempt.input);
     attempt.phase = 'offered'; flow.save('example', attempt);
@@ -104,5 +101,5 @@ export async function issueExample(root: string, state: any) {
   const receipt = await flow.receive(attempt.offer, 'example-delivery');
   await flow.fresh(receipt);
   if (!existsSync(join(root, 'software-holder/example-receipt.json'))) flow.save('example-receipt', receipt);
-  console.log('SOFTWARE_HOLDER_RECEIPT_VERIFIED: Synthetic club membership received and stored. Issuer authority, holder binding and live status verified by the shared Rust core. This is a software-holder development check, not Android acceptance.');
+  console.log('SOFTWARE_HOLDER_RECEIPT_VERIFIED: Synthetic credential received and stored. Issuer authority, holder binding and live status verified by the shared Rust core. This is a software-holder development check, not Android acceptance.');
 }

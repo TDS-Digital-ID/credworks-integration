@@ -2,17 +2,26 @@
 set -euo pipefail
 umask 077
 KIT=$(cd "$(dirname "$0")" && pwd -P)
-ACTION=${1:-help}
+ACTION=${1:-up}
 if [[ "$ACTION" == help || "$ACTION" == --help ]]; then
   cat <<'HELP'
 CredWorks team setup
 
-Supply your own domain and Cloudflare account. Domain registration may cost money.
-Install Docker with Compose and cloudflared. Complete `cloudflared tunnel login`
-in your browser first. This tool never purchases a domain or opens a login prompt.
+Course starter: run ./setup, confirm your team, then open the app.
+It prepares, starts and checks eligibility. Rerun it to use the same installation.
+The starter includes a private team.json. Keep the whole package private.
+Default state: $HOME/.local/share/credworks-team (outside the kit).
 
+Install Docker with Compose. Prepare downloads missing pinned images and verifies them.
+Course groups banana and cherry can import a private operator-issued tunnel bundle;
+they need no Cloudflare account, login, domain purchase or host cloudflared command.
+Otherwise supply your own domain/account, install cloudflared and complete
+`cloudflared tunnel login` yourself. Domain registration may cost money.
+
+  ./setup prepare --state /absolute/private/banana --group banana --tunnel-bundle /absolute/private/banana.json --runtime-origin https://banana-verify.course-domain.example --app-origin https://banana-app.course-domain.example
+  ./setup up [--state /absolute/private/existing-team] [--tunnel-bundle /absolute/private/team.json]
   ./setup prepare --state /absolute/private/team --runtime-origin https://verify.your-domain --app-origin https://app.your-domain
-  ./setup prepare --state /absolute/private/issuer --role issuer --runtime-origin https://issuer.your-domain
+  ./setup prepare --state /absolute/private/issuer --role issuer --runtime-origin https://issuer.your-domain [--definition /absolute/path/credential.json]
   ./setup issue   --state /absolute/private/issuer
   ./setup prepare --role verifier --state /absolute/private/verifier --runtime-origin https://check.your-domain --issuer-state /absolute/private/issuer
   ./setup verify  --state /absolute/private/verifier
@@ -22,20 +31,29 @@ in your browser first. This tool never purchases a domain or opens a login promp
   ./setup android-offer --state /absolute/private/team [--attempt 2]
   ./setup android-open --state /absolute/private/team --stage government
   ./setup sign-in --state /absolute/private/team
+  ./setup upgrade --state /absolute/private/team
   ./setup doctor  --state /absolute/private/team
   ./setup stop    --state /absolute/private/team
   ./setup start   --state /absolute/private/team
+  ./setup replace-tunnel --state /absolute/private/banana --group banana --from-tunnel OLD_UUID --tunnel-bundle /absolute/private/banana-replacement.json --runtime-origin https://banana-verify.course-domain.example --app-origin https://banana-app.course-domain.example
 
-prepare writes protected configuration. resume creates the named tunnel and DNS
-routes, starts containers and registers your verifier. Review your origins first.
+prepare writes protected configuration and binds the group and exact origins.
+resume uses the supplied tunnel, or creates a named tunnel and DNS for an own-domain
+setup, then starts containers and registers your verifier. Review your origins first.
 start resumes the same installation. stop preserves its keys and database.
-Candidate images must already be loaded; see docs/setup/guide.md.
+upgrade downloads the current pinned app/runtime and restarts the same installation.
+It preserves keys, registration and accounts. In-flight verifications must restart.
+replace-tunnel imports the operator's replacement and starts the saved installation.
+It preserves origins and application state. Provider retirement is operator-only.
+Keep one active host per group. Never share state or account credentials.
+See docs/setup/guide.md for setup and links to recovery and operator procedures.
 HELP
   exit 0
 fi
-shift
-case "$ACTION" in prepare|resume|start|stop|doctor|eligibility|sign-in|android-offer|android-open|issue|verify|revoke-example) ;; *) echo SETUP_COMMAND_REFUSED >&2; exit 1;; esac
-STATE=''
+(($# == 0)) || shift
+case "$ACTION" in upgrade|up|prepare|resume|start|stop|doctor|eligibility|sign-in|android-offer|android-open|issue|verify|revoke-example|replace-tunnel) ;; *) echo SETUP_COMMAND_REFUSED >&2; exit 1;; esac
+STATE="$HOME/.local/share/credworks-team"
+COURSE_BUNDLE="$KIT/team.json"
 STAGE=''
 ATTEMPT=''
 ARGS=("$@")
@@ -44,14 +62,18 @@ ISSUER_STATE=''
 ISSUER_LOCK=''
 while (($#)); do
   [[ $# -ge 2 ]] || { echo SETUP_ARGUMENTS_REFUSED >&2; exit 1; }
-  [[ "$ACTION" == prepare || "$1" == --state || ( "$ACTION" == android-offer && "$1" == --attempt ) || ( "$ACTION" == android-open && "$1" == --stage ) ]] || { echo SETUP_ARGUMENTS_REFUSED >&2; exit 1; }
+  [[ "$ACTION" == prepare || "$1" == --state || ( "$ACTION" == up && "$1" == --tunnel-bundle ) || ( "$ACTION" == replace-tunnel && ( "$1" == --group || "$1" == --from-tunnel || "$1" == --tunnel-bundle || "$1" == --runtime-origin || "$1" == --app-origin ) ) || ( "$ACTION" == android-offer && "$1" == --attempt ) || ( "$ACTION" == android-open && "$1" == --stage ) ]] || { echo SETUP_ARGUMENTS_REFUSED >&2; exit 1; }
   case "$1" in
     --state) STATE=$2 ;;
     --stage) [[ "$ACTION" == android-open ]] || { echo SETUP_ARGUMENTS_REFUSED >&2; exit 1; }; STAGE=$2 ;;
     --attempt) [[ "$ACTION" == android-offer ]] || { echo SETUP_ARGUMENTS_REFUSED >&2; exit 1; }; ATTEMPT=$2 ;;
     --issuer-state) ISSUER_STATE=$2 ;;
     --ecosystem) EXTRA_MOUNTS+=(-v "$2:$2:ro") ;;
-    --role|--runtime-origin|--app-origin|--ecosystem-sha256|--runtime-port|--app-port) ;;
+    --tunnel-bundle|--definition)
+      [[ "$2" == /* && "$2" != *$'\n'* && "$2" != *:* && "$2" != *\'* && -f "$2" && ! -L "$2" && -O "$2" ]] || { echo SETUP_STORAGE_REFUSED >&2; exit 1; }
+      if [[ "$ACTION" == up ]]; then COURSE_BUNDLE=$2; else EXTRA_MOUNTS+=(-v "$2:$2:ro"); fi ;;
+    --group|--role|--runtime-origin|--app-origin|--ecosystem-sha256|--runtime-port|--app-port) ;;
+    --from-tunnel) [[ "$ACTION" == replace-tunnel ]] || { echo SETUP_ARGUMENTS_REFUSED >&2; exit 1; } ;;
     *) echo SETUP_ARGUMENTS_REFUSED >&2; exit 1 ;;
   esac
   shift 2
@@ -62,12 +84,20 @@ while IFS= read -r name; do
 done < <(compgen -e)
 [[ "$STATE" == /* && "$STATE" != *$'\n'* && "$STATE" != *:* && "$STATE" != *\'* ]] || { echo 'SETUP_STORAGE_REFUSED: Use an absolute private path without colons, quotes or newlines.' >&2; exit 1; }
 [[ ! -L "$STATE" ]] || { echo SETUP_STORAGE_REFUSED >&2; exit 1; }
-if [[ "$ACTION" == prepare ]]; then mkdir -p -m 700 "$STATE"; fi
+if [[ "$ACTION" == prepare || "$ACTION" == up ]]; then mkdir -p -m 700 "$STATE"; fi
 [[ -d "$STATE" && -O "$STATE" ]] || { echo SETUP_STORAGE_REFUSED >&2; exit 1; }
 # Atomic directory ownership prevents overlapping setup and container operations.
 mkdir "$STATE/.lock" 2>/dev/null || { echo 'SETUP_BUSY: Confirm the other setup has stopped before removing only .lock.' >&2; exit 1; }
 TEMP=$(mktemp -d)
 trap 'rm -rf "$TEMP"; [[ -z "$ISSUER_LOCK" ]] || rmdir "$ISSUER_LOCK"; rmdir "$STATE/.lock"' EXIT
+if [[ "$ACTION" == up ]]; then
+  if [[ -e "$COURSE_BUNDLE" || -L "$COURSE_BUNDLE" ]]; then
+    [[ -f "$COURSE_BUNDLE" && ! -L "$COURSE_BUNDLE" && -O "$COURSE_BUNDLE" ]] || { echo SETUP_STORAGE_REFUSED >&2; exit 1; }
+    head -c 4097 "$COURSE_BUNDLE" > "$TEMP/team.json"
+  elif [[ ! -f "$STATE/state.json" ]]; then
+    echo 'SETUP_TEAM_BUNDLE_REQUIRED: Obtain your private course starter from the operator. It includes team.json.' >&2; exit 1
+  fi
+fi
 CONTEXT=SETUP_FAILED
 bounded() {
   local status=0 child watcher
@@ -84,6 +114,7 @@ bounded() {
   fi
 }
 command -v docker >/dev/null || { echo 'SETUP_DOCKER_REQUIRED: Install Docker and Compose, then complete its OS prompts.' >&2; exit 1; }
+[[ "$ACTION" != up ]] || echo 'Checking Docker and pinned images...'
 CONTEXT='SETUP_DOCKER_UNAVAILABLE: Start Docker or resolve its local permissions. Do not run setup with sudo.'
 bounded docker info --format '{{.OSType}} {{.Architecture}}'
 read -r OS ARCH <"$TEMP/output"
@@ -100,17 +131,51 @@ select_image() {
       [[ "$actual" == "$ref" ]] || { echo SETUP_IMAGE_REFUSED >&2; return 1; }
       echo "$ref"; return 0
     fi
-  done < <(awk -v arch="$ARCH" -v role="$1" '$0 ~ "\"" arch "\"" {chosen=1;next} chosen && /}/ {exit} chosen && $0 ~ "\"" role "(Imported|Config)?\"" {gsub(/[",]/, "", $2); print $2}' "$KIT/config/setup-candidate.json")
+  done < <(awk -v arch="$ARCH" -v role="$1" '$0 ~ "\"" arch "\"" {chosen=1;next} chosen && /}/ {exit} chosen && $0 ~ "\"" role "(Imported|Config)?\"" {gsub(/[",]/, "", $2); print $2}' "${2:-$KIT/config/setup-candidate.json}")
   echo "$CONTEXT" >&2; return 1
 }
-IMAGE=$(select_image partner)
+load_images() {
+  local archive expected size base actual
+  # shortcut: reads the committed manifest's one-field-per-line format; use a JSON parser if its format changes.
+  read -r archive expected size < <(awk -v arch="$ARCH" '
+    /"name":/ {name=$2; gsub(/[",]/, "", name)}
+    /"sha256":/ {hash=$2; gsub(/[",]/, "", hash)}
+    /"size":/ {size=$2; gsub(/,/, "", size)}
+    /"architecture":/ && $0 ~ "\"" arch "\"" {print name, hash, size}
+  ' "$KIT/config/setup-candidate.json") || { echo SETUP_IMAGE_MANIFEST_REFUSED >&2; return 1; }
+  base=$(awk '/"archiveBaseUrl":/ {gsub(/[",]/, "", $2); print $2}' "$KIT/config/setup-candidate.json")
+  [[ "$archive" =~ ^education-containers-[a-f0-9]{40}-(arm64|amd64)\.tar$ && "$expected" =~ ^[a-f0-9]{64}$ && "$size" =~ ^[1-9][0-9]{0,9}$ && "$base" =~ ^https://github\.com/TDS-Digital-ID/credworks-integration/releases/download/[A-Za-z0-9._-]+$ ]] || { echo SETUP_IMAGE_MANIFEST_REFUSED >&2; return 1; }
+  command -v curl >/dev/null || { echo SETUP_CURL_REQUIRED >&2; return 1; }
+  if command -v sha256sum >/dev/null; then
+    CHECKSUM=(sha256sum)
+  elif command -v shasum >/dev/null; then
+    CHECKSUM=(shasum -a 256)
+  else
+    echo SETUP_CHECKSUM_TOOL_REQUIRED >&2; return 1
+  fi
+  echo "Downloading pinned $ARCH container archive..." >&2
+  CONTEXT='SETUP_IMAGE_DOWNLOAD_FAILED: Check network access and the supplied release. Retry the same prepare command; keep existing state.'
+  bounded curl -q --fail --silent --show-error --location --proto '=https' --proto-redir '=https' \
+    --connect-timeout 10 --max-time 80 --max-filesize "$size" --output "$TEMP/images.tar" "$base/$archive" || return $?
+  [[ $(wc -c < "$TEMP/images.tar") -eq "$size" ]] || { echo SETUP_IMAGE_CHECKSUM_REFUSED >&2; return 1; }
+  actual=$("${CHECKSUM[@]}" "$TEMP/images.tar")
+  [[ "${actual%% *}" == "$expected" ]] || { echo SETUP_IMAGE_CHECKSUM_REFUSED >&2; return 1; }
+  CONTEXT='SETUP_IMAGE_LOAD_FAILED: Preserve existing state and retry prepare after resolving Docker availability.'
+  bounded docker load --input "$TEMP/images.tar" || return $?
+}
+if [[ "$ACTION" == prepare || "$ACTION" == up || "$ACTION" == upgrade ]]; then
+  if ! select_image partner >/dev/null 2>&1 || ! select_image application >/dev/null 2>&1; then
+    load_images
+  fi
+fi
+IMAGE=$(select_image partner 2>/dev/null || select_image partner "$KIT/config/setup-candidate-20261013.json")
 NETWORK=none
 helper() {
   CONTEXT='SETUP_FAILED: Preserve the state directory. Run doctor after resolving the reported prerequisite.'
   bounded docker run --rm --read-only --user "$(id -u):$(id -g)" --network "$NETWORK" --cap-drop ALL --security-opt no-new-privileges --tmpfs /tmp:rw,noexec,nosuid,size=16m \
     -v "$KIT:/partner/operator-kit:ro" -v "$STATE:$STATE" -v "$TEMP:$TEMP:ro" ${EXTRA_MOUNTS[@]+"${EXTRA_MOUNTS[@]}"} \
     --entrypoint node "$IMAGE" --import tsx /partner/operator-kit/tool/setup.mjs "$@" || return $?
-  cat "$TEMP/output"
+  if [[ "$COURSE_UP" == false || "$1" == get || "$1" == course-input ]]; then cat "$TEMP/output"; fi
 }
 issuer_mount() {
   [[ "$ISSUER_STATE" == /* && "$ISSUER_STATE" != *$'\n'* && "$ISSUER_STATE" != *:* && "$ISSUER_STATE" != *\'* && "$ISSUER_STATE" != "$STATE" && ! -L "$ISSUER_STATE" ]] || { echo SETUP_STORAGE_REFUSED >&2; return 1; }
@@ -119,9 +184,37 @@ issuer_mount() {
   ISSUER_LOCK="$ISSUER_STATE/.lock"
   EXTRA_MOUNTS+=(-v "$ISSUER_STATE:$ISSUER_STATE")
 }
+COURSE_UP=false
+if [[ "$ACTION" == upgrade ]]; then
+  IMAGE=$(select_image partner)
+  APP_IMAGE=$(select_image application)
+  bounded docker image inspect "$IMAGE" "$APP_IMAGE"
+  cp "$TEMP/output" "$TEMP/images.json"
+  helper upgrade --state "$STATE" --partner-image "$IMAGE" --app-image "$APP_IMAGE" --kit-root "$KIT" --image-inspection "$TEMP/images.json"
+  ACTION=start
+fi
+if [[ "$ACTION" == up ]]; then
+  COURSE_UP=true
+  INPUT_ARGS=()
+  [[ ! -f "$TEMP/team.json" ]] || INPUT_ARGS=(--input "$TEMP/team.json")
+  helper course-input --state "$STATE" ${INPUT_ARGS[@]+"${INPUT_ARGS[@]}"} > "$TEMP/course"
+  { read -r GROUP; read -r RUNTIME_ORIGIN; read -r APP_ORIGIN; } < "$TEMP/course"
+  if [[ ! -f "$STATE/state.json" || -f "$STATE/tunnel-import.json" || -f "$STATE/tunnel-import.json.pending" ]]; then
+    printf 'Team: %s\nApp: %s\nVerifier: %s\nPrivate state: %s\n' "$GROUP" "$APP_ORIGIN" "$RUNTIME_ORIGIN" "$STATE"
+    printf 'Compare these with your course handoff. Type %s to continue: ' "$GROUP"
+    read -r CONFIRMATION || { echo SETUP_CONFIRMATION_REQUIRED >&2; exit 1; }
+    [[ "$CONFIRMATION" == "$GROUP" ]] || { echo SETUP_CONFIRMATION_REFUSED >&2; exit 1; }
+    ARGS=(--state "$STATE" --group "$GROUP" --tunnel-bundle "$TEMP/team.json" --runtime-origin "$RUNTIME_ORIGIN" --app-origin "$APP_ORIGIN")
+    echo 'Preparing your team installation...'
+    ACTION=prepare
+  else
+    printf 'Using the saved installation at %s\n' "$STATE"
+    ACTION=resume
+  fi
+fi
 if [[ "$ACTION" == prepare ]]; then
   [[ -z "$ISSUER_STATE" ]] || issuer_mount
-  if [[ -f "$STATE/state.json" ]]; then
+  if [[ -f "$STATE/state.json" && ! -e "$STATE/tunnel-import.json" && ! -e "$STATE/tunnel-import.json.pending" ]]; then
     APP_IMAGE=$(helper get --state "$STATE" --field appImage)
     IMAGE=$(helper get --state "$STATE" --field partnerImage)
   else
@@ -130,8 +223,15 @@ if [[ "$ACTION" == prepare ]]; then
   bounded docker image inspect "$IMAGE" "$APP_IMAGE"
   cp "$TEMP/output" "$TEMP/images.json"
   helper prepare "${ARGS[@]}" --architecture "$ARCH" --kit-root "$KIT" --partner-image "$IMAGE" --app-image "$APP_IMAGE" --image-inspection "$TEMP/images.json"
-  echo 'Next: review the origins, then run ./setup resume --state with this same directory.'
-  exit 0
+  if [[ "$COURSE_UP" == false ]]; then
+    echo 'Next: review the origins, then run ./setup resume --state with this same directory.'
+    exit 0
+  fi
+  ACTION=resume
+fi
+if [[ "$ACTION" == replace-tunnel ]]; then
+  helper replace-tunnel "${ARGS[@]}"
+  ACTION=start
 fi
 PROJECT=$(helper get --state "$STATE" --field project)
 ROLE=$(helper get --state "$STATE" --field role)
@@ -182,26 +282,32 @@ if [[ "$ACTION" == stop ]]; then
   exit 0
 fi
 if [[ "$ACTION" != doctor && "$ACTION" != eligibility && "$ACTION" != android-offer && "$ACTION" != sign-in && "$ACTION" != issue && "$ACTION" != verify && "$ACTION" != revoke-example ]]; then
-  command -v cloudflared >/dev/null || { echo 'SETUP_CLOUDFLARED_REQUIRED: Install cloudflared, run cloudflared tunnel login, then resume.' >&2; exit 1; }
-  NAME=$(helper get --state "$STATE" --field tunnelName)
-  CONTEXT='SETUP_CLOUDFLARE_AUTHORIZATION_REQUIRED: Run cloudflared tunnel login yourself, finish browser authorization for your domain, then resume. No credentials belong in chat.'
-  bounded cloudflared tunnel list --output json --name "$NAME"
-  cp "$TEMP/output" "$STATE/tunnel-list.json"
-  TUNNEL=$(helper tunnel-reconcile --state "$STATE" --list "$STATE/tunnel-list.json")
-  if [[ "$TUNNEL" == CREATE ]]; then
-    CONTEXT='SETUP_TUNNEL_OUTCOME_UNKNOWN: Resume to reconcile the saved tunnel name. Never delete state or create a replacement.'
-    bounded cloudflared tunnel create --credentials-file "$STATE/tunnel-credentials.json" --output json "$NAME"
+  [[ "$COURSE_UP" == false ]] || echo 'Starting services and checking registration...'
+  TUNNEL_MODE=$(helper get --state "$STATE" --field tunnelMode)
+  if [[ "$TUNNEL_MODE" == supplied ]]; then
+    helper tunnel-reconcile --state "$STATE" >/dev/null
+  else
+    command -v cloudflared >/dev/null || { echo 'SETUP_CLOUDFLARED_REQUIRED: Install cloudflared, run cloudflared tunnel login, then resume.' >&2; exit 1; }
+    NAME=$(helper get --state "$STATE" --field tunnelName)
+    CONTEXT='SETUP_CLOUDFLARE_AUTHORIZATION_REQUIRED: Run cloudflared tunnel login yourself, finish browser authorization for your domain, then resume. No credentials belong in chat.'
     bounded cloudflared tunnel list --output json --name "$NAME"
     cp "$TEMP/output" "$STATE/tunnel-list.json"
     TUNNEL=$(helper tunnel-reconcile --state "$STATE" --list "$STATE/tunnel-list.json")
+    if [[ "$TUNNEL" == CREATE ]]; then
+      CONTEXT='SETUP_TUNNEL_OUTCOME_UNKNOWN: Resume to reconcile the saved tunnel name. Never delete state or create a replacement.'
+      bounded cloudflared tunnel create --credentials-file "$STATE/tunnel-credentials.json" --output json "$NAME"
+      bounded cloudflared tunnel list --output json --name "$NAME"
+      cp "$TEMP/output" "$STATE/tunnel-list.json"
+      TUNNEL=$(helper tunnel-reconcile --state "$STATE" --list "$STATE/tunnel-list.json")
+    fi
+    CONTEXT='SETUP_DNS_REFUSED: The selected hostname may already exist or belong to another zone. Inspect DNS in Cloudflare; do not overwrite a record to continue.'
+    for field in "${HOST_FIELDS[@]}"; do
+      HOST=$(helper get --state "$STATE" --field "$field")
+      bounded env -u TUNNEL_FORCE_PROVISIONING_DNS cloudflared tunnel route dns --overwrite-dns=false "$TUNNEL" "$HOST"
+    done
+    CONTEXT='SETUP_TUNNEL_CONFIGURATION_REFUSED: Preserve the generated ingress and inspect the selected candidate.'
+    bounded cloudflared tunnel --config "$STATE/tunnel.yml" ingress validate
   fi
-  CONTEXT='SETUP_DNS_REFUSED: The selected hostname may already exist or belong to another zone. Inspect DNS in Cloudflare; do not overwrite a record to continue.'
-  for field in "${HOST_FIELDS[@]}"; do
-    HOST=$(helper get --state "$STATE" --field "$field")
-    bounded env -u TUNNEL_FORCE_PROVISIONING_DNS cloudflared tunnel route dns --overwrite-dns=false "$TUNNEL" "$HOST"
-  done
-  CONTEXT='SETUP_TUNNEL_CONFIGURATION_REFUSED: Preserve the generated ingress and inspect the selected candidate.'
-  bounded cloudflared tunnel --config "$STATE/tunnel.yml" ingress validate
   COMPOSE=(docker compose --env-file "$STATE/team.env" -p "$PROJECT" -f "$COMPOSE_FILE")
   [[ "$ROLE" != issuer ]] || COMPOSE+=(-f "$STATE/issuer-compose.json")
   COMPOSE+=(-f "$STATE/tunnel-compose.json" --profile local-db)
@@ -245,7 +351,13 @@ if [[ "$ACTION" != doctor && "$ACTION" != eligibility && "$ACTION" != android-of
   NETWORK="container:$(cat "$TEMP/output")"
 fi
 helper ready --state "$STATE"
-if [[ "$ACTION" == eligibility || "$ACTION" == sign-in ]]; then
+if [[ "$COURSE_UP" == true ]]; then
+  echo 'Checking synthetic student eligibility...'
+  helper eligibility --state "$STATE"
+  printf 'TEAM_READY: Eligibility checked. Open %s\n' "$APP_ORIGIN"
+  if command -v open >/dev/null; then open "$APP_ORIGIN" >/dev/null 2>&1 || true
+  elif command -v xdg-open >/dev/null; then xdg-open "$APP_ORIGIN" >/dev/null 2>&1 || true; fi
+elif [[ "$ACTION" == eligibility || "$ACTION" == sign-in ]]; then
   helper "$ACTION" --state "$STATE"
 fi
 if [[ "$ACTION" == android-offer ]]; then

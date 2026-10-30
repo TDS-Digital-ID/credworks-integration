@@ -19,7 +19,10 @@
           "200": {
             "description": "Secure HttpOnly SameSite cookie for new browser; csrf/status and optional application account_id. Never student ID or credential claims."
           }
-        }
+        },
+        "tags": [
+          "Browser application"
+        ]
       }
     },
     "/api/interactions": {
@@ -65,6 +68,22 @@
                       "education_eligibility"
                     ]
                   }
+                }
+              },
+              "examples": {
+                "education_eligibility": {
+                  "summary": "Education eligibility",
+                  "value": {
+                    "profile": "education_eligibility"
+                  },
+                  "description": "Uses the current browser cookie, exact Origin and CSRF token. Runtime credentials remain on the server."
+                },
+                "education_sign_in": {
+                  "summary": "Education sign in",
+                  "value": {
+                    "profile": "education_sign_in"
+                  },
+                  "description": "Uses the current browser cookie, exact Origin and CSRF token. Runtime credentials remain on the server."
                 }
               }
             }
@@ -193,11 +212,27 @@
                       "type": "number"
                     }
                   }
+                },
+                "examples": {
+                  "created": {
+                    "summary": "Interaction created",
+                    "value": {
+                      "id": "sssssssssssssssssssssssssssssssssssssssssss",
+                      "profile": "education_eligibility",
+                      "activation_uri": "openid4vp://authorize?client_id=decentralized_identifier%3Adid%3Aweb%3Averifier.example&request_uri=https%3A%2F%2Fverifier.example%2Foid4vp%2Frequest%2Frrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+                      "request_uri": "https://verifier.example/oid4vp/request/rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+                      "expires_at": 1793318520
+                    },
+                    "description": "Public activation details only. No runtime management token or correlation capability is exposed."
+                  }
                 }
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Browser application"
+        ]
       }
     },
     "/api/interactions/{id}/complete": {
@@ -242,6 +277,13 @@
               "schema": {
                 "type": "object",
                 "additionalProperties": false
+              },
+              "examples": {
+                "complete": {
+                  "summary": "Complete the original interaction",
+                  "value": {},
+                  "description": "Use the same initiating browser and current CSRF token."
+                }
               }
             }
           }
@@ -273,6 +315,17 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "policyRefused": {
+                    "summary": "Not currently enrolled",
+                    "value": {
+                      "error": {
+                        "code": "ENROLMENT_REQUIRED"
+                      }
+                    },
+                    "description": "Verification alone does not grant access. Application enrolment policy refused this result."
+                  }
                 }
               }
             }
@@ -293,6 +346,17 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "pending": {
+                    "summary": "Awaiting wallet",
+                    "value": {
+                      "error": {
+                        "code": "RESULT_PENDING"
+                      }
+                    },
+                    "description": "Wait before retrying the same interaction and keep the original deadline. RUNTIME_UNAVAILABLE is also retryable before application effects start."
+                  }
                 }
               }
             }
@@ -303,6 +367,17 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "expired": {
+                    "summary": "Interaction expired",
+                    "value": {
+                      "error": {
+                        "code": "INTERACTION_EXPIRED"
+                      }
+                    },
+                    "description": "Create a new interaction. The reference client does not extend the request lifetime."
+                  }
                 }
               }
             }
@@ -333,6 +408,17 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "runtimeUnavailable": {
+                    "summary": "Runtime response unavailable",
+                    "value": {
+                      "error": {
+                        "code": "RUNTIME_UNAVAILABLE"
+                      }
+                    },
+                    "description": "No application callback has started. Retry the same interaction after about one second, within the original limits. APPLICATION_UNAVAILABLE may indicate uncertain application effects and must not be treated the same way."
+                  }
                 }
               }
             }
@@ -373,11 +459,32 @@
                       }
                     }
                   ]
+                },
+                "examples": {
+                  "eligible": {
+                    "summary": "Eligibility accepted",
+                    "value": {
+                      "status": "eligible"
+                    },
+                    "description": "Application policy passed. This does not create an account."
+                  },
+                  "signedIn": {
+                    "summary": "Student signed in",
+                    "value": {
+                      "status": "signed_in",
+                      "account_id": "12345678-1234-4234-8234-123456789abc"
+                    },
+                    "description": "Application policy passed and the browser session was rotated. The account ID is synthetic."
+                  }
                 }
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Browser application"
+        ],
+        "description": "Completes the original browser-bound interaction once. RESULT_PENDING permits waiting for wallet completion. RUNTIME_UNAVAILABLE permits another completion attempt because no application callback has started; retry with the same browser, CSRF token and interaction, one call at a time. Retrieval is bounded by the original request expires_at + 120, evidence validity and browser validity. A validated refusal or any started application callback is terminal. A lost browser completion response is not an acknowledgement protocol: check /api/session for sign-in state before starting again."
       }
     }
   },

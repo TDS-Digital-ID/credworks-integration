@@ -1,9 +1,10 @@
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { createHash, randomBytes } from 'node:crypto';
-import { closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, openSync, readFileSync, readdirSync, renameSync, rmdirSync, writeFileSync } from 'node:fs';
+import { closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, openSync, readFileSync, readdirSync, renameSync, rmdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, resolve, join } from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
 import { httpClient } from './http-client.mjs';
+import { readCredential } from './setup-credential.mjs';
 const fail = (code) => { throw Error(code); };
 const digest = value => createHash('sha256').update(value).digest('hex');
 const random = () => randomBytes(32).toString('base64url');
@@ -18,6 +19,26 @@ function protectedPath(path, directory = false) {
   const info = lstatSync(path);
   if (!(directory ? info.isDirectory() : info.isFile()) || info.uid !== process.getuid() || (info.mode & (directory ? 0o077 : 0o177))) fail('SETUP_STORAGE_REFUSED');
 }
+function suppliedBundle(path, group, runtimeOrigin, appOrigin) {
+  protectedPath(path);
+  if (lstatSync(path).size > 4096) fail('SETUP_TUNNEL_BUNDLE_REFUSED');
+  let bundle;
+  try { bundle = json(path); } catch { fail('SETUP_TUNNEL_BUNDLE_REFUSED'); }
+  const fields = ['version', 'group', 'runtimeOrigin', 'appOrigin', 'accountId', 'tunnelId', 'credentials'];
+  if (!bundle || typeof bundle !== 'object' || Object.keys(bundle).length !== fields.length || !fields.every(field => Object.hasOwn(bundle, field))) fail('SETUP_TUNNEL_BUNDLE_REFUSED');
+  const domain = new URL(runtimeOrigin).hostname.slice(`${group}-verify.`.length);
+  if (bundle.version !== 1 || !['banana', 'cherry'].includes(group) || bundle.group !== group || bundle.runtimeOrigin !== runtimeOrigin || bundle.appOrigin !== appOrigin || runtimeOrigin !== `https://${group}-verify.${domain}` || appOrigin !== `https://${group}-app.${domain}` || !/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/.test(domain)) fail('SETUP_TUNNEL_BUNDLE_REFUSED');
+  const credentials = bundle.credentials;
+  if (!/^[a-f0-9]{32}$/.test(bundle.accountId) || !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(bundle.tunnelId) || !credentials || Object.keys(credentials).length !== 3 || credentials.TunnelID !== bundle.tunnelId || credentials.AccountTag !== bundle.accountId || typeof credentials.TunnelSecret !== 'string' || !/^[A-Za-z0-9+/]{43}=$/.test(credentials.TunnelSecret) || Buffer.from(credentials.TunnelSecret, 'base64').toString('base64') !== credentials.TunnelSecret) fail('SETUP_TUNNEL_BUNDLE_REFUSED');
+  return bundle;
+}
+export function readCourseBundle(path) {
+  protectedPath(path);
+  if (lstatSync(path).size > 4096) fail('SETUP_TUNNEL_BUNDLE_REFUSED');
+  let value;
+  try { value = json(path); } catch { fail('SETUP_TUNNEL_BUNDLE_REFUSED'); }
+  return suppliedBundle(path, value?.group, origin(value?.runtimeOrigin), origin(value?.appOrigin));
+}
 function atomic(path, value, mode = 0o600) {
   const pending = path + '.pending';
   const fd = openSync(pending, 'wx', mode);
@@ -26,7 +47,20 @@ function atomic(path, value, mode = 0o600) {
   const directory = openSync(dirname(path), 'r');
   try { fsyncSync(directory); } finally { closeSync(directory); }
 }
+function recoveryWrite(path, value, refusal = 'SETUP_TUNNEL_REPLACEMENT_AMBIGUOUS') {
+  const pending = path + '.pending';
+  if (existsSync(pending)) {
+    protectedPath(pending);
+    if (!readFileSync(pending).equals(Buffer.from(value))) fail(refusal);
+    const file = openSync(pending, 'r');
+    try { fsyncSync(file); } finally { closeSync(file); }
+    renameSync(pending, path);
+    const directory = openSync(dirname(path), 'r');
+    try { fsyncSync(directory); } finally { closeSync(directory); }
+  } else atomic(path, value);
+}
 const candidate = json(resolve(dirname(fileURLToPath(import.meta.url)), '../config/setup-candidate.json'));
+const previousCandidate = json(resolve(dirname(fileURLToPath(import.meta.url)), '../config/setup-candidate-20261013.json'));
 function validImage(id, platform, role) {
   return [platform?.[role], platform?.[role + 'Imported'], platform?.[role + 'Config']].filter(Boolean).includes(id);
 }
@@ -37,25 +71,48 @@ function inspectImages(binding, inspected) {
     if (image.Id !== expected || image.Os !== 'linux' || image.Architecture !== binding.architecture || image.Config?.User !== '10001:10001' || image.Config?.Labels?.['org.opencontainers.image.revision'] !== binding.sourceRevision) fail('SETUP_IMAGE_REFUSED');
   }
 }
-function readState(root) {
+function tunnelCredentialName(state) {
+  if (state.tunnelCredentialFile && state.tunnelCredentialFile !== `tunnel-credentials.${state.tunnelId}.json`) fail('SETUP_STATE_REFUSED');
+  if (state.tunnelCredentialFile && !/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(state.tunnelId)) fail('SETUP_STATE_REFUSED');
+  return state.tunnelCredentialFile ?? 'tunnel-credentials.json';
+}
+function readState(root, replacingTunnel = false, upgrading) {
   protectedPath(root, true);
-  if (readdirSync(root).some(name => name.endsWith('.pending'))) fail('SETUP_STORAGE_REFUSED');
+  if (!upgrading && ['runtime-upgrade.json', 'runtime-upgrade.json.pending'].some(name => existsSync(join(root, name)))) fail('SETUP_UPGRADE_PENDING');
+  if (existsSync(join(root, 'tunnel-import.json')) || existsSync(join(root, 'tunnel-import.json.pending'))) fail('SETUP_TUNNEL_IMPORT_PENDING');
+  if (!replacingTunnel && (existsSync(join(root, 'tunnel-replacement.json')) || existsSync(join(root, 'tunnel-replacement.json.pending')))) fail('SETUP_TUNNEL_REPLACEMENT_PENDING');
+  if (readdirSync(root).some(name => name.endsWith('.pending') && !upgrading?.pending.has(name) && !(replacingTunnel && (['state.json.pending', 'tunnel-replacement.json.pending'].includes(name) || /^tunnel-credentials\.[a-f0-9-]+\.json\.pending$/.test(name))))) fail('SETUP_STORAGE_REFUSED');
   protectedPath(join(root, 'state.json'));
   const state = json(join(root, 'state.json'));
   if (state.version !== 1 || !/^[a-z0-9-]+$/.test(state.project) || !/^[A-Za-z0-9_-]{43}$/.test(state.unlockKey) || !/^[A-Za-z0-9_-]{43}$/.test(state.managementToken) || !/^[A-Za-z0-9_-]{43}$/.test(state.databasePassword)) fail('SETUP_STATE_REFUSED');
-  const platform = candidate.platforms[state.binding?.architecture];
-  if (!validImage(state.binding?.partnerImage, platform, 'partner') || !validImage(state.binding?.appImage, platform, 'application') || state.binding?.sourceRevision !== candidate.sourceRevision) fail('SETUP_IMAGE_REFUSED');
+  const selected = [candidate, previousCandidate].find(value => value.sourceRevision === state.binding?.sourceRevision);
+  const platform = selected?.platforms[state.binding?.architecture];
+  if (!selected || !validImage(state.binding?.partnerImage, platform, 'partner') || !validImage(state.binding?.appImage, platform, 'application')) fail('SETUP_IMAGE_REFUSED');
   if (!state.configurationHashes) fail('SETUP_STATE_REFUSED');
   for (const [name, expected] of Object.entries(state.configurationHashes)) {
     if (!['team.env', 'registration-config.json', 'partner-image', 'public/verifier.json', 'issuer.json', 'issuer-compose.json'].includes(name)) fail('SETUP_STATE_REFUSED');
     if (name !== 'public/verifier.json') protectedPath(join(root, name));
     else if (!lstatSync(join(root, name)).isFile()) fail('SETUP_STORAGE_REFUSED');
-    if (digest(readFileSync(join(root, name))) !== expected) fail('SETUP_STATE_REFUSED');
+    const actual = digest(readFileSync(join(root, name)));
+    if (actual !== expected && !upgrading?.hashes.get(name)?.has(actual)) fail('SETUP_STATE_REFUSED');
+  }
+  if (state.binding.suppliedTunnel) {
+    const path = join(root, tunnelCredentialName(state));
+    if (!existsSync(path)) {
+      if (!replacingTunnel) fail('SETUP_TUNNEL_CREDENTIAL_REQUIRED');
+    } else {
+      protectedPath(path);
+      if (digest(readFileSync(path)) !== state.tunnelCredentialHash) fail('SETUP_TUNNEL_IDENTITY_REFUSED');
+      const credentials = json(path);
+      if (credentials.TunnelID !== state.tunnelId || credentials.AccountTag !== state.binding.suppliedTunnel.accountId) fail('SETUP_TUNNEL_IDENTITY_REFUSED');
+    }
   }
   return state;
 }
-function save(root, state) { atomic(join(root, 'state.json'), JSON.stringify(state, null, 2) + '\n'); }
-function writeConfiguration(root, state) {
+function save(root, state, write = atomic) { write(join(root, 'state.json'), JSON.stringify(state, null, 2) + '\n'); }
+function writeConfiguration(root, state, writeFile = atomic) {
+  const hashes = {};
+  const write = (name, bytes) => { writeFile(join(root, name), bytes); hashes[name] = digest(bytes); };
   const b = state.binding, e = state.ecosystem;
   const values = {
     PARTNER_IMAGE: b.partnerImage, EDUCATION_APP_IMAGE: b.appImage,
@@ -79,14 +136,57 @@ function writeConfiguration(root, state) {
   }
   if (Object.values(values).some(value => /[\r\n'"$`\\]/.test(String(value)))) fail('SETUP_CONFIGURATION_REFUSED');
   if (b.role === 'issuer') {
-    atomic(join(root, 'issuer-compose.json'), JSON.stringify({ services: { partner: { environment: { PARTNER_ISSUER_CONFIG: state.configured ? '/issuer-config/issuer.json' : '', PARTNER_ISSUER_DATABASE_URL: values.PARTNER_ISSUER_DATABASE_URL }, volumes: ['issuer_config:/issuer-config:ro'] } }, volumes: { issuer_config: {} } }) + '\n');
+    write('issuer-compose.json', JSON.stringify({ services: { partner: { environment: { PARTNER_ISSUER_CONFIG: state.configured ? '/issuer-config/issuer.json' : '', PARTNER_ISSUER_DATABASE_URL: values.PARTNER_ISSUER_DATABASE_URL }, volumes: ['issuer_config:/issuer-config:ro'] } }, volumes: { issuer_config: {} } }) + '\n');
   }
-  atomic(join(root, 'team.env'), Object.entries(values).map(([key, value]) => `${key}='${value}'`).join('\n') + '\n');
-  atomic(join(root, 'partner-image'), b.partnerImage + '\n');
+  write('team.env', Object.entries(values).map(([key, value]) => `${key}='${value}'`).join('\n') + '\n');
+  write('partner-image', b.partnerImage + '\n');
   const registration = { registryOrigin: e.registryOrigin, registryDid: e.registryDid, trustAnchorJwk: e.trustAnchorJwk, educationIssuerDid: e.education.issuerDid, runtimeOrigin: b.runtimeOrigin, managementOrigin: 'http://127.0.0.1:3081', managementToken: state.managementToken };
-  atomic(join(root, 'registration-config.json'), JSON.stringify(registration) + '\n');
-  state.configurationHashes = Object.fromEntries(['team.env', 'partner-image', 'registration-config.json', ...(b.role === 'issuer' ? ['issuer-compose.json', ...(state.configured ? ['issuer.json'] : [])] : state.configured ? ['public/verifier.json'] : [])].map(name => [name, digest(readFileSync(join(root, name)))]));
-  save(root, state);
+  write('registration-config.json', JSON.stringify(registration) + '\n');
+  state.configurationHashes = Object.fromEntries(['team.env', 'partner-image', 'registration-config.json', ...(b.role === 'issuer' ? ['issuer-compose.json', ...(state.configured ? ['issuer.json'] : [])] : state.configured ? ['public/verifier.json'] : [])].map(name => [name, hashes[name] ?? digest(readFileSync(join(root, name)))]));
+  save(root, state, writeFile);
+}
+function upgrade(root, options) {
+  if (Object.keys(options).some(key => !['--state', '--partner-image', '--app-image', '--kit-root', '--image-inspection'].includes(key))) fail('SETUP_ARGUMENTS_REFUSED');
+  const journalPath = join(root, 'runtime-upgrade.json');
+  const existing = [journalPath, journalPath + '.pending'].find(existsSync);
+  let journal;
+  if (existing) { protectedPath(existing); journal = json(existing); }
+  const original = journal?.before ?? readState(root);
+  const platform = candidate.platforms[original.binding.architecture];
+  const binding = { ...original.binding, sourceRevision: candidate.sourceRevision,
+    partnerImage: options['--partner-image'], appImage: options['--app-image'], kitRoot: resolve(options['--kit-root']) };
+  if (!validImage(binding.partnerImage, platform, 'partner') || !validImage(binding.appImage, platform, 'application')) fail('SETUP_IMAGE_REFUSED');
+  inspectImages(binding, json(options['--image-inspection']));
+  if (journal && !isDeepStrictEqual(journal.binding, binding)) fail('SETUP_UPGRADE_REFUSED');
+  const next = { ...structuredClone(original), binding }, writes = new Map();
+  writeConfiguration(root, next, (path, bytes) => writes.set(path.slice(root.length + 1), bytes));
+  if (!existing && isDeepStrictEqual(next, original)) { console.log('SETUP_UPGRADED'); return; }
+  const backupName = `runtime-upgrade-backup.${original.binding.sourceRevision}.json`;
+  const hashes = new Map([...writes].filter(([name]) => name !== 'state.json').map(([name, bytes]) => [name, new Set([original.configurationHashes[name], digest(bytes)])]));
+  const pending = new Set([...writes.keys(), 'runtime-upgrade.json', backupName].map(name => name + '.pending'));
+  const current = readState(root, false, { hashes, pending });
+  if (!isDeepStrictEqual(current, original) && !isDeepStrictEqual(current, next)) fail('SETUP_UPGRADE_REFUSED');
+  journal ??= { before: original, binding, files: Object.fromEntries([...writes.keys()].map(name => [name, readFileSync(join(root, name), 'utf8')])) };
+  if (Object.keys(journal.files).sort().join() !== [...writes.keys()].sort().join()) fail('SETUP_UPGRADE_REFUSED');
+  for (const [name, bytes] of Object.entries(journal.files)) {
+    if (typeof bytes !== 'string' || (name === 'state.json' ? !isDeepStrictEqual(JSON.parse(bytes), original) : digest(bytes) !== original.configurationHashes[name])) fail('SETUP_UPGRADE_REFUSED');
+  }
+  const journalBytes = JSON.stringify(journal) + '\n';
+  const backup = join(root, backupName);
+  if (existsSync(backup)) { protectedPath(backup); if (readFileSync(backup, 'utf8') !== journalBytes) fail('SETUP_UPGRADE_REFUSED'); }
+  // Check every interrupted write before changing anything. Only this exact
+  // transition can resume; keys, origins, registration and volumes are preserved.
+  for (const [name, bytes] of [...writes, ['runtime-upgrade.json', journalBytes], [backupName, journalBytes]]) {
+    const path = join(root, name + '.pending');
+    if (existsSync(path)) { protectedPath(path); if (readFileSync(path, 'utf8') !== bytes) fail('SETUP_UPGRADE_REFUSED'); }
+  }
+  recoveryWrite(journalPath, journalBytes, 'SETUP_UPGRADE_REFUSED');
+  if (!existsSync(backup) || existsSync(backup + '.pending')) recoveryWrite(backup, journalBytes, 'SETUP_UPGRADE_REFUSED');
+  for (const [name, bytes] of writes) recoveryWrite(join(root, name), bytes, 'SETUP_UPGRADE_REFUSED');
+  unlinkSync(journalPath);
+  const directory = openSync(root, 'r');
+  try { fsyncSync(directory); } finally { closeSync(directory); }
+  console.log('SETUP_UPGRADED');
 }
 async function available(call, location) {
   for (let attempt = 0; attempt < 10; attempt++) {
@@ -108,11 +208,26 @@ async function main(args) {
     options[flags[i]] = flags[i + 1];
   }
   const root = resolve(options['--state'] ?? '.credworks');
+  if (command === 'upgrade') { upgrade(root, options); return; }
+  if (command === 'course-input') {
+    const bundle = options['--input'] ? readCourseBundle(options['--input']) : undefined;
+    const importing = ['tunnel-import.json', 'tunnel-import.json.pending'].some(name => existsSync(join(root, name)));
+    const state = existsSync(join(root, 'state.json')) && !importing ? readState(root) : undefined;
+    if (state && ((state.binding.role ?? 'education') !== 'education' || !state.binding.suppliedTunnel)) fail('SETUP_ROLE_REFUSED');
+    if (bundle && state && (bundle.group !== state.binding.suppliedTunnel.group || bundle.accountId !== state.binding.suppliedTunnel.accountId ||
+        bundle.runtimeOrigin !== state.binding.runtimeOrigin || bundle.appOrigin !== state.binding.appOrigin || bundle.tunnelId !== state.tunnelId ||
+        digest(JSON.stringify(bundle.credentials) + '\n') !== state.tunnelCredentialHash)) fail('SETUP_TUNNEL_IDENTITY_REFUSED');
+    if (!bundle && !state) fail('SETUP_TEAM_BUNDLE_REQUIRED');
+    console.log([bundle?.group ?? state.binding.suppliedTunnel.group, bundle?.runtimeOrigin ?? state.binding.runtimeOrigin, bundle?.appOrigin ?? state.binding.appOrigin].join('\n'));
+    return;
+  }
   if (command === 'prepare') {
     const role = options['--role'] ?? 'education';
-    if (!['education', 'issuer', 'verifier'].includes(role) || (role !== 'education' && options['--app-origin']) || (role !== 'verifier' && options['--issuer-state'])) fail('SETUP_ROLE_REFUSED');
+    if (!['education', 'issuer', 'verifier'].includes(role) || (role !== 'education' && options['--app-origin']) || (role !== 'verifier' && options['--issuer-state']) || (role !== 'issuer' && options['--definition'])) fail('SETUP_ROLE_REFUSED');
     const runtimeOrigin = origin(options['--runtime-origin']), appOrigin = role === 'education' ? origin(options['--app-origin']) : undefined;
     if (runtimeOrigin === appOrigin) fail('SETUP_ORIGIN_REFUSED');
+    if ((options['--group'] || options['--tunnel-bundle']) && (role !== 'education' || !options['--group'] || !options['--tunnel-bundle'])) fail('SETUP_TUNNEL_BUNDLE_REFUSED');
+    const bundle = options['--tunnel-bundle'] ? suppliedBundle(options['--tunnel-bundle'], options['--group'], runtimeOrigin, appOrigin) : undefined;
     const platform = candidate.platforms[options['--architecture']];
     if (!platform) fail('SETUP_PLATFORM_REFUSED');
     const ecosystemPath = options['--ecosystem'] ?? resolve(dirname(fileURLToPath(import.meta.url)), '../config', candidate.ecosystemFile);
@@ -132,26 +247,99 @@ async function main(args) {
       issuerProject = issuer.project;
       if (issuer.binding.ecosystemSha256 !== ecosystemSha256) fail('SETUP_TRUST_INPUT_REFUSED');
     }
-    const binding = { ...(role !== 'education' ? { role } : {}), ...(issuerState ? { issuerState, issuerProject } : {}), runtimeOrigin, ...(appOrigin ? { appOrigin } : {}), ecosystemSha256, architecture: options['--architecture'], partnerImage: options['--partner-image'] ?? platform.partner, appImage: options['--app-image'] ?? platform.application, sourceRevision: candidate.sourceRevision, runtimePort: Number(options['--runtime-port'] ?? (role === 'issuer' ? 3083 : role === 'verifier' ? 3084 : 3080)), appPort: Number(options['--app-port'] ?? 3082), kitRoot: resolve(options['--kit-root'] ?? '.') };
+    const credential = options['--definition'] ? await readCredential(options['--definition'], runtimeOrigin) : undefined;
+    const binding = { ...(role !== 'education' ? { role } : {}), ...(credential ? { credential } : {}), ...(issuerState ? { issuerState, issuerProject } : {}), ...(bundle ? { suppliedTunnel: { group: bundle.group, accountId: bundle.accountId } } : {}), runtimeOrigin, ...(appOrigin ? { appOrigin } : {}), ecosystemSha256, architecture: options['--architecture'], partnerImage: options['--partner-image'] ?? platform.partner, appImage: options['--app-image'] ?? platform.application, sourceRevision: candidate.sourceRevision, runtimePort: Number(options['--runtime-port'] ?? (role === 'issuer' ? 3083 : role === 'verifier' ? 3084 : 3080)), appPort: Number(options['--app-port'] ?? 3082), kitRoot: resolve(options['--kit-root'] ?? '.') };
     if (!validImage(binding.partnerImage, platform, 'partner') || !validImage(binding.appImage, platform, 'application')) fail('SETUP_IMAGE_REFUSED');
     if (options['--image-inspection']) inspectImages(binding, json(options['--image-inspection']));
     if ([binding.runtimePort, binding.appPort].some(port => !Number.isInteger(port) || port < 1024 || port > 65535) || binding.runtimePort === binding.appPort) fail('SETUP_PORT_REFUSED');
     if (!existsSync(root)) mkdirSync(root, { mode: 0o700 });
     protectedPath(root, true);
-    if (existsSync(join(root, 'state.json'))) {
+    const journal = join(root, 'tunnel-import.json');
+    const interrupted = [journal, journal + '.pending'].find(existsSync);
+    if (existsSync(join(root, 'state.json')) && !interrupted) {
       const saved = readState(root);
       if (!isDeepStrictEqual(saved.binding, binding)) fail('SETUP_STATE_REFUSED');
+      if (bundle && (saved.tunnelId !== bundle.tunnelId || !isDeepStrictEqual(json(join(root, tunnelCredentialName(saved))), bundle.credentials))) fail('SETUP_TUNNEL_IDENTITY_REFUSED');
       console.log('SETUP_PREPARED_EXISTING_STATE'); return;
     }
-    if (readdirSync(root).filter(name => name !== '.lock').length) fail('SETUP_STORAGE_REFUSED');
+    if (!interrupted && readdirSync(root).filter(name => name !== '.lock').length) fail('SETUP_STORAGE_REFUSED');
     const suffix = randomBytes(8).toString('hex');
-    const state = { version: 1, binding, ecosystem, project: 'credworks-' + suffix, tunnelName: 'credworks-' + suffix, phase: 'prepared', unlockKey: random(), managementToken: random(), databasePassword: random(), configured: false };
+    let state = { version: 1, binding, ecosystem, project: 'credworks-' + suffix, tunnelName: 'credworks-' + suffix, phase: 'prepared', unlockKey: random(), managementToken: random(), databasePassword: random(), configured: false };
+    if (interrupted) {
+      if (!bundle) fail('SETUP_TUNNEL_IMPORT_PENDING');
+      protectedPath(interrupted);
+      try { state = json(interrupted); } catch { fail('SETUP_TUNNEL_IMPORT_AMBIGUOUS'); }
+      const expected = { version: 1, binding, ecosystem, project: state?.project, tunnelName: state?.project, phase: 'prepared', unlockKey: state?.unlockKey, managementToken: state?.managementToken, databasePassword: state?.databasePassword, configured: false, tunnelId: bundle.tunnelId, tunnelCredentialHash: digest(JSON.stringify(bundle.credentials) + '\n') };
+      if (!/^credworks-[a-f0-9]{16}$/.test(state?.project) || ['unlockKey', 'managementToken', 'databasePassword'].some(key => !/^[A-Za-z0-9_-]{43}$/.test(state?.[key])) || !isDeepStrictEqual(state, expected)) fail('SETUP_STATE_REFUSED');
+    }
+    if (bundle) {
+      const credentialBytes = JSON.stringify(bundle.credentials) + '\n';
+      state.tunnelId = bundle.tunnelId; state.tunnelCredentialHash = digest(credentialBytes);
+      const writes = [[journal, JSON.stringify(state, null, 2) + '\n'], [join(root, 'tunnel-credentials.json'), credentialBytes]];
+      writeConfiguration(root, { ...state }, (path, bytes) => writes.push([path, bytes]));
+      const allowed = new Set(['.lock', 'public', ...writes.flatMap(([path]) => [path.slice(root.length + 1), path.slice(root.length + 1) + '.pending'])]);
+      if (readdirSync(root).some(name => !allowed.has(name))) fail('SETUP_STORAGE_REFUSED');
+      const publicPath = join(root, 'public');
+      if (existsSync(publicPath)) {
+        const info = lstatSync(publicPath);
+        if (!info.isDirectory() || info.uid !== process.getuid() || (info.mode & 0o022) || readdirSync(publicPath).length) fail('SETUP_STORAGE_REFUSED');
+      }
+      for (const [path, bytes] of writes) {
+        for (const existing of [path, path + '.pending'].filter(existsSync)) {
+          protectedPath(existing);
+          if (!readFileSync(existing).equals(Buffer.from(bytes))) fail('SETUP_TUNNEL_IMPORT_AMBIGUOUS');
+        }
+      }
+      // Record the selected identity before writing any of its credential or configuration files.
+      for (const [path, bytes] of writes) {
+        if (!existsSync(path) || existsSync(path + '.pending')) recoveryWrite(path, bytes, 'SETUP_TUNNEL_IMPORT_AMBIGUOUS');
+      }
+      if (!existsSync(publicPath)) mkdirSync(publicPath, { mode: 0o755 });
+      unlinkSync(journal);
+      const directory = openSync(root, 'r');
+      try { fsyncSync(directory); } finally { closeSync(directory); }
+      console.log('SETUP_PREPARED'); return;
+    }
     save(root, state);
     mkdirSync(join(root, 'public'), { mode: 0o755 });
     writeConfiguration(root, state);
     console.log('SETUP_PREPARED'); return;
   }
-  const state = readState(root);
+  const state = readState(root, command === 'replace-tunnel');
+  if (command === 'replace-tunnel') {
+    if (Object.keys(options).some(key => !['--state', '--group', '--tunnel-bundle', '--runtime-origin', '--app-origin', '--from-tunnel'].includes(key))) fail('SETUP_ARGUMENTS_REFUSED');
+    if (!state.binding.suppliedTunnel || options['--group'] !== state.binding.suppliedTunnel.group || options['--runtime-origin'] !== state.binding.runtimeOrigin || options['--app-origin'] !== state.binding.appOrigin) fail('SETUP_TUNNEL_REPLACEMENT_REFUSED');
+    const bundle = suppliedBundle(options['--tunnel-bundle'], options['--group'], origin(options['--runtime-origin']), origin(options['--app-origin']));
+    const credentialBytes = JSON.stringify(bundle.credentials) + '\n';
+    const replacement = { fromTunnel: options['--from-tunnel'], tunnelId: bundle.tunnelId, credentialHash: digest(credentialBytes) };
+    if (bundle.accountId !== state.binding.suppliedTunnel.accountId) fail('SETUP_TUNNEL_REPLACEMENT_REFUSED');
+    const repeated = isDeepStrictEqual(state.tunnelReplacement, replacement);
+    if (!repeated && (replacement.fromTunnel !== state.tunnelId || bundle.tunnelId === state.tunnelId || state.tunnelReplacedIds?.includes(bundle.tunnelId))) fail('SETUP_TUNNEL_REPLACEMENT_REFUSED');
+    const filename = `tunnel-credentials.${bundle.tunnelId}.json`;
+    if (readdirSync(root).some(name => name.endsWith('.pending') && !['state.json.pending', 'tunnel-replacement.json.pending', filename + '.pending'].includes(name))) fail('SETUP_STORAGE_REFUSED');
+    const journal = join(root, 'tunnel-replacement.json'), journalBytes = JSON.stringify(replacement) + '\n';
+    if (!repeated) {
+      state.tunnelReplacedIds = [...(state.tunnelReplacedIds ?? []), state.tunnelId];
+      state.tunnelId = bundle.tunnelId; state.tunnelCredentialHash = replacement.credentialHash;
+      state.tunnelCredentialFile = filename; state.tunnelReplacement = replacement;
+    }
+    const statePath = join(root, 'state.json'), stateBytes = JSON.stringify(state, null, 2) + '\n';
+    for (const [path, bytes] of [[journal, journalBytes], [join(root, filename), credentialBytes], [statePath, stateBytes]]) {
+      if (path !== statePath && existsSync(path)) {
+        protectedPath(path);
+        if (!readFileSync(path).equals(Buffer.from(bytes))) fail('SETUP_TUNNEL_REPLACEMENT_REFUSED');
+      }
+      if (existsSync(path + '.pending')) {
+        protectedPath(path + '.pending');
+        if (!readFileSync(path + '.pending').equals(Buffer.from(bytes))) fail('SETUP_TUNNEL_REPLACEMENT_AMBIGUOUS');
+      }
+    }
+    recoveryWrite(journal, journalBytes);
+    if (!existsSync(join(root, filename)) || existsSync(join(root, filename + '.pending'))) recoveryWrite(join(root, filename), credentialBytes);
+    recoveryWrite(statePath, stateBytes);
+    unlinkSync(journal);
+    console.log('SETUP_TUNNEL_REPLACED'); return;
+  }
   const customIssuer = () => {
     if (state.binding.role !== 'verifier') fail('SETUP_ISSUER_REQUIRED');
     const issuer = readState(state.binding.issuerState);
@@ -180,7 +368,7 @@ async function main(args) {
     console.log(JSON.stringify(result)); return;
   }
   if (command === 'get') {
-    const fields = { project: state.project, partnerImage: state.binding.partnerImage, appImage: state.binding.appImage, phase: state.phase, issuerBootstrap: state.issuerBootstrap ?? '', tunnelName: state.tunnelName, tunnelId: state.tunnelId ?? '', runtimeHost: new URL(state.binding.runtimeOrigin).hostname, appHost: state.binding.appOrigin ? new URL(state.binding.appOrigin).hostname : '', role: state.binding.role ?? 'education', issuerState: state.binding.issuerState ?? '' };
+    const fields = { project: state.project, partnerImage: state.binding.partnerImage, appImage: state.binding.appImage, phase: state.phase, issuerBootstrap: state.issuerBootstrap ?? '', tunnelName: state.tunnelName, tunnelId: state.tunnelId ?? '', tunnelMode: state.binding.suppliedTunnel ? 'supplied' : 'owned', runtimeHost: new URL(state.binding.runtimeOrigin).hostname, appHost: state.binding.appOrigin ? new URL(state.binding.appOrigin).hostname : '', role: state.binding.role ?? 'education', issuerState: state.binding.issuerState ?? '' };
     if (!(options['--field'] in fields)) fail('SETUP_FIELD_REFUSED');
     console.log(fields[options['--field']]); return;
   }
@@ -256,17 +444,20 @@ async function main(args) {
     await (command === 'issue' ? issueExample : revokeExample)(root, state); return;
   }
   if (command === 'tunnel-reconcile') {
-    const listing = json(options['--list']) ?? [];
-    if (!Array.isArray(listing)) fail('SETUP_TUNNEL_LIST_REFUSED');
-    const matches = listing.filter(item => item.name === state.tunnelName && (!item.deleted_at || item.deleted_at === '0001-01-01T00:00:00Z'));
-    if (matches.length > 1) fail('SETUP_TUNNEL_OUTCOME_UNKNOWN');
-    if (!matches.length) {
-      if (state.tunnelPhase || state.tunnelId) fail('SETUP_TUNNEL_OUTCOME_UNKNOWN');
-      state.tunnelPhase = 'creating'; save(root, state); console.log('CREATE'); return;
+    let id = state.tunnelId;
+    if (!state.binding.suppliedTunnel) {
+      const listing = json(options['--list']) ?? [];
+      if (!Array.isArray(listing)) fail('SETUP_TUNNEL_LIST_REFUSED');
+      const matches = listing.filter(item => item.name === state.tunnelName && (!item.deleted_at || item.deleted_at === '0001-01-01T00:00:00Z'));
+      if (matches.length > 1) fail('SETUP_TUNNEL_OUTCOME_UNKNOWN');
+      if (!matches.length) {
+        if (state.tunnelPhase || state.tunnelId) fail('SETUP_TUNNEL_OUTCOME_UNKNOWN');
+        state.tunnelPhase = 'creating'; save(root, state); console.log('CREATE'); return;
+      }
+      id = matches[0].id;
+      if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(id) || (state.tunnelId && state.tunnelId !== id)) fail('SETUP_TUNNEL_IDENTITY_REFUSED');
     }
-    const id = matches[0].id;
-    if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(id) || (state.tunnelId && state.tunnelId !== id)) fail('SETUP_TUNNEL_IDENTITY_REFUSED');
-    const credentialsPath = join(root, 'tunnel-credentials.json');
+    const credentialsPath = join(root, tunnelCredentialName(state));
     if (!existsSync(credentialsPath)) fail('SETUP_TUNNEL_CREDENTIAL_REQUIRED');
     protectedPath(credentialsPath);
     const credentials = json(credentialsPath);

@@ -55,8 +55,9 @@ test('resume refuses preparation-only flags before any Docker or Cloudflare oper
 test('loaded archive image identities prepare and repeat without replacing the saved binding', () => {
   const parent = mkdtempSync(join(tmpdir(), 'setup-import-'));
   const state = join(parent, 'team'), bin = join(parent, 'bin');
-  const partner = 'sha256:9fd6aabe535529c5e7a94c02bbb28d837a3d8d9fc2266d05e2cff65e5b0a39d2';
-  const application = 'sha256:68bb7faf4b72fbc94cf28f2df4e7584fbf33d5726ba251019b1729b7c5f1d594';
+  const current = JSON.parse(readFileSync(join(kit, 'config/setup-candidate.json')));
+  const partner = current.platforms.arm64.partnerConfig;
+  const application = current.platforms.arm64.applicationConfig;
   try {
     mkdirSync(bin);
     writeFileSync(join(bin, 'docker'), `#!${process.execPath}\n${String.raw`
@@ -112,5 +113,99 @@ process.exit(2);
     assert.match(result.stderr, /SETUP_BUSY/);
     assert.equal(existsSync(join(issuer, '.lock')), true, 'must preserve another operation lock');
     assert.equal(existsSync(join(verifier, '.lock')), false, 'must release only its own lock');
+  } finally { rmSync(parent, { recursive: true, force: true }); }
+});
+
+test('supplied tunnel setup prepares, resumes and diagnoses without Cloudflare account commands', () => {
+  const parent = mkdtempSync(join(tmpdir(), 'setup-supplied-wrapper-'));
+  const state = join(parent, 'team'), bin = join(parent, 'bin'), bundlePath = join(parent, 'banana.json');
+  const credentials = { TunnelID: '11111111-1111-4111-8111-111111111111', AccountTag: 'a'.repeat(32), TunnelSecret: Buffer.alloc(32, 7).toString('base64') };
+  const bundle = { version: 1, group: 'banana', runtimeOrigin: 'https://banana-verify.course.example', appOrigin: 'https://banana-app.course.example', accountId: credentials.AccountTag, tunnelId: credentials.TunnelID, credentials };
+  try {
+    mkdirSync(bin);
+    writeFileSync(bundlePath, JSON.stringify(bundle), { mode: 0o600 });
+    writeFileSync(join(bin, 'cloudflared'), `#!${process.execPath}\nrequire('node:fs').writeFileSync(process.env.TEST_ACCOUNT_CALL, 'called');process.exit(1);\n`, { mode: 0o755 });
+    writeFileSync(join(bin, 'docker'), `#!${process.execPath}\n${String.raw`
+const {spawnSync}=require('node:child_process');
+const {readFileSync,appendFileSync}=require('node:fs');
+const args=process.argv.slice(2), kit=process.env.TEST_KIT;
+if(args[0]==='info') {console.log('linux arm64');process.exit(0)}
+if(args[0]==='image') {
+ if(args.includes('--format')) {console.log(args.at(-1));process.exit(0)}
+ const candidate=JSON.parse(readFileSync(kit+'/config/setup-candidate.json'));
+ console.log(JSON.stringify(args.slice(2).map(Id=>({Id,Os:'linux',Architecture:'arm64',Config:{User:'10001:10001',Labels:{'org.opencontainers.image.revision':candidate.sourceRevision}}}))));process.exit(0);
+}
+if(args[0]==='run') {
+ const index=args.indexOf('/partner/operator-kit/tool/setup.mjs');
+ if(args[index+1]==='check-local') {console.error('SETUP_TEST_RUNTIME_UNAVAILABLE');process.exit(1)}
+ const preload=args[index+1]==='prepare' && process.env.TEST_PREPARE_PRELOAD ? ['--require',process.env.TEST_PREPARE_PRELOAD] : [];
+ const child=spawnSync(process.execPath,[...preload,kit+'/tool/setup.mjs',...args.slice(index+1)],{stdio:'inherit'});process.exit(child.status);
+}
+if(args[0]==='compose') {
+ appendFileSync(process.env.TEST_COMPOSE_LOG,JSON.stringify(args)+'\n');
+ if(args.includes('ps')) console.log('a'.repeat(64));
+ process.exit(0);
+}
+process.exit(2);
+`}`, { mode: 0o755 });
+    const env = { ...process.env, PATH: bin + ':' + process.env.PATH, TEST_KIT: kit, TEST_ACCOUNT_CALL: join(parent, 'account-called'), TEST_COMPOSE_LOG: join(parent, 'compose.log') };
+    const run = (...args) => spawnSync('bash', [join(kit, 'setup'), ...args], { encoding: 'utf8', env, timeout: 15000 });
+    const prepare = ['prepare', '--state', state, '--group', 'banana', '--tunnel-bundle', bundlePath, '--runtime-origin', bundle.runtimeOrigin, '--app-origin', bundle.appOrigin];
+    env.TEST_PREPARE_PRELOAD = join(parent, 'interrupt.cjs');
+    writeFileSync(env.TEST_PREPARE_PRELOAD, `
+      const fs = require('node:fs');
+      const rename = fs.renameSync, sync = fs.fsyncSync;
+      let renamed = false;
+      fs.renameSync = (...args) => { rename(...args); if (String(args[1]).endsWith('/state.json')) renamed = true; };
+      fs.fsyncSync = fd => { sync(fd); if (renamed) process.exit(97); };
+      require('node:module').syncBuiltinESMExports();
+    `);
+    assert.equal(run(...prepare).status, 97);
+    const committed = readFileSync(join(state, 'state.json'));
+    const journal = readFileSync(join(state, 'tunnel-import.json'));
+    for (const action of ['resume', 'start', 'doctor', 'stop']) {
+      const refused = run(action, '--state', state);
+      assert.equal(refused.status, 1);
+      assert.match(refused.stderr, /SETUP_TUNNEL_IMPORT_PENDING/);
+      assert.deepEqual(readFileSync(join(state, 'state.json')), committed);
+      assert.deepEqual(readFileSync(join(state, 'tunnel-import.json')), journal);
+    }
+    delete env.TEST_PREPARE_PRELOAD;
+    const prepared = run(...prepare);
+    assert.equal(prepared.status, 0, prepared.stderr);
+    assert.deepEqual(readFileSync(join(state, 'state.json')), committed);
+    rmSync(bundlePath);
+    for (const action of ['resume', 'resume', 'start', 'doctor']) {
+      const result = run(action, '--state', state);
+      assert.equal(result.status, 1);
+      assert.match(result.stderr, /SETUP_TEST_RUNTIME_UNAVAILABLE/, 'must reach runtime diagnosis without a Cloudflare login or the original bundle');
+      assert(!result.stderr.includes(credentials.TunnelSecret));
+    }
+    assert.equal(existsSync(env.TEST_ACCOUNT_CALL), false, 'student commands must not invoke the account CLI');
+    const saved = readFileSync(join(state, 'state.json'));
+    const stopped = run('stop', '--state', state);
+    assert.equal(stopped.status, 0, stopped.stderr);
+    assert.deepEqual(readFileSync(join(state, 'state.json')), saved);
+    const replacementId = '22222222-2222-4222-8222-222222222222';
+    writeFileSync(bundlePath, JSON.stringify({ ...bundle, tunnelId: replacementId, credentials: { ...credentials, TunnelID: replacementId, TunnelSecret: Buffer.alloc(32, 8).toString('base64') } }), { mode: 0o600 });
+    rmSync(join(state, 'tunnel-credentials.json'));
+    const replacement = ['replace-tunnel', '--state', state, '--group', 'banana', '--from-tunnel', credentials.TunnelID, '--tunnel-bundle', bundlePath, '--runtime-origin', bundle.runtimeOrigin, '--app-origin', bundle.appOrigin];
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const result = run(...replacement);
+      assert.match(result.stdout, /SETUP_TUNNEL_REPLACED/);
+      assert.match(result.stderr, /SETUP_TEST_RUNTIME_UNAVAILABLE/, 'an interrupted start must retain the accepted replacement');
+      assert.equal(JSON.parse(readFileSync(join(state, 'state.json'))).tunnelId, replacementId);
+    }
+    rmSync(bundlePath);
+    assert.match(run('start', '--state', state).stderr, /SETUP_TEST_RUNTIME_UNAVAILABLE/);
+    assert.equal(existsSync(env.TEST_ACCOUNT_CALL), false);
+    assert.equal(readFileSync(env.TEST_COMPOSE_LOG, 'utf8').split('\n').filter(line => line.includes('bootstrap')).length, 1);
+    const tunnel = JSON.parse(readFileSync(join(state, 'tunnel.yml')));
+    assert.equal(tunnel.tunnel, replacementId);
+    const ingress = tunnel.ingress;
+    assert.equal(ingress[0].hostname, 'banana-verify.course.example');
+    assert.equal(ingress[2].hostname, 'banana-app.course.example');
+    assert.equal(ingress.at(-1).service, 'http_status:404');
+    assert(!JSON.stringify(ingress).includes('3081'));
   } finally { rmSync(parent, { recursive: true, force: true }); }
 });

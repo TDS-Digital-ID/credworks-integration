@@ -36,7 +36,7 @@ test("scalar session signs explicit issuer, immutable definition and registered 
     await f.close();
   }
 });
-test("scalar verified result preserves typed false separately from application eligibility and is consumed once", async () => {
+test("scalar verified result preserves typed false and supports authenticated result retries", async () => {
   const f = await fixture();
   try {
     const { session, request } = await create(f);
@@ -54,10 +54,11 @@ test("scalar verified result preserves typed false separately from application e
       {},
       session.correlation_capability,
     );
-    assert.equal(replay.status, 409);
-    assert.deepEqual(await replay.json(), {
-      error: { code: "RESULT_CONSUMED" },
-    });
+    assert.equal(replay.status, 200);
+    assert.deepEqual(await replay.json(), result);
+    f.advance(30);
+    const expired = await consume(f, session);
+    assert.deepEqual(expired, { status: "refused", interaction_id: session.interaction_id, error: { code: "EVIDENCE_STALE" } });
   } finally {
     await f.close();
   }
@@ -459,15 +460,18 @@ test("pending set freezes members; later publication cannot add a signing key", 
 test("retained withdrawal refuses pending completion and completed consumption without widening surviving requests", async () => {
   const f = await fixture({ retainedKeys: true });
   try {
-    const pending = await create(f), completed = await create(f);
+    const pending = await create(f), completed = await create(f), delivered = await create(f);
     await complete(f, completed.request, presentation(f, completed.request));
+    await complete(f, delivered.request, presentation(f, delivered.request));
+    assert.equal((await consume(f, delivered.session)).status, "verified");
     f.evidence.set(f.authorityUrl, f.signAuthority({ key_state: "withdrawn" }));
     assert.equal((await f.app("/management/evidence/refresh", {})).status, 200);
     await complete(f, pending.request, presentation(f, pending.request));
-    for (const session of [pending.session, completed.session]) {
+    for (const session of [pending.session, completed.session, delivered.session]) {
       assert.equal((await consume(f, session)).error.code, "ISSUER_NOT_AUTHORIZED");
       const replay = await f.app("/management/sessions/" + session.session_id + "/result", {}, session.correlation_capability);
-      assert.equal(replay.status, 409);
+      assert.equal(replay.status, 200);
+      assert.equal((await replay.json()).error.code, "ISSUER_NOT_AUTHORIZED");
     }
     const fresh = await create(f);
     assert.deepEqual(fresh.request.credworks_scalar.credential_issuer_keys.map(key => key.key_id), [f.newIssuerKeyId]);

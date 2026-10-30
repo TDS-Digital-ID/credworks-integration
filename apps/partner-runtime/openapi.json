@@ -27,7 +27,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Trust and identity"
+        ]
       }
     },
     "/oid4vp/request/{capability}": {
@@ -83,7 +86,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Wallet presentation"
+        ]
       }
     },
     "/oid4vp/response/{capability}": {
@@ -213,7 +219,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Wallet presentation"
+        ]
       }
     },
     "/management/sign": {
@@ -267,7 +276,10 @@
           "404": {
             "description": "Legacy not_found"
           }
-        }
+        },
+        "tags": [
+          "Trust and identity"
+        ]
       }
     },
     "/management/sessions": {
@@ -284,99 +296,222 @@
             "RuntimeBearer": []
           }
         ],
-        "description": "Requires fresh exact issuer/type/definition/profile/origin/key scope. Protect returned correlation_capability in the initiating application interaction. No account, eligibility or cookie decision. Maximum100 retained sessions; management bodies4KiB. Scalar mode additionally requires the explicit local configuration_id. Callers cannot supply issuers, definitions, claim paths or publication destinations.",
+        "description": "Requires fresh exact issuer/type/definition/profile/origin/key scope. Protect returned correlation_capability in the initiating application interaction. No account, eligibility or cookie decision. Maximum100 retained sessions; management bodies4KiB. Scalar mode additionally requires the explicit local configuration_id. Callers cannot supply issuers, definitions, claim paths or publication destinations. The request lifetime is at most 120 seconds. Use the returned expires_at Unix timestamp in seconds; signed authority can shorten a generic request. Example timestamps and capabilities are illustrative and are not usable credentials.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateSession"
+              },
+              "examples": {
+                "eligibility": {
+                  "summary": "Education eligibility",
+                  "value": {
+                    "profile": "education_eligibility",
+                    "interaction_id": "example-eligibility-1",
+                    "purpose": "Check student eligibility"
+                  },
+                  "description": "Requests enrolment and institution only. Keep returned management capabilities on the application backend."
+                },
+                "signIn": {
+                  "summary": "Education sign-in",
+                  "value": {
+                    "profile": "education_sign_in",
+                    "interaction_id": "example-sign-in-1",
+                    "purpose": "Sign in a student"
+                  },
+                  "description": "The sign-in profile also requests the student identifier for the application account."
+                },
+                "partner": {
+                  "summary": "Custom credential",
+                  "value": {
+                    "configuration_id": "entitlement",
+                    "profile": "enabled_only",
+                    "interaction_id": "example-member-1",
+                    "purpose": "Check membership"
+                  },
+                  "description": "Only valid on a generic verifier configured and registered for these selectors."
+                }
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Response",
+            "description": "Verification request created",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Session"
+                },
+                "examples": {
+                  "created": {
+                    "summary": "Request created",
+                    "value": {
+                      "session_id": "sssssssssssssssssssssssssssssssssssssssssss",
+                      "interaction_id": "example-eligibility-1",
+                      "correlation_capability": "ccccccccccccccccccccccccccccccccccccccccccc",
+                      "request_uri": "https://verifier.example/oid4vp/request/rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+                      "activation_uri": "openid4vp://authorize?client_id=decentralized_identifier%3Adid%3Aweb%3Averifier.example&request_uri=https%3A%2F%2Fverifier.example%2Foid4vp%2Frequest%2Frrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+                      "expires_at": 1793318520
+                    },
+                    "description": "Synthetic example. expires_at is a Unix timestamp in seconds, 120 seconds after the example creation time. Only activation_uri and request_uri belong in the holder flow."
+                  }
                 }
               }
             }
           },
           "400": {
-            "description": "Stable refusal; no diagnostics or claims",
+            "description": "Invalid input",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "badRequest": {
+                    "summary": "Invalid session input",
+                    "value": {
+                      "error": {
+                        "code": "SESSION_BAD_REQUEST"
+                      }
+                    },
+                    "description": "No new verification request was created. Correct the reported condition before creating a request."
+                  }
                 }
               }
             }
           },
           "403": {
-            "description": "Stable refusal; no diagnostics or claims",
+            "description": "Scope not permitted",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "scope": {
+                    "summary": "Scope not permitted",
+                    "value": {
+                      "error": {
+                        "code": "SCOPE_NOT_PERMITTED"
+                      }
+                    },
+                    "description": "No new verification request was created. Correct the reported condition before creating a request."
+                  }
                 }
               }
             }
           },
           "408": {
-            "description": "Stable refusal; no diagnostics or claims",
+            "description": "HTTP request body deadline exceeded",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "deadline": {
+                    "summary": "HTTP body deadline",
+                    "value": {
+                      "error": {
+                        "code": "REQUEST_DEADLINE"
+                      }
+                    },
+                    "description": "No new verification request was created. Correct the reported condition before creating a request."
+                  }
                 }
               }
             }
           },
           "413": {
-            "description": "Stable refusal; no diagnostics or claims",
+            "description": "HTTP request body too large",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "tooLarge": {
+                    "summary": "Body too large",
+                    "value": {
+                      "error": {
+                        "code": "REQUEST_TOO_LARGE"
+                      }
+                    },
+                    "description": "No new verification request was created. Correct the reported condition before creating a request."
+                  }
                 }
               }
             }
           },
           "429": {
-            "description": "Stable refusal; no diagnostics or claims",
+            "description": "Retained-session capacity reached",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "capacity": {
+                    "summary": "Session capacity reached",
+                    "value": {
+                      "error": {
+                        "code": "SESSION_CAPACITY"
+                      }
+                    },
+                    "description": "No new verification request was created. Correct the reported condition before creating a request."
+                  }
                 }
               }
             }
           },
           "503": {
-            "description": "Stable refusal; no diagnostics or claims",
+            "description": "Required signed evidence unavailable or stale",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "stale": {
+                    "summary": "Cached evidence expired",
+                    "value": {
+                      "error": {
+                        "code": "EVIDENCE_STALE"
+                      }
+                    },
+                    "description": "No new verification request was created. Correct the reported condition before creating a request."
+                  }
                 }
               }
             }
           },
           "401": {
-            "description": "Runtime bearer refusal or protected correlation refusal",
+            "description": "Management bearer or session capability refused",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnauthorizedError"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Management bearer refused",
+                    "value": {
+                      "error": "unauthorized"
+                    },
+                    "description": "The legacy listener authentication error uses a string error. Check the management bearer on the backend."
+                  }
                 }
               }
             }
           }
-        }
+        },
+        "summary": "Create a verification request",
+        "tags": [
+          "Verification sessions"
+        ]
       }
     },
     "/management/sessions/{session_id}": {
@@ -407,26 +542,111 @@
         ],
         "responses": {
           "200": {
-            "description": "Response",
+            "description": "Session status",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SessionStatus"
+                },
+                "examples": {
+                  "pending": {
+                    "summary": "Awaiting the wallet",
+                    "value": {
+                      "session_id": "sssssssssssssssssssssssssssssssssssssssssss",
+                      "interaction_id": "example-eligibility-1",
+                      "status": "pending",
+                      "expires_at": 1793318520
+                    },
+                    "description": "Poll this GET again after about one second, before expires_at."
+                  },
+                  "verifying": {
+                    "summary": "Verification in progress",
+                    "value": {
+                      "session_id": "sssssssssssssssssssssssssssssssssssssssssss",
+                      "interaction_id": "example-eligibility-1",
+                      "status": "verifying",
+                      "expires_at": 1793318520
+                    },
+                    "description": "Wait for completion. Do not consume a result concurrently."
+                  },
+                  "complete": {
+                    "summary": "Result available",
+                    "value": {
+                      "session_id": "sssssssssssssssssssssssssssssssssssssssssss",
+                      "interaction_id": "example-eligibility-1",
+                      "status": "complete",
+                      "expires_at": 1793318520
+                    },
+                    "description": "Stop polling and read the result. It may still be refused."
+                  },
+                  "expired": {
+                    "summary": "Request expired",
+                    "value": {
+                      "session_id": "sssssssssssssssssssssssssssssssssssssssssss",
+                      "interaction_id": "example-eligibility-1",
+                      "status": "expired",
+                      "expires_at": 1793318520
+                    },
+                    "description": "Start a fresh verification request. Reading status cannot renew a request."
+                  },
+                  "consumed": {
+                    "summary": "Result delivery attempted",
+                    "value": {
+                      "session_id": "sssssssssssssssssssssssssssssssssssssssssss",
+                      "interaction_id": "example-eligibility-1",
+                      "status": "consumed",
+                      "expires_at": 1793318520
+                    },
+                    "description": "An ordinary result can be read again if delivery was uncertain, within the original retention and validity limits. This status alone never establishes verification success or application completion. Linked issuance remains exclusive."
+                  },
+                  "linking": {
+                    "summary": "Linked issuance in progress",
+                    "value": {
+                      "session_id": "sssssssssssssssssssssssssssssssssssssssssss",
+                      "interaction_id": "example-eligibility-1",
+                      "status": "linking",
+                      "expires_at": 1793318520
+                    },
+                    "description": "The linked issuance operation owns this session. Do not consume its ordinary result."
+                  }
                 }
               }
             }
           },
           "401": {
-            "description": "Runtime bearer refusal or protected correlation refusal",
+            "description": "Management bearer or session capability refused",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnauthorizedError"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Management bearer refused",
+                    "value": {
+                      "error": "unauthorized"
+                    },
+                    "description": "The legacy listener authentication error uses a string error. Check the management bearer on the backend."
+                  },
+                  "accessDenied": {
+                    "summary": "Session capability refused",
+                    "value": {
+                      "error": {
+                        "code": "SESSION_ACCESS_DENIED"
+                      }
+                    },
+                    "description": "Unknown, removed or incorrectly authorised session. Do not infer whether a session exists from this refusal."
+                  }
                 }
               }
             }
           }
-        }
+        },
+        "summary": "Poll session status without consuming the result",
+        "description": "Repeatable, claim-free status read. Poll sequentially about once per second while pending or verifying, with one call in flight. This is client guidance, not a rate-limit guarantee. Stop polling on complete, expired, consumed or linking. Complete means a result is available, not that verification succeeded. Consumed means an ordinary delivery was attempted or linked issuance claimed it; it does not prove receipt. An uncertain ordinary delivery can be retried through the result POST within its original limits. Stop waiting for wallet completion at expires_at; retries never renew a deadline.",
+        "tags": [
+          "Verification sessions"
+        ]
       }
     },
     "/management/sessions/{session_id}/result": {
@@ -455,89 +675,261 @@
             }
           }
         ],
-        "description": "One-time atomic consumption. A linking result refuses ordinary consumption with RESULT_LINKED; a committed link is consumed. Public state cannot authorize retrieval. Results are retained until creation plus 240 seconds; completed ceremonies are not subject to the 120-second request-completion deadline. Verified claims are delivered only before the immutable original evidence/credential deadline and while current exact permission and credential status remain valid. Refusal consumes the result without claims. Refresh cannot extend its original deadline. Verified enrolled=false remains a value for caller policy.",
+        "description": "Repeatable ordinary result delivery using the same session ID, management bearer and X-Session-Capability. A lost HTTP reply can be retried with the same empty JSON body. HTTP 200 returns status verified or refused; inspect the body. Results remain in memory for 120 seconds after the original request deadline, at most 240 seconds from creation. Verified retries recheck the original evidence and credential deadlines and current exact permission, issuer authority and credential status. A retry can downgrade to refused; once refused, verified claims are erased and cannot return. Refresh never extends validity. Concurrent reads can receive the same result; applications must apply effects only once per interaction. Status remains consumed after ordinary delivery for compatibility. RESULT_PENDING with HTTP 409 permits status polling before expiry. RESULT_LINKED and RESULT_CONSUMED remain terminal for ordinary reads of sessions claimed by linked issuance. Runtime restart or retention expiry requires a fresh verification. Verified enrolled=false remains a value for application policy, not automatic access.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/Empty"
+              },
+              "examples": {
+                "consume": {
+                  "summary": "Consume once",
+                  "value": {},
+                  "description": "Send only after the status GET reports complete. Keep both authentication credentials on your backend."
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Response",
+            "description": "Verified or refused result; ordinary delivery is retryable while retained and valid",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Result"
+                },
+                "examples": {
+                  "verified": {
+                    "summary": "Verified",
+                    "value": {
+                      "status": "verified",
+                      "interaction_id": "example-eligibility-1",
+                      "claims": {
+                        "enrolled": true,
+                        "institution_id": "UNSW"
+                      },
+                      "evidence": {
+                        "issuer_did": "did:web:issuer.example",
+                        "credential_type": "UniversityEducationCredential",
+                        "definition_id": "urn:credworks:education",
+                        "definition_version": "1",
+                        "profile": "education_eligibility",
+                        "claim_paths": [
+                          [
+                            "credentialSubject",
+                            "enrolled"
+                          ],
+                          [
+                            "credentialSubject",
+                            "institution_id"
+                          ]
+                        ],
+                        "verifier_did": "did:web:verifier.example",
+                        "verifier_public_jwk_sha256_thumbprint": "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv",
+                        "issuer_public_jwk_sha256_thumbprint": "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii",
+                        "holder_public_jwk_sha256_thumbprint": "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh",
+                        "verified_at": 1793318420,
+                        "expires_at": 1793318500
+                      }
+                    },
+                    "description": "Illustrative authenticated-result shape. The example performs no cryptographic verification. The application must still check expected issuer, verifier, scope, freshness and its own eligibility policy. The same protected read can recover a lost response, subject to fresh authorization checks and the original deadlines. Apply application effects only once."
+                  },
+                  "statusRefused": {
+                    "summary": "Refused: status check",
+                    "value": {
+                      "status": "refused",
+                      "interaction_id": "example-eligibility-1",
+                      "error": {
+                        "code": "STATUS_CHECK_FAILED"
+                      }
+                    },
+                    "description": "A status check failed. Revocation, suspension and invalid status references can produce this code. The code alone does not establish revocation. HTTP 200 delivers the refusal successfully. No claims are returned. This refusal can be read again until retention expires."
+                  },
+                  "freshnessRefused": {
+                    "summary": "Refused: freshness check",
+                    "value": {
+                      "status": "refused",
+                      "interaction_id": "example-eligibility-1",
+                      "error": {
+                        "code": "FRESHNESS_CHECK_FAILED"
+                      }
+                    },
+                    "description": "A credential or proof failed a time-validity check. Expiry, not-yet-valid credentials and old or future-dated proofs are possible causes. HTTP 200 delivers the refusal successfully. No claims are returned. This refusal can be read again until retention expires."
+                  },
+                  "evidenceRefused": {
+                    "summary": "Refused: evidence expired",
+                    "value": {
+                      "status": "refused",
+                      "interaction_id": "example-eligibility-1",
+                      "error": {
+                        "code": "EVIDENCE_STALE"
+                      }
+                    },
+                    "description": "A completed result lost its original evidence freshness before delivery. Refresh does not extend that result deadline. Start a fresh request. HTTP 200 delivers the refusal successfully. No claims are returned. This refusal can be read again until retention expires."
+                  }
                 }
               }
             }
           },
           "400": {
-            "description": "Stable refusal; no diagnostics or claims",
+            "description": "Invalid input",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "badRequest": {
+                    "summary": "Invalid request body",
+                    "value": {
+                      "error": {
+                        "code": "SESSION_BAD_REQUEST"
+                      }
+                    },
+                    "description": "The result request body must be an empty JSON object."
+                  }
                 }
               }
             }
           },
           "401": {
-            "description": "Runtime bearer refusal or protected correlation refusal",
+            "description": "Management bearer or session capability refused",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnauthorizedError"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Management bearer refused",
+                    "value": {
+                      "error": "unauthorized"
+                    },
+                    "description": "The legacy listener authentication error uses a string error. Check the management bearer on the backend."
+                  },
+                  "accessDenied": {
+                    "summary": "Session capability refused",
+                    "value": {
+                      "error": {
+                        "code": "SESSION_ACCESS_DENIED"
+                      }
+                    },
+                    "description": "Unknown, removed or incorrectly authorised session. Do not infer whether a session exists from this refusal."
+                  }
                 }
               }
             }
           },
           "408": {
-            "description": "Stable refusal; no diagnostics or claims",
+            "description": "HTTP request body deadline exceeded",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "deadline": {
+                    "summary": "HTTP body deadline",
+                    "value": {
+                      "error": {
+                        "code": "REQUEST_DEADLINE"
+                      }
+                    },
+                    "description": "The HTTP request body did not arrive within its bounded deadline. This is separate from the verification request expiry."
+                  }
                 }
               }
             }
           },
           "409": {
-            "description": "Stable refusal; no diagnostics or claims",
+            "description": "Result pending or exclusively claimed by linked issuance",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "pending": {
+                    "summary": "Still pending",
+                    "value": {
+                      "error": {
+                        "code": "RESULT_PENDING"
+                      }
+                    },
+                    "description": "No completed result was consumed. Resume status polling before the original deadline."
+                  },
+                  "consumed": {
+                    "summary": "Consumed by linked issuance",
+                    "value": {
+                      "error": {
+                        "code": "RESULT_CONSUMED"
+                      }
+                    },
+                    "description": "Linked issuance already consumed this verification. Ordinary result reads cannot recover it. Continue the original linked operation using its own retry contract. Ordinary result delivery alone does not produce this error in the updated runtime."
+                  },
+                  "linked": {
+                    "summary": "Linked to issuance",
+                    "value": {
+                      "error": {
+                        "code": "RESULT_LINKED"
+                      }
+                    },
+                    "description": "Continue the original linked issuance operation instead of consuming the result."
+                  }
                 }
               }
             }
           },
           "410": {
-            "description": "Stable refusal; no diagnostics or claims",
+            "description": "Verification request expired",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "expired": {
+                    "summary": "Request expired",
+                    "value": {
+                      "error": {
+                        "code": "SESSION_EXPIRED"
+                      }
+                    },
+                    "description": "The request expired before completion. Start a fresh request."
+                  }
                 }
               }
             }
           },
           "413": {
-            "description": "Stable refusal; no diagnostics or claims",
+            "description": "HTTP request body too large",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "tooLarge": {
+                    "summary": "Body too large",
+                    "value": {
+                      "error": {
+                        "code": "REQUEST_TOO_LARGE"
+                      }
+                    },
+                    "description": "Management JSON bodies are limited to 4 KiB."
+                  }
                 }
               }
             }
           }
-        }
+        },
+        "summary": "Read or retry the protected verification result",
+        "tags": [
+          "Verification sessions"
+        ]
       }
     },
     "/management/evidence/refresh": {
@@ -635,7 +1027,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Trust and identity"
+        ]
       }
     },
     "/.well-known/oauth-authorization-server": {
@@ -660,7 +1055,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Trust and identity"
+        ]
       }
     },
     "/.well-known/openid-credential-issuer": {
@@ -695,7 +1093,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Trust and identity"
+        ]
       }
     },
     "/management/sessions/{session_id}/issuance-offer": {
@@ -816,6 +1217,9 @@
               "pattern": "^[A-Za-z0-9_-]{43}$"
             }
           }
+        ],
+        "tags": [
+          "Verification sessions"
         ]
       }
     },
@@ -905,7 +1309,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Issuer administration"
+        ]
       }
     },
     "/oid4vci/offers/{id}": {
@@ -960,7 +1367,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Credential issuance"
+        ]
       }
     },
     "/oid4vci/token": {
@@ -1025,7 +1435,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Credential issuance"
+        ]
       }
     },
     "/oid4vci/nonce": {
@@ -1060,7 +1473,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Credential issuance"
+        ]
       }
     },
     "/oid4vci/credential": {
@@ -1149,7 +1565,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Credential issuance"
+        ]
       }
     },
     "/oid4vci/status/revocation.jwt": {
@@ -1194,7 +1613,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Credential issuance"
+        ]
       }
     },
     "/management/issuer/issuances/{issuance_id}/status": {
@@ -1275,7 +1697,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Issuer administration"
+        ]
       },
       "post": {
         "servers": [
@@ -1404,7 +1829,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Issuer administration"
+        ]
       }
     },
     "/management/issuer/renewals": {
@@ -1545,7 +1973,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Renewal"
+        ]
       }
     },
     "/partner-renewals/{renewal_id}": {
@@ -1640,7 +2071,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Trust and identity"
+        ]
       }
     },
     "/partner-renewals/{renewal_id}/authorize": {
@@ -1756,7 +2190,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Trust and identity"
+        ]
       }
     },
     "/partner-renewals/{renewal_id}/status": {
@@ -1862,7 +2299,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Trust and identity"
+        ]
       }
     },
     "/partner-renewals/{renewal_id}/cancel": {
@@ -1968,7 +2408,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Trust and identity"
+        ]
       }
     },
     "/partner-renewals/{renewal_id}/receipts/{receipt_id}/successors/{successor_issuance_id}/confirm": {
@@ -2092,7 +2535,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Trust and identity"
+        ]
       }
     },
     "/management/issuer/keys": {
@@ -2136,7 +2582,10 @@
           "503": {
             "description": "ISSUER_KEY_STATE_UNAVAILABLE or ISSUER_AUTHORITY_UNAVAILABLE; restore complete consistent backup for established missing material"
           }
-        }
+        },
+        "tags": [
+          "Issuer administration"
+        ]
       }
     },
     "/management/issuer/keys/stage": {
@@ -2210,7 +2659,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Issuer administration"
+        ]
       }
     },
     "/management/issuer/keys/proof": {
@@ -2293,7 +2745,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Issuer administration"
+        ]
       }
     },
     "/management/issuer/keys/activate": {
@@ -2367,7 +2822,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Issuer administration"
+        ]
       }
     },
     "/management/issuer/keys/abandon": {
@@ -2441,7 +2899,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Issuer administration"
+        ]
       }
     }
   },
@@ -2524,7 +2985,8 @@
             "format": "uri"
           },
           "expires_at": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Request completion deadline as Unix seconds. At most creation + 120 seconds; signed authority may shorten it. It is not a result-retention or evidence-freshness guarantee."
           }
         },
         "required": [
@@ -2561,7 +3023,8 @@
             ]
           },
           "expires_at": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Original request completion deadline as Unix seconds. Status reads do not extend it."
           }
         },
         "required": [

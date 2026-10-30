@@ -30,6 +30,8 @@ A source label identifies the commit used to build an image. A later integration
 
 The source export manifest and [packaging transforms](../../provenance/GENERIC-TRANSFORMS.md) describe original files and deliberate packaging changes. [Earlier generic acceptance evidence](../../provenance/GENERIC-ACCEPTANCE.md) distinguishes intermediate producer pins from later consumer checks. These historical image pins describe preparation, not the currently published image archive. Other CPU architectures require their own build and inspection.
 
+The [result delivery update](../setup/operations.md#upgrade-the-runtime-and-client) uses image source `4be274ebc92a8653f56f83661d035150d1497770` for both Education and generic verification. It changes result retrieval and the Education client, without changing credential formats or the wallet. Older image pins above remain historical.
+
 ## Availability and release limits
 
 The public source and preview artifacts are in TDS-Digital-ID/credworks-integration. Both producer repositories remain private. Source builds require public package registries, not private-monorepo access or private build secrets. Project-owned code is Apache-2.0; third-party terms remain unchanged. Read the release manifest, required notices and corresponding-source attachments before using the image/APK downloads.
@@ -43,7 +45,7 @@ independent-wallet interoperability or a second-device matrix.
 The new guided onboarding candidate includes independently authenticated sandbox
 configuration. Its public HTTPS Education and custom software flows passed on macOS
 ARM64. Both flows also passed in an Ubuntu ARM64 VM using supplied public-only artifacts;
-see [platform evidence](../setup/guide.md#platform-evidence) for scope and limits.
+see [platform evidence](../setup/operations.md#platform-evidence) for scope and limits.
 Its new commands and container archives are awaiting publication. Teams still operate their own HTTPS services,
 databases and protected identities. [Getting started](../education/getting-started.md)
 explains the first development milestone; software-holder checks do not establish

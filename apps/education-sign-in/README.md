@@ -12,6 +12,11 @@ can correlate visits. Use eligibility when account continuity is unnecessary.
 
 For container startup without native compilation, follow [Run the Education containers](../../docs/setup/containers.md).
 
+The server uses the shared `educationClient` exported as
+`@unsw-vc/education-sign-in/client`. Its `create` and `consume` methods retain
+capabilities, retryable result reads, one-time application callbacks, exact result validation and deadline checks.
+The browser adapter still owns cookies, CSRF, account storage and session rotation.
+
 ## Prerequisites and configuration
 
 First follow the [partner runtime setup](../partner-runtime/README.md): create a project,
@@ -73,7 +78,9 @@ instance and requested values in the wallet and use normal hardware authorizatio
 `POST /api/interactions/<id>/complete` accepts exactly `{}` and consumes the protected
 runtime result using the server-held capability. A pending result returns 409 RESULT_PENDING
 and can be checked again. One admitted completion claims the app interaction before I/O.
-Uncertain upstream delivery fails closed and consumes it. A different browser gets 404
+A lost or unreadable runtime reply returns 503 RUNTIME_UNAVAILABLE and permits a
+retry of the same interaction before its original retention/evidence deadlines. The
+client never repeats an application callback, including after an uncertain callback failure. A different browser gets 404
 INTERACTION_NOT_FOUND. Replay gets 409 INTERACTION_CONSUMED; competing admitted interactions
 cannot rotate the same browser twice. Rotation invalidates remaining pending interactions.
 

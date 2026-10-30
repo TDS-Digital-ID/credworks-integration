@@ -2,7 +2,9 @@
 
 Check whether a holder is a club member without asking which club they joined.
 Your verifier requests only `member` from the synthetic credential you issued.
-The expected result is the boolean `true`, with `club` absent.
+For the default example, the selected `member` value is `true` and `club` is absent.
+For a supplied definition, setup uses its single profile and checks exactly those
+fields against the saved synthetic claims.
 
 ## Before you start
 
@@ -11,7 +13,7 @@ Keep that issuer running. Choose another unused hostname for your verifier,
 such as `check.your-domain.example`. It needs a separate identity and state
 folder. It does not need another database.
 
-The example credential expires **one hour after the offer is prepared**. Repeating `issue` reuses
+The default example expires **one hour after the offer is prepared**. A supplied definition uses its `max_validity_seconds`. Repeating `issue` reuses
 that receipt and checks its current validity; it does not extend or replace it.
 If it has expired, keep the receipt and keys. Ask your issuer operator to arrange
 an explicit new synthetic issuance through the [advanced issuance procedure](../partner/quickstart.md#host-software-holder-lifecycle).
@@ -43,8 +45,8 @@ if it is occupied.
 ```
 
 Expect `SETUP_CUSTOM_VERIFIER_READY`. Setup proves the verifier owns its hostname,
-then uses your issuer's protected project credential to grant the `membership`
-profile. That profile permits only the `member` field.
+then uses your issuer's protected project credential to grant the selected profile.
+For the default example this is `membership`, permitting only `member`.
 
 The verifier registration identifies the recipient. The issuer adoption identifies
 which issuer may issue this definition. The permission identifies which fields
@@ -61,14 +63,9 @@ credential into browser code.
 ./setup verify --state "$HOME/.credworks/club-verifier"
 ```
 
-Expect `SOFTWARE_HOLDER_CUSTOM_VERIFIED` and:
-
-```json
-{"member":true}
-```
-
-The command checks the verifier's authenticated result after presentation. It
-requires exactly that field with its boolean type and rejects extra fields.
+Expect `SOFTWARE_HOLDER_CUSTOM_VERIFIED`. The command checks the authenticated
+result against the selected profile and saved synthetic claims, rejecting extra
+fields. It prints no claim values.
 A public "accepted" response only acknowledges delivery; it is not the result.
 
 You can stop and start this verifier, then repeat the check. Its identity and
@@ -97,10 +94,12 @@ Revocation cannot be undone by rerunning `issue`.
 | `SETUP_PERMISSION_UNAVAILABLE` | Restore registry connectivity and resume with the same state. An identical grant request is safe to retry. |
 | `SETUP_ISSUER_REQUIRED` or `SETUP_ISSUER_NOT_READY` | Use the original issuer state folder and finish its setup first. |
 | `SETUP_PERMISSION_REFUSED` | Preserve both state folders. Check the registered recipient and exact profile with the issuer operator. |
-| `STATUS_CHECK_FAILED` | The credential is revoked or its current status cannot be validated. Do not grant access. |
-| `FRESHNESS_CHECK_FAILED` | Keep the expired receipt. Arrange an explicit new issuance; do not reset the holder key or disable expiry checks. |
+| `STATUS_CHECK_FAILED` | The credential may be revoked or suspended, or its status reference may be invalid. Do not infer revocation from this code alone. |
+| `FRESHNESS_CHECK_FAILED` | A time-validity check failed. The credential may be expired or not yet valid, or the proof may be too old or future-dated. Preserve state and identify the cause before reissuing. |
 
 State folders contain keys, management credentials and credential contents. Share
 only the command, refusal code and candidate revision when asking for help.
 See [definitions and disclosure](../partner/definitions.md) for custom profiles
 and [operations](../partner/operations.md) for backups and lifecycle procedures.
+
+See the [refusal-code reference](../education/api.md#refusal-codes) for the broader meanings and recovery guidance.

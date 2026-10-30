@@ -6,6 +6,8 @@ const messages = {
   INSTITUTION_NOT_ALLOWED: "Access declined. This institution is not accepted.",
   RESULT_PENDING:
     "Still waiting for wallet completion. No account session has been created.",
+  RUNTIME_UNAVAILABLE:
+    "The verifier response could not be read. Try checking this request again before it expires.",
   EVIDENCE_STALE: "Evidence expired. Start a fresh request.",
   INTERACTION_EXPIRED: "This interaction expired. Start a fresh request.",
 };
@@ -41,7 +43,8 @@ function failure(error) {
     ? error.message
     : "APPLICATION_UNAVAILABLE";
   byId("outcome").textContent =
-    code === "RESULT_PENDING" ? "Awaiting wallet" : "Request refused";
+    code === "RESULT_PENDING" ? "Awaiting wallet" :
+    code === "RUNTIME_UNAVAILABLE" ? "Try checking again" : "Request refused";
   byId("detail").textContent =
     messages[code] ??
     "No new account session was created. Check the configuration or start again.";

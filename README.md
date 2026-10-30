@@ -3,14 +3,14 @@
 Project code is licensed under [Apache-2.0](LICENSE); third-party notices remain in force.
 Read the [distribution status and limits](DISTRIBUTION.md) before selecting an artifact.
 
-Start with [Getting started](docs/education/getting-started.md) to check student
-eligibility using the supplied app. Run [guided setup](docs/setup/guide.md) with
-Docker; no host Node.js or Rust compiler is required for that path.
+Course teams: obtain the private starter from your operator, start Docker, then
+run `./setup` in the extracted folder. Confirm the team and addresses. Setup starts
+the example, checks eligibility and opens the app. [Getting started](docs/education/getting-started.md)
+is the complete team walkthrough.
 
-These instructions target the [student onboarding preview](https://github.com/TDS-Digital-ID/credworks-integration/releases/tag/student-onboarding-preview-20261013).
-If that release is unavailable, publication has not happened yet. Earlier experimental downloads do not contain these setup commands and images.
-The later physical preview records retained-scope checks on one Pixel; it does not
-qualify this new setup. The producer repositories remain private.
+The current helper requires the reviewed kit supplied by your operator. Older public
+previews retain their original instructions. [Own-domain setup](docs/setup/guide.md)
+is available for integrations without a course starter.
 
 Use [Education concepts](docs/education/overview.md) or
 [partner integration](docs/partner/overview.md) for background and advanced flows.
@@ -100,7 +100,7 @@ point it at an ecosystem/registry database. Supply `EDUCATION_APP_DATABASE_URL`,
 pnpm --filter @unsw-vc/education-sign-in start 2>&1 | tee .logs/education-sign-in.log
 ```
 
-The browser app uses Secure/HttpOnly/SameSite cookies, CSRF and protected one-time
+The browser app uses Secure/HttpOnly/SameSite cookies, CSRF and protected retryable
 runtime results. A public `status: accepted` is delivery acknowledgement, not verification.
 See the app's packaged OpenAPI and the runtime's `openapi.json`.
 
@@ -153,4 +153,4 @@ on one Pixel 7 running Android 17. An independent Ubuntu ARM64 VM run also passe
 Education and custom software flows using supplied public-only artifacts, with
 documented recovery and operator DNS cache refreshes.
 Native Linux AMD64 and Windows/WSL2 remain unverified;
-see [platform evidence](docs/setup/guide.md#platform-evidence).
+see [platform evidence](docs/setup/operations.md#platform-evidence).

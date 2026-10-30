@@ -5,6 +5,7 @@ import { isDeepStrictEqual } from 'node:util';
 import { randomUUID } from 'node:crypto';
 import { httpClient } from './http-client.mjs';
 import { openGeneric } from './generic-http.js';
+import { credentialInput } from './setup-credential.mjs';
 import { exampleConfig } from './setup-issuer.js';
 
 const check = (condition: unknown, code: string) => { if (!condition) throw Error(code); };
@@ -49,9 +50,11 @@ export async function verifyExample(root: string, state: any, issuer: any) {
   const flow = openGeneric({ ...config, verifierOrigin: state.binding.runtimeOrigin, verifierManagementOrigin: 'http://127.0.0.1:3081', verifierManagementToken: state.managementToken, permissionPath: new URL(permission.granted.permission_url).pathname });
   await flow.fresh(receipt);
   await flow.management('verifier', '/management/evidence/refresh', {});
-  const session = await flow.createSession('membership-' + randomUUID(), 'Check synthetic club membership without the club name');
+  const session = await flow.createSession('verification-' + randomUUID(), 'Check the selected fields of a synthetic credential');
   await flow.present(session, receipt);
   const result = await flow.result(session);
-  check(result.status === 'verified' && result.evidence.definition_id === config.definitionId && isDeepStrictEqual(result.evidence.claim_paths, config.claimPaths) && isDeepStrictEqual(result.claims, { member: true }), 'SETUP_VERIFICATION_REFUSED');
-  console.log('SOFTWARE_HOLDER_CUSTOM_VERIFIED: {"member":true}. Club name withheld. Authenticated verifier result checked; software development evidence only.');
+  const input = credentialInput(issuer);
+  const expected = Object.fromEntries(config.claimPaths.filter(path => Object.hasOwn(input.claims, path[1]!)).map(path => [path[1]!, input.claims[path[1]!] ]));
+  check(result.status === 'verified' && result.evidence.definition_id === config.definitionId && isDeepStrictEqual(result.evidence.claim_paths, config.claimPaths) && isDeepStrictEqual(result.claims, expected), 'SETUP_VERIFICATION_REFUSED');
+  console.log('SOFTWARE_HOLDER_CUSTOM_VERIFIED: Selected fields matched; other fields withheld. Authenticated verifier result checked; software development evidence only.');
 }

@@ -16,6 +16,59 @@
       "previous_export_sha256": "cb4eef979b3abf319da2b5b067ae5740770a11ebe558f5de4662dc10bc6a4edc"
     },
     {
+      "path": "apps/education-sign-in/README.md",
+      "source_revision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
+      "source_sha256": "67b16817ea15c5ff482d2ed5e6214af67ff6955c772d71651ffcb5a26723d444",
+      "export_sha256": "c53023c8af2e889093c8dcdffcd7dac6ee2ff116e9fa0575aa353626b8064bec",
+      "transformation": "standalone README links and result retry documentation",
+      "previous_export_sha256": "17c545e1c1f83819e093aaa88b56f24f23d9319a8d07398cd911b9ca6c0bb264"
+    },
+    {
+      "path": "apps/education-sign-in/src/cli.ts",
+      "source_revision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
+      "source_path": "apps/education-sign-in/src/cli.ts",
+      "source_sha256": "6ba7ffdc6656d0fd79fba283bc38cb2121a2ee68a712979ba5d86518192d092a",
+      "export_sha256": "6ba7ffdc6656d0fd79fba283bc38cb2121a2ee68a712979ba5d86518192d092a"
+    },
+    {
+      "path": "apps/education-sign-in/src/client.ts",
+      "source_revision": "4be274ebc92a8653f56f83661d035150d1497770",
+      "source_sha256": "cc9cb1bc32152db942a8e677223a8798f442e390702535bfe0e49b747dd97d8d",
+      "export_sha256": "cc9cb1bc32152db942a8e677223a8798f442e390702535bfe0e49b747dd97d8d"
+    },
+    {
+      "path": "apps/education-sign-in/src/public/app.js",
+      "source_revision": "4be274ebc92a8653f56f83661d035150d1497770",
+      "source_sha256": "ea20777e625948a270e0619b1c7832b9cb4f1f39862bb00a38834240f957e054",
+      "export_sha256": "ea20777e625948a270e0619b1c7832b9cb4f1f39862bb00a38834240f957e054"
+    },
+    {
+      "path": "apps/education-sign-in/src/public/openapi.json",
+      "source_revision": "4be274ebc92a8653f56f83661d035150d1497770",
+      "source_sha256": "1bc31e179c5aaf77d1feed80f5db1875148675941d6cefe42bb3c23db4e957ae",
+      "export_sha256": "1bc31e179c5aaf77d1feed80f5db1875148675941d6cefe42bb3c23db4e957ae"
+    },
+    {
+      "path": "apps/education-sign-in/tests/cli.test.mjs",
+      "source_revision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
+      "source_path": "apps/education-sign-in/tests/cli.test.mjs",
+      "source_sha256": "bf7f3aa61a11f8707fd778befd64ea574f1e164138af19a32a7a760e5d8cb263",
+      "export_sha256": "bf7f3aa61a11f8707fd778befd64ea574f1e164138af19a32a7a760e5d8cb263"
+    },
+    {
+      "path": "apps/education-sign-in/tests/client.test.mjs",
+      "source_revision": "4be274ebc92a8653f56f83661d035150d1497770",
+      "source_sha256": "5d806c3cfe27aa7c0c82b4c803974ddd37cd0339a95f817bc328bf0c93c631d9",
+      "export_sha256": "5d806c3cfe27aa7c0c82b4c803974ddd37cd0339a95f817bc328bf0c93c631d9"
+    },
+    {
+      "path": "apps/education-sign-in/tests/container.test.mjs",
+      "source_revision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
+      "source_path": "apps/education-sign-in/tests/container.test.mjs",
+      "source_sha256": "c2b5deb8a6ef3d2843a2a49053a1d4eb4046cbef3b2684c957a7af5c0e8f2915",
+      "export_sha256": "c2b5deb8a6ef3d2843a2a49053a1d4eb4046cbef3b2684c957a7af5c0e8f2915"
+    },
+    {
       "path": "apps/partner-runtime/.env.example",
       "source_sha256": "1d3ee7cad6da257a46b6dfeeeb313ca256a833ec51e1cc83d18889d5b3180cf1",
       "export_sha256": "1d3ee7cad6da257a46b6dfeeeb313ca256a833ec51e1cc83d18889d5b3180cf1"
@@ -129,8 +182,10 @@
     },
     {
       "path": "apps/partner-runtime/openapi.json",
-      "source_sha256": "9f95930bb9723a1b330e6da1af49b30d4f68363260e51a2dccbbdf20f2441c24",
-      "export_sha256": "9f95930bb9723a1b330e6da1af49b30d4f68363260e51a2dccbbdf20f2441c24"
+      "source_revision": "4be274ebc92a8653f56f83661d035150d1497770",
+      "source_sha256": "a62d29207fa4b040142ca3601d8e75aaddeffbf277388e79bcc5cacf6208c54c",
+      "export_sha256": "a62d29207fa4b040142ca3601d8e75aaddeffbf277388e79bcc5cacf6208c54c",
+      "previous_export_sha256": "9f95930bb9723a1b330e6da1af49b30d4f68363260e51a2dccbbdf20f2441c24"
     },
     {
       "path": "apps/partner-runtime/package.json",
@@ -196,8 +251,10 @@
     },
     {
       "path": "apps/partner-runtime/src/sessions.ts",
-      "source_sha256": "1592fa1f13803f2bd5a29042eaa315961a6b239e17f9fd605ccc712dc1198a49",
-      "export_sha256": "1592fa1f13803f2bd5a29042eaa315961a6b239e17f9fd605ccc712dc1198a49"
+      "source_revision": "4be274ebc92a8653f56f83661d035150d1497770",
+      "source_sha256": "11420fe385fb17449cf929ed35b1442dca3df24c27309a2bbc3b5dbfa176dbfb",
+      "export_sha256": "11420fe385fb17449cf929ed35b1442dca3df24c27309a2bbc3b5dbfa176dbfb",
+      "previous_export_sha256": "1592fa1f13803f2bd5a29042eaa315961a6b239e17f9fd605ccc712dc1198a49"
     },
     {
       "path": "apps/partner-runtime/src/subject-paths.ts",
@@ -224,8 +281,9 @@
     {
       "path": "apps/partner-runtime/tests/issuer-container.test.mjs",
       "source_sha256": "4b40153d3ff3d27adb09205e63a03e9c16aa6e1ee593b5637594ae9bb202600c",
-      "export_sha256": "1ea36c605d495a484b96ed9fcf5d74872524b557e50221c5c6270d8b5a0a7902",
-      "transformation": "standalone test resources"
+      "export_sha256": "c9b3a0e871a0bfaedfba7c1875a79f94210d4fd23f736bb4e8d7f602456c0672",
+      "transformation": "portable fixture ports and repeatable result assertion",
+      "previous_export_sha256": "1ea36c605d495a484b96ed9fcf5d74872524b557e50221c5c6270d8b5a0a7902"
     },
     {
       "path": "apps/partner-runtime/tests/issuer-lifecycle.test.mjs",
@@ -256,14 +314,18 @@
     },
     {
       "path": "apps/partner-runtime/tests/scalar-sessions.test.mjs",
-      "source_sha256": "f51e9e5ddde20cd8480f7a2a7f2d7ae42d2f9ccd11bf58464437b0c119e532de",
-      "export_sha256": "f51e9e5ddde20cd8480f7a2a7f2d7ae42d2f9ccd11bf58464437b0c119e532de"
+      "source_revision": "4be274ebc92a8653f56f83661d035150d1497770",
+      "source_sha256": "2ee5e7b1b83bf81e61d8bcef507a5fea92cd828a4a6898ed91c74ff828fc9ba2",
+      "export_sha256": "2ee5e7b1b83bf81e61d8bcef507a5fea92cd828a4a6898ed91c74ff828fc9ba2",
+      "previous_export_sha256": "f51e9e5ddde20cd8480f7a2a7f2d7ae42d2f9ccd11bf58464437b0c119e532de"
     },
     {
       "path": "apps/partner-runtime/tests/sessions.test.mjs",
-      "source_sha256": "bd6e218968211732e16b08d51a497b0d64206757da73d0c0bee22327ff0f1bac",
-      "export_sha256": "0b46c6ad179496af2222c5be1c511ce25a5d4912131994be049d6cd6e9c835a4",
-      "transformation": "standalone test resources"
+      "source_revision": "4be274ebc92a8653f56f83661d035150d1497770",
+      "source_sha256": "842a54d9d4a099c40b01a00956cbae45f0d2c7b55f22fbf02b1b64082662d365",
+      "export_sha256": "c84fdd5f40e0ccee1b0e77c75ccc55d1b43e1075bfca9e0795e154a651100919",
+      "previous_export_sha256": "0b46c6ad179496af2222c5be1c511ce25a5d4912131994be049d6cd6e9c835a4",
+      "transformation": "portable fixture port 29270"
     },
     {
       "path": "apps/partner-runtime/tests/support/issuer-lifecycle.mjs",
@@ -427,6 +489,15 @@
       "export_sha256": "ba1c8bce9919ceed85841f45199e24882c50e083714d0521859a50dcb6af5a35"
     },
     {
+      "path": "docs/setup/containers.md",
+      "source_revision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
+      "source_path": "docs/partner/container-startup.md",
+      "source_sha256": "e5fed73754d789818ed5e484a71f4f50aca56c1a2ca1cb6e297af45e5d0facdf",
+      "export_sha256": "f8bbbc9809b65c2e9297e4788a1de181c327777f0017496c7257c991c57791ef",
+      "transformation": "Kit-owned documentation transformation: relocated outside the finite partner reference index, link to the guided setup entry point, and explain the public-only configuration child mount while retaining private operator secrets. Original producer source revision, path and hash are preserved. Versioned onboarding preview follow-up: replace the unpublished-image sentence with a link to the exact release download/checksum steps and explicitly refuse substituting another image when that release is unavailable.",
+      "previous_export_sha256": "1bee7017892e81ebc0ce9da9a7249bea617e0e1a9345d84415614f19150dfd72"
+    },
+    {
       "path": "infra/partner-issuer/compose.yml",
       "source_sha256": "0c0c0a2b39bdaed1554b9356ed69c658b9ab2922a822b26a1c0dfb7151fe7f91",
       "export_sha256": "0c0c0a2b39bdaed1554b9356ed69c658b9ab2922a822b26a1c0dfb7151fe7f91"
@@ -513,8 +584,9 @@
     {
       "path": "pnpm-lock.yaml",
       "source_sha256": "687fe64f05da570d35ed3b0d1ba0b2bcef8a750037f4b5c772450ebb3989cb31",
-      "export_sha256": "bd96c8aa548c50cd9aa47663df5f5ddcf800ff2033f4764db73d086237354e21",
-      "transformation": "standalone frozen importer closure"
+      "export_sha256": "15c87abc53ed3674c0af57f7438a7bfd55fae139ba45745c6559f619b42c5759",
+      "transformation": "standalone packaging and API example schema-validation dependencies introduced by the docs update",
+      "previous_export_sha256": "bd96c8aa548c50cd9aa47663df5f5ddcf800ff2033f4764db73d086237354e21"
     },
     {
       "path": "usecases/webapp-explainer/example.json",
@@ -550,43 +622,6 @@
       "path": "vectors/conformance/student-uc3.json",
       "source_sha256": "5593b0cf8e73352dad8ad3ccc7c37a27ab1de19cfdad930c8cc3616041d93c12",
       "export_sha256": "5593b0cf8e73352dad8ad3ccc7c37a27ab1de19cfdad930c8cc3616041d93c12"
-    },
-    {
-      "path": "apps/education-sign-in/src/cli.ts",
-      "source_revision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
-      "source_path": "apps/education-sign-in/src/cli.ts",
-      "source_sha256": "6ba7ffdc6656d0fd79fba283bc38cb2121a2ee68a712979ba5d86518192d092a",
-      "export_sha256": "6ba7ffdc6656d0fd79fba283bc38cb2121a2ee68a712979ba5d86518192d092a"
-    },
-    {
-      "path": "apps/education-sign-in/tests/cli.test.mjs",
-      "source_revision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
-      "source_path": "apps/education-sign-in/tests/cli.test.mjs",
-      "source_sha256": "bf7f3aa61a11f8707fd778befd64ea574f1e164138af19a32a7a760e5d8cb263",
-      "export_sha256": "bf7f3aa61a11f8707fd778befd64ea574f1e164138af19a32a7a760e5d8cb263"
-    },
-    {
-      "path": "apps/education-sign-in/tests/container.test.mjs",
-      "source_revision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
-      "source_path": "apps/education-sign-in/tests/container.test.mjs",
-      "source_sha256": "c2b5deb8a6ef3d2843a2a49053a1d4eb4046cbef3b2684c957a7af5c0e8f2915",
-      "export_sha256": "c2b5deb8a6ef3d2843a2a49053a1d4eb4046cbef3b2684c957a7af5c0e8f2915"
-    },
-    {
-      "path": "docs/setup/containers.md",
-      "source_revision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
-      "source_path": "docs/partner/container-startup.md",
-      "source_sha256": "e5fed73754d789818ed5e484a71f4f50aca56c1a2ca1cb6e297af45e5d0facdf",
-      "export_sha256": "f8bbbc9809b65c2e9297e4788a1de181c327777f0017496c7257c991c57791ef",
-      "transformation": "Kit-owned documentation transformation: relocated outside the finite partner reference index, link to the guided setup entry point, and explain the public-only configuration child mount while retaining private operator secrets. Original producer source revision, path and hash are preserved. Versioned onboarding preview follow-up: replace the unpublished-image sentence with a link to the exact release download/checksum steps and explicitly refuse substituting another image when that release is unavailable.",
-      "previous_export_sha256": "1bee7017892e81ebc0ce9da9a7249bea617e0e1a9345d84415614f19150dfd72"
-    },
-    {
-      "path": "apps/education-sign-in/README.md",
-      "source_revision": "61c2b16b6f43dc72c0e31a8d4ee6837f04a6eccb",
-      "source_sha256": "67b16817ea15c5ff482d2ed5e6214af67ff6955c772d71651ffcb5a26723d444",
-      "export_sha256": "0cebf430283c4f74eb28346e3046552d72f4e6684f985b5375aa36cba11b795f",
-      "transformation": "Preserve existing Apache-2.0 distribution wording and point the container guide to docs/setup/containers.md."
     }
   ],
   "omitted_generated_files": [

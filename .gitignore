@@ -5,4 +5,5 @@ native-test/
 .logs/
 .artifacts/
 .env
+team.json
 *.tsbuildinfo

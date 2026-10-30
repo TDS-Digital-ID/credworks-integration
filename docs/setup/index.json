@@ -12,5 +12,19 @@
     "order": 2,
     "source": "containers.md",
     "group": "Run your services"
+  },
+  {
+    "slug": "setup-operations",
+    "title": "Setup recovery and platform evidence",
+    "order": 3,
+    "source": "operations.md",
+    "group": "Run your services"
+  },
+  {
+    "slug": "course-operator",
+    "title": "Course operator procedures",
+    "order": 4,
+    "source": "operator.md",
+    "group": "Run your services"
   }
 ]
