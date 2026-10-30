@@ -53,7 +53,7 @@ Verify the successor and durably save it and pending receipt before sending `eve
 
 `renewalStatus(name)` is read/reconciliation, never first storage confirmation. Status/cancel/confirm proofs each use a new nonce and exact action URI audience; public POST query fields are refused. Expired unissued leases require a new authorized attempt. Expiry alone does not free an issued unconfirmed successor. The application must not invent a parallel operation while the original outcome is uncertain.
 
-## Consistent backup, restore and upgrade
+## Consistent backup and restore
 
 Stop and fence all issuer/verifier writers, management clients, replicas and migration jobs before capture. Preserve one generation, not selected rows or only the currently selected signing key.
 
@@ -78,8 +78,6 @@ tar -cpf /absolute/private/new-backup/verifier-identity.tar -C /absolute/private
 A DB snapshot alone cannot make a concurrently copied identity consistent. Keep all writers stopped through capture, retain protected configs/unlock material separately and record checksums. For Compose copy complete named volumes read-only using native `tar` in the pinned image; preserve UID/GID 10001. Do not pass a source-directory path to archive an unrelated container volume.
 
 Restore into new empty DB/volume resources, preserve original archives and fence the original deployment. Refuse an existing destination rather than erasing it. Restore ownership/modes, the entire DB, config and matching unlock secrets. Private DB address may change; public origin/DID/pins cannot. Start the same immutable image first with `start`. Never run `bootstrap` or `bootstrap-issuer` on restored established state.
-
-For compatible upgrades take another stopped-writer backup, apply only bundled forward migrations through `db:migrate` or the container migration command in [setup](quickstart.md#compose-alternative), then launch the exact new image. Migration history is `partner_runtime_migrations.issuer_migrations`. Earlier upgrade checks covered the specific prior kit image source 95a9da7a73d9fe2c2f1e414607ec76e8c586b316 to f632ec5caf8d917304501ad038b2aceef1e46bae, including whole-state/retained-key restoration. This is evidence for that pair, not arbitrary upgrades or downgrades.
 
 Compare public DID and protected key inventory against the captured generation. Fetch fresh signed evidence, start new sessions and check retained/current credentials, exact revoked instances, consumed authorization and pending/completed renewals before switching traffic. Positive caches/sessions/results are ephemeral. A healthy port is insufficient. Keep staged minting paused until normal signed activation authority permits it.
 
@@ -115,4 +113,4 @@ Use disposable test databases/isolated ports and the opt-in variables required b
 | TOKEN_DELIVERY_UNCERTAIN, PRIVATE_STATE_REFUSED | Retain protected host operation state; reconcile/cancel safely, never recreate established holder keys |
 | INVALID_SIGNATURE, BINDING_CHECK_FAILED, STATUS_CHECK_FAILED, REQUEST_SCOPE_NOT_PERMITTED | Refuse disclosure/access; inspect authenticated pins, exact scope and signed evidence |
 
-Read `.logs/partner-issuer.log` and `.logs/partner-verifier.log` or bounded container logs locally. Report only source/image pins and sanitized fixed codes. No framework, new cryptographic implementation or UI-driving suite is needed for these HTTP checks. Physical install/update, hardware authorization and consent require separate device observations. Generic release publication follows Education release publication.
+Read `.logs/partner-issuer.log` and `.logs/partner-verifier.log` or bounded container logs locally. Report only source/image pins and sanitized fixed codes. No framework, new cryptographic implementation or UI-driving suite is needed for these HTTP checks. Physical install/update, hardware authorization and consent require separate device observations.

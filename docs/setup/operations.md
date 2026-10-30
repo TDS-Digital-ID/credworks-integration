@@ -3,23 +3,6 @@
 Use the same protected state directory and original volumes on every retry.
 Return to [team setup](guide.md) for a new installation.
 
-## Upgrade the runtime and client
-
-Use the [result-retry update](https://github.com/TDS-Digital-ID/credworks-integration/releases/tag/result-retry-update-20261030) to install the corrected runtime and Education client together. Download its source archive, verify it against `SHA256SUMS`, and extract it into a new folder. Keep your existing private state directory and Docker volumes.
-
-From the new kit folder, with Docker running:
-
-```sh
-./setup upgrade --state "$HOME/.local/share/credworks-team"
-./setup doctor --state "$HOME/.local/share/credworks-team"
-```
-
-Use your actual state path if it differs. The command downloads and checks the pinned images for your architecture, verifies their source labels, updates the saved image references and restarts the same services. Keys, origins, registration, database volumes and existing accounts are preserved. In-flight verification requests and browser logins must start again after the restart. No wallet update or credential reissuance is required for this fix.
-
-If interrupted, rerun the same upgrade command from the same new kit. It resumes only that exact transition. `SETUP_UPGRADE_PENDING` means normal setup is waiting for this recovery. `SETUP_UPGRADE_REFUSED` or `SETUP_IMAGE_REFUSED` means the supplied images or saved files do not match; preserve the files and resolve the mismatch. A protected `runtime-upgrade-backup.<previous-revision>.json` remains in the state directory. It contains private configuration and must not be shared.
-
-The new helper can still start or stop an installation using the previous pinned images. Those older images retain single-use results until you run the upgrade. Use the new kit folder for later setup commands. A custom backend using `educationClient` must also take the updated client source; HTTP integrations use the [result retry contract](../education/api.md#result-retries-and-recovery).
-
 ## Interrupted course import
 
 If the first course `prepare` stops, repeat that exact command with the same bundle,
@@ -33,9 +16,9 @@ checks `tunnel-import.json` against the original allocation and bundle. If that
 committed journal is complete and an adjacent `.pending` file is truncated, move
 only that failed pending file to protected evidence, then repeat the same `prepare`
 command. Keep the journal, local secrets and all committed files unchanged.
-If the journal itself is incomplete, a committed file conflicts, or an older kit
-left only a credential without a journal, keep the attempt stopped for operator
-reconciliation or restore a known complete backup. Do not guess missing secrets,
+If the journal itself is incomplete, a committed file conflicts, or a credential
+has no matching journal, keep the attempt stopped for operator reconciliation or
+restore a known complete backup. Do not guess missing secrets,
 edit saved hashes or delete state to continue.
 
 ## Stop, resume and diagnose
@@ -174,24 +157,19 @@ restore the original image; setup will not silently migrate existing state.
 
 ## Platform evidence
 
-The rows below record the earlier published own-domain path. The supplied-tunnel
-candidate passed its CLI-to-backend eligibility journey on macOS ARM64 through local
-mapped HTTPS. Live Cloudflare authorization, routing and retirement, and actual
-cross-group browser behavior remain NOT RUN. The historical rows do not qualify the
-course allocation for handoff.
+These checks describe the supplied runtime/app images and setup helper. Confirm the
+team's public addresses, eligibility and browser behaviour during its first setup.
 
 | Environment | Observed checks | Limit |
 | --- | --- | --- |
-| macOS ARM64 | Public HTTPS setup, registration, software eligibility and sign-in; full stop/start preserved identity, credentials and account | Software holder with labelled mock platform attestation |
-| Ubuntu 26.04 ARM64 virtual machine | Supplied public-only source and images; Education setup, eligibility, sign-in and restart; custom receipt, member-only verification, restart and exact revocation refusal | Existing prepared VM; recovered after operator DNS cache actions and same-state retries; public release download not tested |
-| AMD64 containers | Image build and container checks under emulation | Native Linux AMD64 host not verified |
-| Windows/WSL2 | NOT RUN; no Windows machine available | Instructions are provided without a verified support claim |
-| Pixel 7, Android 17, arm64-v8a | New Government receipt, Education enrolment and receipt, Android cancellation, then successful disclosure and app-confirmed eligibility | One phone with the exact wallet candidate already installed; installation and other devices not tested; iPhone is coming soon |
+| ARM64 Docker Linux VM | Packaged runtime/issuer and Education application checks, including recovery after a lost runtime response and account continuity after restart | Container checks do not establish the team's public routing or browser behaviour. |
+| AMD64 containers under emulation | The same packaged runtime and application checks | A native AMD64 host was not checked. |
+| macOS ARM64 with Docker | Fresh archive import and the published source's `./setup prepare` | Preparation does not register or start a team's public services. |
+| Windows/WSL2 | Not checked | Instructions require a Docker-enabled WSL2 Linux terminal. |
+| Team host and Android phone | Follow [Getting started](../education/getting-started.md), then [Use an Android wallet](../guides/android-wallet.md) | Each team's public setup, browser behaviour and phone flow must be observed on its actual devices. |
 
-On 13 October 2026, the macOS ARM64 custom flow also passed over public HTTPS: issuance, selected-field verification of only the boolean `member`, full stop/start with the same identity and receipt, then exact revocation and refusal of the revoked credential. The first verifier resume failed with a transport error; one retry with the same saved state passed. The cause of that transient failure was not isolated.
-
-The Ubuntu run preserved its initial DNS and issuer identity-check failures. It completed after two operator DNS cache refreshes and documented same-state recovery, without changing keys, origins or trust settings. Its revocation check refused the saved credential before presentation; forced delivery of a revoked credential was not tested.
-
-The Android run first encountered stale signed evidence and expired requests. Those attempts did not pass. Refreshing with `doctor` before each fresh request allowed the cancellation and successful eligibility checks to complete, with the same held credential and unchanged deadlines. These are sandbox observations, not production assurance.
+The software holder uses synthetic data and labelled mock platform attestation.
+These checks do not establish production assurance, vendor attestation or broad
+external-wallet interoperability.
 
 For API integration, see [HTTP responses and error formats](../education/api.md#responses-and-errors), [polling and deadlines](../education/api.md#session-deadlines-and-polling), [lost result responses](../education/api.md#result-retries-and-recovery) and [refusal-code meanings](../education/api.md#refusal-codes).

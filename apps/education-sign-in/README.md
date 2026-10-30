@@ -25,8 +25,8 @@ bootstrap a persistent identity, configure independently pinned trust/status evi
 serve the public runtime at reachable HTTPS. Obtain holder-bound synthetic Education through
 the issuer's existing Government enrolment prerequisite. The application integrates only
 Education, not Government Identity. No operator host-table edit or new credential crypto is
-needed. Project-owned code is Apache-2.0 under the root LICENSE. Public checkout/export, exact signed artifact selection and public-release approval remain under #338;
-#349 delivers the kit, and #348 tracks the later Release B gate.
+needed. Project-owned code is Apache-2.0 under the root LICENSE. Use the source and
+image identities supplied with your team starter.
 
 Use installed pnpm/Node tooling and **a dedicated application Postgres database**. Never point
 the app at the ecosystem registry/issuer database: its Drizzle migration ledger is independent.
@@ -159,8 +159,7 @@ volumes, but logs browser sessions out. App software and bundled migrations are 
 of the ecosystem registry database.
 
 Fonts are unmodified existing UI assets with separately bundled official OFL notices and
-binary provenance in [fonts.md](src/public/fonts.md). Project code reuse/publication remains
-the Education #338 human gate and later Release B #348 gate.
+binary provenance in [fonts.md](src/public/fonts.md).
 
 ## HTTP checks and physical handoff
 
@@ -184,7 +183,7 @@ PR CI creates separate ephemeral fixture/app databases and enables these HTTP te
 coordinator gates additionally enable the pinned app/runtime container check. Missing opt-in
 variables cause skips, which are not completion evidence.
 
-Physical Android steps and exact artifact/source combination are in the revision-specific
-handoff under `docs/partner/education-sign-in.md`. Host page inspection at desktop and narrow
-width is visual evidence only. Public reachability, actual Android activation/hardware prompt,
-installation/upgrade and physical accessibility remain NOT RUN under #338.
+Follow the [Android wallet guide](../../docs/guides/android-wallet.md) for the signed
+artifact and phone steps. Host page inspection at desktop and narrow widths is visual
+evidence only. Check public reachability, Android authorization and accessibility
+on the team's actual host and phone.

@@ -67,7 +67,7 @@ The supplied `educationClient` permits another `consume(originalRequest, apply)`
 
 A runtime restart loses its in-memory sessions; a backend restart also loses the client's private correlation. Start a fresh verification after either restart, a terminal refusal or retention expiry. Removed sessions return `401 SESSION_ACCESS_DENIED`. `409 RESULT_LINKED` and `409 RESULT_CONSUMED` still protect sessions claimed by linked issuance; continue that original linked operation instead of reading an ordinary result. Never repeat the wallet presentation or use result reads to create another linked offer.
 
-Older pinned container previews retain the single-use behaviour. Use the runtime and client from the [result-retry update](../setup/operations.md#upgrade-the-runtime-and-client) together; updating this documentation alone does not change an installed service.
+Use the runtime and client supplied together in your team starter. [Getting started](../education/getting-started.md) installs the matching images and checks eligibility.
 
 ## Refusal codes
 
