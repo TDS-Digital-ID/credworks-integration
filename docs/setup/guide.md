@@ -79,14 +79,6 @@ See [host handover](operations.md#hand-over-the-active-host).
 
 See [diagnostics](operations.md#find-the-first-failing-step).
 
-## Course operator allocation
-
-See [operator allocation](operator.md#course-operator-allocation).
-
-## Course tunnel replacement and retirement
-
-See [operator retirement](operator.md#course-tunnel-replacement-and-retirement).
-
 ## Platform evidence
 
 See [tested platforms and limits](operations.md#platform-evidence).

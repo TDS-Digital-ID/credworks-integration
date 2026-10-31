@@ -44,7 +44,7 @@ service layout.
 Losing the original delivery bundle does not affect an imported installation. Setup
 keeps its own protected credential copy. If that copy is lost, restore its exact
 bytes from a protected backup, or ask the operator for a replacement. If a credential
-may have escaped, use the operator's [replacement procedure](operator.md#course-tunnel-replacement-and-retirement).
+may have escaped, contact your operator to revoke it and arrange a replacement.
 Copying a file locally does not revoke a credential at Cloudflare.
 
 The operator supplies a new tunnel UUID and bundle for your existing group, teaching
@@ -54,13 +54,14 @@ the existing state directory, keys, database and registry project. Run:
 ```sh
 ./setup replace-tunnel \
   --state "$HOME/.local/share/credworks-team" \
-  --group banana --from-tunnel OLD_TUNNEL_UUID \
-  --tunnel-bundle "$HOME/.local/share/course-handoff/banana-replacement.json" \
-  --runtime-origin https://banana-verify.your-course-domain \
-  --app-origin https://banana-app.your-course-domain
+  --group "$GROUP" --from-tunnel OLD_TUNNEL_UUID \
+  --tunnel-bundle /absolute/private/replacement.json \
+  --runtime-origin "$RUNTIME_ORIGIN" \
+  --app-origin "$APP_ORIGIN"
 ```
 
-Use your confirmed values, with `cherry` for the other group. The bundle must be a
+Set `GROUP`, `RUNTIME_ORIGIN` and `APP_ORIGIN` to the values your operator confirms.
+Replace the old UUID and bundle path with your own. The bundle must be a
 private, owner-held regular file with mode `0600`. The replacement must have a new
 tunnel UUID. Setup refuses changed group, account, origins, trust inputs, or a
 previously replaced tunnel. It preserves the DID, signing key, project credential,

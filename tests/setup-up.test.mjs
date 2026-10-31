@@ -8,7 +8,7 @@ import { spawnSync } from 'node:child_process';
 test('one-command course setup confirms once, resumes the same identity and opens only after eligibility passes', () => {
   const root = realpathSync(mkdtempSync(join(tmpdir(), 'setup-up-'))), kit = join(root, 'kit'), bin = join(root, 'bin'), state = join(root, 'state');
   const credentials = { TunnelID: '11111111-1111-4111-8111-111111111111', AccountTag: 'a'.repeat(32), TunnelSecret: Buffer.alloc(32, 7).toString('base64') };
-  const bundle = { version: 1, group: 'banana', runtimeOrigin: 'https://banana-verify.course.example', appOrigin: 'https://banana-app.course.example', accountId: credentials.AccountTag, tunnelId: credentials.TunnelID, credentials };
+  const bundle = { version: 1, group: 'example-team', runtimeOrigin: 'https://example-team-verify.course.example', appOrigin: 'https://example-team-app.course.example', accountId: credentials.AccountTag, tunnelId: credentials.TunnelID, credentials };
   try {
     mkdirSync(kit); mkdirSync(bin);
     for (const file of ['setup', 'config', 'tool']) cpSync(file, join(kit, file), { recursive: true });
@@ -42,26 +42,26 @@ if(args[0]==='compose'){
 process.exit(2);
 `}`, { mode: 0o755 });
     const run = (input = '', fail = '') => spawnSync('bash', [join(kit, 'setup'), 'up', '--state', state], { input, encoding: 'utf8', env: { ...process.env, PATH: bin + ':' + process.env.PATH, TEST_ROOT: root, TEST_FAIL: fail }, timeout: 20000 });
-    for (const input of ['', 'cherry\n']) {
+    for (const input of ['', 'other-team\n']) {
       const result = run(input);
       assert.equal(result.status, 1, result.stderr);
       assert.match(result.stderr, /SETUP_CONFIRMATION_(REQUIRED|REFUSED)/);
       assert(!existsSync(join(state, 'state.json')));
       assert(!existsSync(join(root, 'opened')));
     }
-    let result = run('banana\n');
+    let result = run('example-team\n');
     assert.equal(result.status, 0, result.stderr);
     assert.match(result.stdout, /TEAM_READY: Eligibility checked/);
     assert.equal(readFileSync(join(root, 'opened'), 'utf8'), bundle.appOrigin);
     const saved = readFileSync(join(state, 'state.json'));
     const original = readFileSync(bundlePath);
-    writeFileSync(bundlePath, JSON.stringify({ ...bundle, appOrigin: 'https://banana-app.wrong.example' }));
+    writeFileSync(bundlePath, JSON.stringify({ ...bundle, appOrigin: 'https://example-team-app.wrong.example' }));
     assert.equal(run().status, 1);
     assert.deepEqual(readFileSync(join(state, 'state.json')), saved);
     writeFileSync(bundlePath, original);
     result = run();
     assert.equal(result.status, 0, result.stderr);
-    assert.doesNotMatch(result.stdout, /Type banana/);
+    assert.doesNotMatch(result.stdout, /Type example-team/);
     assert.deepEqual(readFileSync(join(state, 'state.json')), saved);
     rmSync(bundlePath);
     rmSync(join(root, 'opened'));

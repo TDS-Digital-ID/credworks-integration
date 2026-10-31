@@ -49,6 +49,19 @@ test('partner narrative and its finite index are mandatory',()=>{
  } finally { rmSync(root,{recursive:true,force:true}); }
 });
 
+test('the public setup index refuses operator material even when its navigation matches',()=>{
+ const root=mkdtempSync(join(tmpdir(),'private-docs-'));
+ try {
+  for(const p of [...linkedSources,'docs/education','docs/partner','apps/partner-runtime/openapi.json','apps/education-sign-in/src/public/openapi.json','tool/examples/partner-runtime-http.json']) cpSync(p,join(root,p),{recursive:true});
+  const path=join(root,'docs/setup/index.json');
+  const index=JSON.parse(readFileSync(path,'utf8'));
+  index.push({slug:'course-operator',title:'Course operator procedures',order:4,source:'operator.md',group:'Run your services'});
+  writeFileSync(path,JSON.stringify(index));
+  writeFileSync(join(root,'docs/setup/operator.md'),'# Course operator procedures\n');
+  assert.throws(()=>run(root),e=>e.stderr.includes('DOCS_INDEX_INVALID'));
+ } finally { rmSync(root,{recursive:true,force:true}); }
+});
+
 test('partner docs refuse missing operations, inventory drift and broken cross-section links',()=>{
  const root=mkdtempSync(join(tmpdir(),'partner-docs-'));
  try {

@@ -26,8 +26,10 @@ function suppliedBundle(path, group, runtimeOrigin, appOrigin) {
   try { bundle = json(path); } catch { fail('SETUP_TUNNEL_BUNDLE_REFUSED'); }
   const fields = ['version', 'group', 'runtimeOrigin', 'appOrigin', 'accountId', 'tunnelId', 'credentials'];
   if (!bundle || typeof bundle !== 'object' || Object.keys(bundle).length !== fields.length || !fields.every(field => Object.hasOwn(bundle, field))) fail('SETUP_TUNNEL_BUNDLE_REFUSED');
+  // Leave room for the -verify suffix in the DNS label. Allocation stays private.
+  if (typeof group !== 'string' || !/^[a-z0-9](?:[a-z0-9-]{0,54}[a-z0-9])?$/.test(group)) fail('SETUP_TUNNEL_BUNDLE_REFUSED');
   const domain = new URL(runtimeOrigin).hostname.slice(`${group}-verify.`.length);
-  if (bundle.version !== 1 || !['banana', 'cherry'].includes(group) || bundle.group !== group || bundle.runtimeOrigin !== runtimeOrigin || bundle.appOrigin !== appOrigin || runtimeOrigin !== `https://${group}-verify.${domain}` || appOrigin !== `https://${group}-app.${domain}` || !/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/.test(domain)) fail('SETUP_TUNNEL_BUNDLE_REFUSED');
+  if (bundle.version !== 1 || bundle.group !== group || bundle.runtimeOrigin !== runtimeOrigin || bundle.appOrigin !== appOrigin || runtimeOrigin !== `https://${group}-verify.${domain}` || appOrigin !== `https://${group}-app.${domain}` || !/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/.test(domain)) fail('SETUP_TUNNEL_BUNDLE_REFUSED');
   const credentials = bundle.credentials;
   if (!/^[a-f0-9]{32}$/.test(bundle.accountId) || !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(bundle.tunnelId) || !credentials || Object.keys(credentials).length !== 3 || credentials.TunnelID !== bundle.tunnelId || credentials.AccountTag !== bundle.accountId || typeof credentials.TunnelSecret !== 'string' || !/^[A-Za-z0-9+/]{43}=$/.test(credentials.TunnelSecret) || Buffer.from(credentials.TunnelSecret, 'base64').toString('base64') !== credentials.TunnelSecret) fail('SETUP_TUNNEL_BUNDLE_REFUSED');
   return bundle;

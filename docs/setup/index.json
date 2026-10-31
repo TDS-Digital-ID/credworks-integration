@@ -19,12 +19,5 @@
     "order": 3,
     "source": "operations.md",
     "group": "Run your services"
-  },
-  {
-    "slug": "course-operator",
-    "title": "Course operator procedures",
-    "order": 4,
-    "source": "operator.md",
-    "group": "Run your services"
   }
 ]

@@ -17,7 +17,7 @@ test('private starter ships only executable setup helpers and its own team, excl
     git('init'); git('add', '.'); git('-c','user.name=Test','-c','user.email=test@example.invalid','commit','-m','reviewed kit');
     writeFileSync(join(kit, 'operator-secret'), 'must not ship');
     const credentials = { TunnelID: '11111111-1111-4111-8111-111111111111', AccountTag: 'a'.repeat(32), TunnelSecret: Buffer.alloc(32, 7).toString('base64') };
-    const bundle = { version: 1, group: 'banana', runtimeOrigin: 'https://banana-verify.course.example', appOrigin: 'https://banana-app.course.example', accountId: credentials.AccountTag, tunnelId: credentials.TunnelID, credentials };
+    const bundle = { version: 1, group: 'example-team', runtimeOrigin: 'https://example-team-verify.course.example', appOrigin: 'https://example-team-app.course.example', accountId: credentials.AccountTag, tunnelId: credentials.TunnelID, credentials };
     writeFileSync(bundlePath, JSON.stringify(bundle), { mode: 0o600 });
     const run = destination => spawnSync(process.execPath, [join(kit, 'tool/package-team.mjs'), bundlePath, destination], { encoding: 'utf8' });
     let result = run(output);
