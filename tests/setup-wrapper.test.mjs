@@ -118,9 +118,9 @@ process.exit(2);
 
 test('supplied tunnel setup prepares, resumes and diagnoses without Cloudflare account commands', () => {
   const parent = mkdtempSync(join(tmpdir(), 'setup-supplied-wrapper-'));
-  const state = join(parent, 'team'), bin = join(parent, 'bin'), bundlePath = join(parent, 'banana.json');
+  const state = join(parent, 'team'), bin = join(parent, 'bin'), bundlePath = join(parent, 'example-team.json');
   const credentials = { TunnelID: '11111111-1111-4111-8111-111111111111', AccountTag: 'a'.repeat(32), TunnelSecret: Buffer.alloc(32, 7).toString('base64') };
-  const bundle = { version: 1, group: 'banana', runtimeOrigin: 'https://banana-verify.course.example', appOrigin: 'https://banana-app.course.example', accountId: credentials.AccountTag, tunnelId: credentials.TunnelID, credentials };
+  const bundle = { version: 1, group: 'example-team', runtimeOrigin: 'https://example-team-verify.course.example', appOrigin: 'https://example-team-app.course.example', accountId: credentials.AccountTag, tunnelId: credentials.TunnelID, credentials };
   try {
     mkdirSync(bin);
     writeFileSync(bundlePath, JSON.stringify(bundle), { mode: 0o600 });
@@ -150,7 +150,7 @@ process.exit(2);
 `}`, { mode: 0o755 });
     const env = { ...process.env, PATH: bin + ':' + process.env.PATH, TEST_KIT: kit, TEST_ACCOUNT_CALL: join(parent, 'account-called'), TEST_COMPOSE_LOG: join(parent, 'compose.log') };
     const run = (...args) => spawnSync('bash', [join(kit, 'setup'), ...args], { encoding: 'utf8', env, timeout: 15000 });
-    const prepare = ['prepare', '--state', state, '--group', 'banana', '--tunnel-bundle', bundlePath, '--runtime-origin', bundle.runtimeOrigin, '--app-origin', bundle.appOrigin];
+    const prepare = ['prepare', '--state', state, '--group', 'example-team', '--tunnel-bundle', bundlePath, '--runtime-origin', bundle.runtimeOrigin, '--app-origin', bundle.appOrigin];
     env.TEST_PREPARE_PRELOAD = join(parent, 'interrupt.cjs');
     writeFileSync(env.TEST_PREPARE_PRELOAD, `
       const fs = require('node:fs');
@@ -189,7 +189,7 @@ process.exit(2);
     const replacementId = '22222222-2222-4222-8222-222222222222';
     writeFileSync(bundlePath, JSON.stringify({ ...bundle, tunnelId: replacementId, credentials: { ...credentials, TunnelID: replacementId, TunnelSecret: Buffer.alloc(32, 8).toString('base64') } }), { mode: 0o600 });
     rmSync(join(state, 'tunnel-credentials.json'));
-    const replacement = ['replace-tunnel', '--state', state, '--group', 'banana', '--from-tunnel', credentials.TunnelID, '--tunnel-bundle', bundlePath, '--runtime-origin', bundle.runtimeOrigin, '--app-origin', bundle.appOrigin];
+    const replacement = ['replace-tunnel', '--state', state, '--group', 'example-team', '--from-tunnel', credentials.TunnelID, '--tunnel-bundle', bundlePath, '--runtime-origin', bundle.runtimeOrigin, '--app-origin', bundle.appOrigin];
     for (let attempt = 0; attempt < 2; attempt++) {
       const result = run(...replacement);
       assert.match(result.stdout, /SETUP_TUNNEL_REPLACED/);
@@ -203,8 +203,8 @@ process.exit(2);
     const tunnel = JSON.parse(readFileSync(join(state, 'tunnel.yml')));
     assert.equal(tunnel.tunnel, replacementId);
     const ingress = tunnel.ingress;
-    assert.equal(ingress[0].hostname, 'banana-verify.course.example');
-    assert.equal(ingress[2].hostname, 'banana-app.course.example');
+    assert.equal(ingress[0].hostname, 'example-team-verify.course.example');
+    assert.equal(ingress[2].hostname, 'example-team-app.course.example');
     assert.equal(ingress.at(-1).service, 'http_status:404');
     assert(!JSON.stringify(ingress).includes('3081'));
   } finally { rmSync(parent, { recursive: true, force: true }); }

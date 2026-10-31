@@ -5,15 +5,31 @@ import { spawnSync } from 'node:child_process';
 import { chmodSync, mkdtempSync, renameSync, readdirSync, symlinkSync, writeFileSync, readFileSync, existsSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { readCourseBundle } from '../tool/setup.mjs';
 const helper = new URL('../tool/setup.mjs', import.meta.url);
 const invoke = (...args) => spawnSync(process.execPath, [helper.pathname, ...args], { encoding: 'utf8' });
 function courseFixture(parent) {
-  const state = join(parent, 'team'), bundlePath = join(parent, 'banana.json');
+  const state = join(parent, 'team'), bundlePath = join(parent, 'example-team.json');
   const credentials = { TunnelID: '11111111-1111-4111-8111-111111111111', AccountTag: 'a'.repeat(32), TunnelSecret: Buffer.alloc(32, 7).toString('base64') };
-  const bundle = { version: 1, group: 'banana', runtimeOrigin: 'https://banana-verify.course.example', appOrigin: 'https://banana-app.course.example', accountId: credentials.AccountTag, tunnelId: credentials.TunnelID, credentials };
-  const binding = ['--state', state, '--group', 'banana', '--tunnel-bundle', bundlePath, '--runtime-origin', bundle.runtimeOrigin, '--app-origin', bundle.appOrigin];
+  const bundle = { version: 1, group: 'example-team', runtimeOrigin: 'https://example-team-verify.course.example', appOrigin: 'https://example-team-app.course.example', accountId: credentials.AccountTag, tunnelId: credentials.TunnelID, credentials };
+  const binding = ['--state', state, '--group', 'example-team', '--tunnel-bundle', bundlePath, '--runtime-origin', bundle.runtimeOrigin, '--app-origin', bundle.appOrigin];
   return { state, bundlePath, credentials, bundle, binding, args: ['prepare', ...binding, '--architecture', 'arm64'] };
 }
+test('course assignments use bounded DNS labels without embedding a roster', () => {
+  const parent = mkdtempSync(join(tmpdir(), 'setup-group-'));
+  const { bundlePath, bundle } = courseFixture(parent);
+  try {
+    for (const group of ['a', 'example-team', 'other-team', 'a'.repeat(56)]) {
+      const candidate = { ...bundle, group, runtimeOrigin: `https://${group}-verify.course.example`, appOrigin: `https://${group}-app.course.example` };
+      writeFileSync(bundlePath, JSON.stringify(candidate), { mode: 0o600 });
+      assert.deepEqual(readCourseBundle(bundlePath), candidate);
+    }
+    for (const group of ['', '-team', 'team-', 'Example-Team', 'team.name', 'team_name', 'a'.repeat(57), null, 1, {}]) {
+      writeFileSync(bundlePath, JSON.stringify({ ...bundle, group }));
+      assert.throws(() => readCourseBundle(bundlePath), /SETUP_TUNNEL_BUNDLE_REFUSED/);
+    }
+  } finally { rmSync(parent, { recursive: true, force: true }); }
+});
 test('setup refuses a temporary runtime origin before creating protected state', () => {
   const parent = mkdtempSync(join(tmpdir(), 'setup-test-'));
   try {
@@ -255,7 +271,7 @@ test('a supplied course tunnel prepares protected state and repeats without repl
     assert.deepEqual(readFileSync(join(state, 'state.json')), saved);
     assert.deepEqual(readFileSync(join(state, 'team.env')), env);
     assert(!prepared.stdout.includes(credentials.TunnelSecret));
-    for (const changed of [args.map(value => value === 'banana' ? 'cherry' : value), args.map(value => value === bundle.runtimeOrigin ? 'https://other-verify.course.example' : value)]) {
+    for (const changed of [args.map(value => value === 'example-team' ? 'other-team' : value), args.map(value => value === bundle.runtimeOrigin ? 'https://other-verify.course.example' : value)]) {
       const refused = invoke(...changed);
       assert.equal(refused.status, 1);
       assert.match(refused.stderr, /SETUP_TUNNEL_BUNDLE_REFUSED/);
@@ -279,8 +295,8 @@ test('course bundle import refuses unrelated authority, malformed data and chang
       { ...bundle, credentials: { ...credentials, AccountTag: 'b'.repeat(32) } },
       { ...bundle, credentials: { ...credentials, TunnelSecret: credentials.TunnelSecret + '\n' } },
       { ...bundle, credentials: { ...credentials, certPem: 'account-wide-certificate' } },
-      { ...bundle, group: 'cherry' },
-      { ...bundle, appOrigin: 'https://cherry-app.course.example' },
+      { ...bundle, group: 'other-team' },
+      { ...bundle, appOrigin: 'https://other-team-app.course.example' },
       null,
     ]) {
       writeFileSync(bundlePath, JSON.stringify(invalid), { mode: 0o600 });
@@ -314,36 +330,6 @@ test('course bundle import refuses unrelated authority, malformed data and chang
   } finally { rmSync(parent, { recursive: true, force: true }); }
 });
 
-test('the operator recipe projects a provider credential into a private bundle without leaking refused secrets', () => {
-  const directory = mkdtempSync(join(tmpdir(), 'course-operator-'));
-  try {
-    const guide = readFileSync(new URL('../docs/setup/operator.md', import.meta.url), 'utf8');
-    const recipe = guide.match(/```js\n([\s\S]*?)```/)[1];
-    const script = join(directory, 'bundle.cjs'), credentialPath = join(directory, 'banana-credential.json'), bundlePath = join(directory, 'banana.json');
-    writeFileSync(script, recipe);
-    const credentials = { TunnelID: '11111111-1111-4111-8111-111111111111', AccountTag: 'a'.repeat(32), TunnelSecret: Buffer.alloc(32, 7).toString('base64') };
-    const env = { ...process.env, TEACHING_ACCOUNT_ID: credentials.AccountTag, TEACHING_DOMAIN: 'course.example', TUNNEL_ID: credentials.TunnelID, GROUP: 'banana', TEACHING_ADMIN: directory };
-    const run = () => spawnSync(process.execPath, [script], { encoding: 'utf8', env });
-    writeFileSync(credentialPath, JSON.stringify({ ...credentials, Endpoint: '' }), { mode: 0o600 });
-    assert.equal(run().status, 0);
-    const bundle = readFileSync(bundlePath);
-    assert.deepEqual(JSON.parse(bundle).credentials, credentials, 'provider-only Endpoint must not enter the bundle');
-    assert.equal(statSync(bundlePath).mode & 0o777, 0o600);
-    assert.equal(run().status, 1, 'must refuse overwriting a prior private delivery');
-    assert.deepEqual(readFileSync(bundlePath), bundle);
-    rmSync(bundlePath);
-    const malformedSecret = 'A'.repeat(42) + 'B=';
-    writeFileSync(credentialPath, JSON.stringify({ ...credentials, TunnelSecret: malformedSecret }));
-    const refused = run();
-    assert.equal(refused.status, 1);
-    assert.equal(existsSync(bundlePath), false);
-    assert(![refused.stdout, refused.stderr].some(value => value.includes(malformedSecret)), 'refusal must not print credential bytes');
-    writeFileSync(credentialPath, JSON.stringify({ ...credentials, Endpoint: 'https://custom-endpoint.example' }));
-    assert.equal(run().status, 1);
-    assert.equal(existsSync(bundlePath), false);
-  } finally { rmSync(directory, { recursive: true, force: true }); }
-});
-
 test('explicit supplied tunnel replacement preserves application state and repeats with the same bundle', () => {
   const parent = mkdtempSync(join(tmpdir(), 'setup-replace-'));
   const { state, bundlePath, credentials, bundle, binding } = courseFixture(parent);
@@ -375,10 +361,10 @@ test('explicit supplied tunnel replacement preserves application state and repea
 
 test('lost supplied credentials recover only through an explicit same-binding replacement', () => {
   const parent = mkdtempSync(join(tmpdir(), 'setup-lost-tunnel-'));
-  const state = join(parent, 'team'), bundlePath = join(parent, 'cherry.json');
+  const state = join(parent, 'team'), bundlePath = join(parent, 'other-team.json');
   const credentials = { TunnelID: '33333333-3333-4333-8333-333333333333', AccountTag: 'a'.repeat(32), TunnelSecret: Buffer.alloc(32, 3).toString('base64') };
-  const bundle = { version: 1, group: 'cherry', runtimeOrigin: 'https://cherry-verify.course.example', appOrigin: 'https://cherry-app.course.example', accountId: credentials.AccountTag, tunnelId: credentials.TunnelID, credentials };
-  const binding = ['--state', state, '--group', 'cherry', '--tunnel-bundle', bundlePath, '--runtime-origin', bundle.runtimeOrigin, '--app-origin', bundle.appOrigin];
+  const bundle = { version: 1, group: 'other-team', runtimeOrigin: 'https://other-team-verify.course.example', appOrigin: 'https://other-team-app.course.example', accountId: credentials.AccountTag, tunnelId: credentials.TunnelID, credentials };
+  const binding = ['--state', state, '--group', 'other-team', '--tunnel-bundle', bundlePath, '--runtime-origin', bundle.runtimeOrigin, '--app-origin', bundle.appOrigin];
   try {
     writeFileSync(bundlePath, JSON.stringify(bundle), { mode: 0o600 });
     assert.equal(invoke('prepare', ...binding, '--architecture', 'arm64').status, 0);
@@ -389,8 +375,8 @@ test('lost supplied credentials recover only through an explicit same-binding re
     const args = ['replace-tunnel', ...binding, '--from-tunnel', credentials.TunnelID];
     for (const invalid of [
       { ...replacement, accountId: 'b'.repeat(32), credentials: { ...replacement.credentials, AccountTag: 'b'.repeat(32) } },
-      { ...replacement, group: 'banana' },
-      { ...replacement, appOrigin: 'https://banana-app.course.example' },
+      { ...replacement, group: 'example-team' },
+      { ...replacement, appOrigin: 'https://example-team-app.course.example' },
       { ...replacement, ecosystem: {} },
     ]) {
       writeFileSync(bundlePath, JSON.stringify(invalid));

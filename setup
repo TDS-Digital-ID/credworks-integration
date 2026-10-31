@@ -13,12 +13,12 @@ The starter includes a private team.json. Keep the whole package private.
 Default state: $HOME/.local/share/credworks-team (outside the kit).
 
 Install Docker with Compose. Prepare downloads missing pinned images and verifies them.
-Course groups banana and cherry can import a private operator-issued tunnel bundle;
+Course teams can import a private operator-issued tunnel bundle;
 they need no Cloudflare account, login, domain purchase or host cloudflared command.
 Otherwise supply your own domain/account, install cloudflared and complete
 `cloudflared tunnel login` yourself. Domain registration may cost money.
 
-  ./setup prepare --state /absolute/private/banana --group banana --tunnel-bundle /absolute/private/banana.json --runtime-origin https://banana-verify.course-domain.example --app-origin https://banana-app.course-domain.example
+  ./setup prepare --state /absolute/private/example-team --group example-team --tunnel-bundle /absolute/private/example-team.json --runtime-origin https://example-team-verify.course-domain.example --app-origin https://example-team-app.course-domain.example
   ./setup up [--state /absolute/private/existing-team] [--tunnel-bundle /absolute/private/team.json]
   ./setup prepare --state /absolute/private/team --runtime-origin https://verify.your-domain --app-origin https://app.your-domain
   ./setup prepare --state /absolute/private/issuer --role issuer --runtime-origin https://issuer.your-domain [--definition /absolute/path/credential.json]
@@ -35,7 +35,7 @@ Otherwise supply your own domain/account, install cloudflared and complete
   ./setup doctor  --state /absolute/private/team
   ./setup stop    --state /absolute/private/team
   ./setup start   --state /absolute/private/team
-  ./setup replace-tunnel --state /absolute/private/banana --group banana --from-tunnel OLD_UUID --tunnel-bundle /absolute/private/banana-replacement.json --runtime-origin https://banana-verify.course-domain.example --app-origin https://banana-app.course-domain.example
+  ./setup replace-tunnel --state /absolute/private/example-team --group example-team --from-tunnel OLD_UUID --tunnel-bundle /absolute/private/example-team-replacement.json --runtime-origin https://example-team-verify.course-domain.example --app-origin https://example-team-app.course-domain.example
 
 prepare writes protected configuration and binds the group and exact origins.
 resume uses the supplied tunnel, or creates a named tunnel and DNS for an own-domain
@@ -46,7 +46,7 @@ It preserves keys, registration and accounts. In-flight verifications must resta
 replace-tunnel imports the operator's replacement and starts the saved installation.
 It preserves origins and application state. Provider retirement is operator-only.
 Keep one active host per group. Never share state or account credentials.
-See docs/setup/guide.md for setup and links to recovery and operator procedures.
+See docs/setup/guide.md for setup and recovery. Contact your operator for allocations.
 HELP
   exit 0
 fi

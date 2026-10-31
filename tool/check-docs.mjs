@@ -18,6 +18,9 @@ for (const section of ['education', 'partner', 'guides', 'setup']) {
     assert.deepEqual(index.map(p => p.slug), partnerPages.map(p => 'partner-'+p), 'DOCS_INDEX_INVALID');
     assert.deepEqual(index.map(p => p.source), partnerPages.map(p => p+'.md'), 'DOCS_INDEX_INVALID');
   }
+  if (section === 'setup') {
+    assert.deepEqual(index.map(p => [p.slug, p.source]), [['setup','guide.md'],['containers','containers.md'],['setup-operations','operations.md']], 'DOCS_INDEX_INVALID');
+  }
   const filename = page => page.source ?? page.slug+'.md';
   assert.deepEqual(readdirSync(directory).filter(p => p.endsWith('.md')).sort(), index.map(filename).sort(), 'DOCS_INDEX_INVALID');
   for (const page of index) {
